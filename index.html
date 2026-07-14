@@ -101,6 +101,7 @@
     .p-pitcher{left:50%;top:65%}.p-catcher{left:50%;top:89%}
     .grade-editor{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:10px}
     .grade-editor label{font-size:12px;font-weight:900}.grade-editor select{width:100%;padding:7px;border-radius:8px;border:1px solid #9cafc8;background:#fff;color:#111}
+    .ai-formula-note{margin:-2px 12px 12px;padding:8px;border-radius:8px;background:#e8f3ff;color:#23446d;font-size:10px;font-weight:800;line-height:1.5}
     .inputs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:10px}
     .inputs label{font-size:11px;font-weight:900;text-align:center}.inputs input{width:100%;padding:8px;border-radius:8px;border:1px solid #aac0d8;text-align:center;color:#111;background:#fff}
     .primary{display:block;width:calc(100% - 20px);margin:0 10px 10px;border:0;border-radius:12px;padding:13px;font-weight:1000;background:linear-gradient(#ffe75d,#ffb300);color:#15234d}
@@ -163,8 +164,9 @@
     .preloaded-data-panel p{margin:10px;color:#314d75;font-size:12px;line-height:1.6;font-weight:700}
     .embedded-status{margin:0 10px 10px;padding:9px;border-radius:8px;background:#e7f2ff;color:#23436c;font-size:11px;font-weight:800}
     .embedded-status.success{background:#d8f4d3;color:#1f5a26}
-    .secondary-data-button,.danger-data-button{display:block;width:calc(100% - 20px);margin:0 10px 8px;border:0;border-radius:9px;padding:11px;font-weight:1000}
+    .secondary-data-button,.danger-data-button,.ai-reassess-button{display:block;width:calc(100% - 20px);margin:0 10px 8px;border:0;border-radius:9px;padding:11px;font-weight:1000}
     .secondary-data-button{background:linear-gradient(#168bf2,#07429a);color:#fff}
+    .ai-reassess-button{background:linear-gradient(#ffe65e,#ffad00);color:#16234b}
     .danger-data-button{background:linear-gradient(#ff7482,#cb263d);color:#fff}
     @media(max-width:420px){.quick-actions-five{grid-template-columns:repeat(3,1fr)}}
 
@@ -376,7 +378,7 @@
     <button class="header-back" type="button" onclick="scrollTo({top:0,behavior:'smooth'})">‹</button>
     <div class="game-logo">
       <div class="logo-main">草野球AI査定</div>
-      <div class="logo-sub">BASEBALL SCOUTING SYSTEM</div><div class="visible-version">Ver.12・画像内蔵</div>
+      <div class="logo-sub">BASEBALL SCOUTING SYSTEM</div><div class="visible-version">Ver.13・AI自動更新</div>
     </div>
     <button class="header-star" type="button">★</button>
   </section>
@@ -498,6 +500,7 @@
     <div class="section-title">打撃成績入力（AI査定用）</div>
     <div class="inputs" id="inputs"></div>
     <button class="primary" id="assess">✨ AI査定を実行</button>
+    <div class="ai-formula-note">打率・長打率・四球率・三振率・打席数から、ミート・パワー・選球眼だけを更新します。</div>
   </section>
 
   <section class="section">
@@ -559,6 +562,7 @@
     <button class="primary" id="applyEmbeddedSeasonData">29選手の2026成績を反映</button>
     <div class="embedded-status" id="embeddedStatus">既存の手動能力と守備適性は保持して、29選手を必ず追加・更新します。</div>
     <button class="secondary-data-button" id="forceReloadEmbeddedData">データを強制再反映</button>
+    <button class="ai-reassess-button" id="reassessAllPlayers">全選手をAI一括再査定</button>
     <button class="danger-data-button" id="resetAppData">端末内データを初期化して29選手を入れる</button>
   </section>
 
@@ -907,6 +911,65 @@ function findEmbeddedExisting(row){
   });
 }
 
+
+function calculateAIBattingAbilities(player){
+  const s=player.stats||{};
+  const pa=Math.max(0,Number(s.pa)||0);
+  const ab=Math.max(0,Number(s.ab)||0);
+  const hits=Math.max(0,Number(s.hits)||0);
+  const doubles=Math.max(0,Number(s.doubles)||0);
+  const triples=Math.max(0,Number(s.triples)||0);
+  const hr=Math.max(0,Number(s.hr)||0);
+  const walks=Math.max(0,Number(s.walks)||0);
+  const so=Math.max(0,Number(s.so)||0);
+
+  if(pa===0 && ab===0){
+    return {contact:50,power:50,discipline:50};
+  }
+
+  const avg=ab>0?hits/ab:0;
+  const singles=Math.max(0,hits-doubles-triples-hr);
+  const totalBases=singles+doubles*2+triples*3+hr*4;
+  const slg=ab>0?totalBases/ab:0;
+  const walkRate=pa>0?walks/pa:0;
+  const strikeoutRate=pa>0?so/pa:0;
+
+  // Small samples are pulled toward league-average 50.
+  const reliability=Math.min(1,pa/25);
+  const rawContact=20+avg*170-strikeoutRate*35;
+  const rawPower=18+slg*115+(hr/Math.max(1,ab))*160;
+  const rawDiscipline=38+walkRate*300-strikeoutRate*95;
+
+  const blend=value=>Math.round(50+(value-50)*reliability);
+  const clamp=value=>Math.max(1,Math.min(100,value));
+
+  return {
+    contact:clamp(blend(rawContact)),
+    power:clamp(blend(rawPower)),
+    discipline:clamp(blend(rawDiscipline))
+  };
+}
+
+function applyAIBattingAssessment(player){
+  const result=calculateAIBattingAbilities(player);
+  player.abilities.contact=result.contact;
+  player.abilities.power=result.power;
+  player.abilities.discipline=result.discipline;
+  return result;
+}
+
+function reassessEveryPlayer(){
+  let assessed=0;
+  for(const player of data.players){
+    player.abilities ??= {contact:50,power:50,discipline:50,speed:50,arm:50,fielding:50,catching:50};
+    applyAIBattingAssessment(player);
+    assessed++;
+  }
+  saveLocal();
+  render();
+  return assessed;
+}
+
 function applyEmbedded2026Data(){
   let added=0,updated=0;
   for(const row of EMBEDDED_2026_DATA.players){
@@ -934,15 +997,16 @@ function applyEmbedded2026Data(){
       rbi:row.rbi,runs:row.r,walks:row.bb,so:row.so,
       sb:row.sb,cs:row.cs,sacrifice:row.sac
     };
+    applyAIBattingAssessment(p);
   }
   data.teamName=EMBEDDED_2026_DATA.teamName;
   data.teamResults={...EMBEDDED_2026_DATA.teamResults,importedAt:new Date().toISOString()};
   if(!data.selected && data.players[0])data.selected=data.players[0].id;
-  data.embeddedDatasetVersion="2026-07-13-v2";
+  data.embeddedDatasetVersion="2026-07-13-v3";
   saveLocal();
   render();
   embeddedStatus.className="embedded-status success";
-  embeddedStatus.textContent=`反映完了：登録${data.players.length}人（追加${added}・更新${updated}）。手動能力と守備適性は保持されています。`;
+  embeddedStatus.textContent=`反映完了：登録${data.players.length}人（追加${added}・更新${updated}）。ミート・パワー・選球眼をAI更新し、走力・肩力・守備力・捕球・守備適性は保持しました。`;
   toast("2026シーズンデータを反映しました");
 }
 
@@ -953,7 +1017,7 @@ let playerSort="number";
 data.teamName ??= "Romance";
 data.lineup ??= [];
 if(!data.selected && data.players.length)data.selected=data.players[0].id;
-if(data.embeddedDatasetVersion!=="2026-07-13-v2"){
+if(data.embeddedDatasetVersion!=="2026-07-13-v3"){
   setTimeout(()=>{
     applyEmbedded2026Data();
     embeddedStatus.className="embedded-status success";
@@ -1195,7 +1259,7 @@ function render(){
   document.querySelectorAll("[data-stat]").forEach(i=>i.oninput=e=>{p.stats[e.target.dataset.stat]=Math.max(0,+e.target.value||0);saveLocal();renderStatsOnly()});
 
   teamName.value=data.teamName;
-  if(typeof embeddedStatus!=="undefined" && embeddedStatus && data.embeddedDatasetVersion==="2026-07-13-v2"){
+  if(typeof embeddedStatus!=="undefined" && embeddedStatus && data.embeddedDatasetVersion==="2026-07-13-v3"){
     embeddedStatus.textContent=`Ver.10データ適用済み：現在${data.players.length}人登録`;
   }
   renderTeamSummary();
@@ -1265,11 +1329,11 @@ deletePlayer.onclick=()=>{
   data.selected=data.players[Math.max(0,idx-1)].id;saveLocal();render()
 };
 assess.onclick=()=>{
-  const p=current(),s=calcStats(p),st=p.stats;
-  p.abilities.contact=Math.max(1,Math.min(100,Math.round(s.avg*220+(st.pa?st.walks/st.pa*25:0))));
-  p.abilities.power=Math.max(1,Math.min(100,Math.round(s.slg*105)));
-  p.abilities.discipline=Math.max(1,Math.min(100,Math.round(st.pa?45+(st.walks/st.pa)*300-(st.so/st.pa)*80:50)));
-  saveLocal();render();toast("打撃能力だけAI査定しました")
+  const p=current();
+  applyAIBattingAssessment(p);
+  saveLocal();
+  render();
+  toast(`AI査定完了：ミート${p.abilities.contact}・パワー${p.abilities.power}・選球眼${p.abilities.discipline}`);
 };
 function downloadJson(){
   const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
@@ -1320,6 +1384,12 @@ forceReloadEmbeddedData.onclick=()=>{
   applyEmbedded2026Data();
   embeddedStatus.className="embedded-status success";
   embeddedStatus.textContent=`強制反映完了：現在${data.players.length}人を登録しています。`;
+};
+reassessAllPlayers.onclick=()=>{
+  const count=reassessEveryPlayer();
+  embeddedStatus.className="embedded-status success";
+  embeddedStatus.textContent=`AI一括再査定完了：${count}人のミート・パワー・選球眼を更新しました。`;
+  toast(`${count}人をAI再査定しました`);
 };
 resetAppData.onclick=()=>{
   if(!confirm("端末内の選手データを初期化し、PDF記載の29選手を入れ直しますか？\n手動入力した内容も削除されます。"))return;
