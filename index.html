@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#061a4d">
-<link rel="manifest" href="./manifest.webmanifest?v=20">
-<title>草野球AI査定 Ver.20</title>
+<link rel="manifest" href="./manifest.webmanifest?v=22">
+<title>草野球AI査定 Ver.22</title>
 <style>
 :root{--navy:#061a4d;--blue:#086bd3;--cyan:#55e7ff;--gold:#ffc928;--panel:#eef6ff}
 *{box-sizing:border-box}
@@ -15,7 +15,7 @@ button,input,select,textarea{font:inherit}
 .header{position:sticky;top:0;z-index:40;padding:calc(env(safe-area-inset-top) + 12px) 12px 12px;background:linear-gradient(#0a80ed,#032457);border-bottom:3px solid var(--cyan);text-align:center;color:#fff}
 .header h1{margin:0;color:#ffdf38;font-size:26px;text-shadow:2px 2px #06459b}
 .version{display:inline-block;margin-top:6px;padding:4px 10px;border-radius:999px;background:var(--gold);color:#14264d;font-size:11px;font-weight:900}
-.top-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;padding:8px}
+.top-actions{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;padding:8px}
 .top-actions button{border:1px solid var(--cyan);border-radius:10px;padding:10px 4px;background:linear-gradient(#0b79df,#04317b);color:#fff;font-weight:900}
 .card{margin:8px;border:2px solid var(--cyan);border-radius:16px;overflow:hidden;background:#fff;box-shadow:0 4px 10px #0006}
 .card-title{padding:10px;background:linear-gradient(#0b73db,#052661);color:#fff;text-align:center;font-size:18px;font-weight:900}
@@ -46,7 +46,7 @@ button,input,select,textarea{font:inherit}
 .abilities .grade{font-size:20px;font-weight:1000;text-align:center}
 .abilities .value{font-weight:1000;text-align:center}
 .abilities input{width:95%}
-.savebar{position:sticky;bottom:76px;z-index:20;display:grid;grid-template-columns:1fr 150px;gap:8px;align-items:center;padding:10px;background:#dceeff;border-top:2px solid var(--cyan)}
+.savebar{position:relative;bottom:auto;z-index:1;display:grid;grid-template-columns:1fr 150px;gap:8px;align-items:center;padding:10px;background:#dceeff;border-top:2px solid var(--cyan)}
 .savebar button{border:0;border-radius:10px;padding:12px;background:linear-gradient(#ffe85e,#ffad00);font-weight:1000}
 .savebar button:disabled{background:#c9d2dc;color:#777}
 .stats-grid{display:grid;grid-template-columns:repeat(5,1fr)}
@@ -72,13 +72,45 @@ button,input,select,textarea{font:inherit}
 .bottom button{border:1px solid #43cfff;border-radius:10px;padding:8px 2px;background:linear-gradient(#0b73d4,#063075);color:#fff;font-weight:900;font-size:11px}
 textarea{width:100%;min-height:100px}
 @media(max-width:430px){.hero{grid-template-columns:48% 1fr}.character{height:250px}.abilities .row{grid-template-columns:86px 30px 36px 1fr}}
+
+.grade-A{color:#ec3d89!important}.grade-B{color:#ff7a52!important}.grade-C{color:#f1bd00!important}.grade-D{color:#52be45!important}.grade-E{color:#2c9de0!important}.grade-F{color:#7762d7!important}.grade-G{color:#6f7884!important}
+.abilities .grade,.abilities .value{text-shadow:0 1px #fff;font-weight:1000}
+.field-wrap{padding:10px;background:#eaf4ff}
+.field{position:relative;height:350px;margin:0;border-radius:16px;overflow:hidden;background:
+repeating-linear-gradient(100deg,#58bd48 0 26px,#4eaf42 26px 52px)}
+.outfield-arc{position:absolute;left:-8%;right:-8%;top:-10%;height:72%;border-radius:0 0 50% 50%;border-bottom:4px solid #fff8}
+.infield-dirt{position:absolute;left:50%;top:58%;width:220px;height:220px;transform:translate(-50%,-50%) rotate(45deg);background:#c98743;border:3px solid #e9b777}
+.infield-grass{position:absolute;left:50%;top:58%;width:145px;height:145px;transform:translate(-50%,-50%) rotate(45deg);background:#43aa3e}
+.base{position:absolute;width:18px;height:18px;background:#fff;border:1px solid #ddd;transform:rotate(45deg);z-index:3}
+.base.home{left:calc(50% - 9px);top:86%}.base.first{left:72%;top:63%}.base.second{left:calc(50% - 9px);top:40%}.base.third{left:27%;top:63%}
+.mound{position:absolute;left:50%;top:62%;width:28px;height:18px;transform:translate(-50%,-50%);border-radius:50%;background:#d79a55;z-index:2}
+.pos{z-index:5}
+.smart-import{padding:12px;background:#f4f8ff}
+.smart-import p{margin:0 0 10px;font-size:12px;line-height:1.6;color:#405d7f;font-weight:700}
+.smart-import button{width:100%;border:0;border-radius:10px;padding:11px;background:linear-gradient(#0d79dd,#073477);color:#fff;font-weight:900;margin-bottom:8px}
+.smart-import details{border:1px solid #bed0e3;border-radius:9px;background:#fff;padding:8px}
+.smart-import summary{font-size:12px;font-weight:900;color:#173b69}
+.smart-status{padding:9px;border-radius:8px;background:#e4eef9;font-size:12px;font-weight:800;margin-bottom:8px}
+.smart-status.success{background:#d8f3d2;color:#245d2b}.smart-status.error{background:#ffd9df;color:#8b2030}
+#deletePlayer{background:linear-gradient(#ff6f7e,#c62940)}
+
+
+.abilities{padding-bottom:0}
+.savebar{margin-top:0;border-top:2px solid var(--cyan);box-shadow:none}
+.share-panel{padding:12px;background:#f4f8ff}
+.share-panel p{margin:0 0 10px;font-size:12px;line-height:1.6;color:#405d7f;font-weight:700}
+.share-panel button{width:100%;border:0;border-radius:10px;padding:12px;margin-bottom:8px;background:linear-gradient(#0d79dd,#073477);color:#fff;font-weight:900}
+.share-panel button:nth-of-type(2){background:linear-gradient(#eef4fb,#cbd8e6);color:#17395f}
+.share-note{padding:9px;border-radius:8px;background:#e5effa;color:#49627e;font-size:11px;font-weight:800;line-height:1.5}
+#shareData{background:linear-gradient(#20a86a,#087947)}
+
 </style>
 </head>
 <body>
 <div class="app">
-<header class="header"><h1>草野球AI査定</h1><div class="version">Ver.20 完成版</div></header>
+<header class="header"><h1>草野球AI査定</h1><div class="version">Ver.22 保存・共有修正版</div></header>
 <section class="top-actions">
-<button id="addPlayer">＋選手</button><button id="applySeason">29選手反映</button><button id="saveJson">JSON保存</button><button id="loadJson">JSON読込</button>
+<button id="addPlayer">＋選手</button><button id="deletePlayer">選手削除</button><button id="applySeason">29選手反映</button><button id="smartImportTop">SmartScorer</button><button id="saveJson">JSON保存</button><button id="shareData">データ共有</button><button id="loadJson">JSON読込</button>
 </section>
 <section class="card"><div class="player-strip" id="playerStrip"></div></section>
 <section class="card" id="detailCard">
@@ -99,12 +131,47 @@ textarea{width:100%;min-height:100px}
 </section>
 <section class="card"><div class="card-title">能力</div><div class="abilities" id="abilities"></div><div class="savebar"><div><b id="saveState">保存済み</b><small>保存すると総合・一覧・ランキングへ反映</small></div><button id="saveAbilities" disabled>能力値を保存</button></div></section>
 <section class="card"><div class="card-title">打撃成績</div><div class="stats-grid" id="statsGrid"></div><div style="padding:10px"><button id="aiAssess">AI打撃査定</button></div></section>
-<section class="card"><div class="card-title">守備適性</div><div class="field" id="field"></div><div class="grade-editor" id="gradeEditor"></div></section>
+<section class="card"><div class="card-title">守備適性</div>
+    <div class="field-wrap">
+      <div class="field" id="field">
+        <div class="outfield-arc"></div>
+        <div class="infield-dirt"></div>
+        <div class="infield-grass"></div>
+        <div class="base home"></div>
+        <div class="base first"></div>
+        <div class="base second"></div>
+        <div class="base third"></div>
+        <div class="mound"></div>
+      </div>
+    </div>
+    <div class="grade-editor" id="gradeEditor"></div></section>
+<section class="card" id="shareCard">
+<div class="card-title">データ共有</div>
+<div class="share-panel">
+  <p>全選手の能力・成績・守備適性・メモをJSONファイルにして共有します。</p>
+  <button id="shareDataMain">アプリデータを共有</button>
+  <button id="downloadBackup">共有できない場合：JSONを保存</button>
+  <div class="share-note">iPhoneではLINE、メール、AirDrop、ファイル保存などを選べます。</div>
+</div>
+</section>
+<section class="card" id="smartImportCard">
+<div class="card-title">SmartScorer読込</div>
+<div class="smart-import">
+  <p>SmartScorerの「試合結果・集計・スタッツ」PDFを選択します。SafariでPDF解析できない場合は、スタッツ表の文字を貼り付けて読み込めます。</p>
+  <button id="smartPdfButton">PDFを選択</button>
+  <div id="smartStatus" class="smart-status">未読込</div>
+  <details>
+    <summary>PDFが読めない場合：文字を貼り付ける</summary>
+    <textarea id="smartText" placeholder="例：8 山本 永遠 .286 .400 .381 .400 7 25 21 6 4 2 0 0 1 4 0 4 3 0 0 0 0"></textarea>
+    <button id="smartTextButton">貼り付けデータを読み込む</button>
+  </details>
+</div>
+</section>
 <section class="card" id="rankingCard"><div class="card-title">チーム内ランキング</div><div class="rank-guide" id="rankGuide"></div><div class="rank-tabs" id="rankTabs"></div><div id="rankList"></div></section>
 <section class="card"><div class="card-title">監督メモ</div><div style="padding:10px"><textarea id="note"></textarea></div></section>
 </div>
 <div class="bottom"><div class="bottom-inner"><button data-go="#detailCard">選手</button><button data-go=".abilities">能力</button><button data-go=".field">守備</button><button data-go="#rankingCard">順位</button><button data-go=".top-actions">メニュー</button></div></div>
-<input id="jsonFile" type="file" accept=".json,application/json" hidden>
+<input id="jsonFile" type="file" accept=".json,application/json" hidden><input id="smartPdfFile" type="file" accept=".pdf,application/pdf" hidden>
 <script>
 const STORAGE="kusayakyu_ai_v20";
 const POSITIONS=["投手","捕手","一塁手","二塁手","三塁手","遊撃手","左翼手","中堅手","右翼手"];
@@ -169,7 +236,7 @@ function render(){
  throwImg.className=`throw ${p.pose==="throw"?"active":""} ${p.throwHand==="左"?"left":""}`;
  batImg.className=`bat ${p.pose==="bat"?"active":""} ${p.batHand==="左"?"left":""}`;
  poseThrow.classList.toggle("active",p.pose==="throw");poseBat.classList.toggle("active",p.pose==="bat");
- abilities.innerHTML=ABILITIES.map(([k,l,m])=>`<div class="row"><label>${l}<small>${m}</small></label><span class="grade">${grade(p.abilities[k])}</span><span class="value">${p.abilities[k]}</span><input type="range" min="1" max="100" value="${p.abilities[k]}" data-ability="${k}"></div>`).join("");
+ abilities.innerHTML=ABILITIES.map(([k,l,m])=>`<div class="row"><label>${l}<small>${m}</small></label><span class="grade grade-${grade(p.abilities[k])}">${grade(p.abilities[k])}</span><span class="value grade-${grade(p.abilities[k])}">${p.abilities[k]}</span><input type="range" min="1" max="100" value="${p.abilities[k]}" data-ability="${k}"></div>`).join("");
  statsGrid.innerHTML=statsItems(p).map(([l,v])=>`<div class="stat"><b>${l}</b><span>${v}</span></div>`).join("");
  field.innerHTML=fieldMarkup(p);
  gradeEditor.innerHTML=POSITIONS.map(pos=>`<label>${pos}<select data-grade="${pos}">${GRADES.map(g=>`<option ${p.grades[pos]===g?"selected":""}>${g}</option>`).join("")}</select></label>`).join("");
@@ -178,7 +245,11 @@ function render(){
  renderRanking();
 }
 function statsItems(p){const s=p.stats,c=calc(p);return [["試合",s.games],["打席",s.pa],["打数",s.ab],["安打",s.hits],["打率",c.avg.toFixed(3).replace(/^0/,"")],["本塁打",s.hr],["打点",s.rbi],["得点",s.runs],["四死球",s.walks],["三振",s.so],["盗塁",s.sb],["出塁率",c.obp.toFixed(3).replace(/^0/,"")],["長打率",c.slg.toFixed(3).replace(/^0/,"")],["OPS",c.ops.toFixed(3).replace(/^0/,"")]]}
-function fieldMarkup(p){const cls={"投手":"p-p","捕手":"p-c","一塁手":"p-1","二塁手":"p-2","三塁手":"p-3","遊撃手":"p-ss","左翼手":"p-lf","中堅手":"p-cf","右翼手":"p-rf"};return POSITIONS.map(pos=>`<div class="pos ${cls[pos]}">${pos}<br>${p.grades[pos]}</div>`).join("")}
+function fieldMarkup(p){
+ const cls={"投手":"p-p","捕手":"p-c","一塁手":"p-1","二塁手":"p-2","三塁手":"p-3","遊撃手":"p-ss","左翼手":"p-lf","中堅手":"p-cf","右翼手":"p-rf"};
+ const bg=`<div class="outfield-arc"></div><div class="infield-dirt"></div><div class="infield-grass"></div><div class="base home"></div><div class="base first"></div><div class="base second"></div><div class="base third"></div><div class="mound"></div>`;
+ return bg+POSITIONS.map(pos=>`<div class="pos ${cls[pos]}">${pos}<br><span class="grade-${p.grades[pos]}">${p.grades[pos]}</span></div>`).join("");
+}
 function qualification(){return Math.ceil((+data.teamResults?.games||Math.max(0,...data.players.map(p=>+p.stats.games||0)))*1.1)}
 function rankValue(p,k){const s=p.stats,c=calc(p);if(k==="overall")return overall(p);if(k in p.abilities)return p.abilities[k];return {avg:c.avg,hits:+s.hits||0,doubles:+s.doubles||0,triples:+s.triples||0,hr:+s.hr||0,rbi:+s.rbi||0,runs:+s.runs||0,sb:+s.sb||0,walks:+s.walks||0,so:+s.so||0,obp:c.obp,slg:c.slg,ops:c.ops}[k]||0}
 function renderRanking(){
@@ -192,7 +263,10 @@ function renderRanking(){
 playerStrip.addEventListener("click",e=>{const b=e.target.closest("[data-id]");if(!b)return;data.selected=b.dataset.id;save();render()});
 rankTabs.addEventListener("click",e=>{const b=e.target.closest("[data-rank]");if(!b)return;rankingKey=b.dataset.rank;renderRanking()});
 rankList.addEventListener("click",e=>{const b=e.target.closest("[data-player]");if(!b)return;if(dirty&&!confirm("未保存の能力変更があります。保存せず移動しますか？"))return;data.selected=b.dataset.player;save();render();setTimeout(()=>detailCard.scrollIntoView({behavior:"smooth"}),50)});
-abilities.addEventListener("input",e=>{const k=e.target.dataset.ability;if(!k)return;current().abilities[k]=+e.target.value;dirty=true;saveState.textContent="未保存";saveAbilities.disabled=false;const row=e.target.closest(".row");row.querySelector(".value").textContent=e.target.value;row.querySelector(".grade").textContent=grade(+e.target.value);const ov=overall(current());overallGrade.textContent=grade(ov);overallNum.textContent=ov});
+abilities.addEventListener("input",e=>{const k=e.target.dataset.ability;if(!k)return;current().abilities[k]=+e.target.value;dirty=true;saveState.textContent="未保存";saveAbilities.disabled=false;const row=e.target.closest(".row");const g=grade(+e.target.value);
+    const gv=row.querySelector(".grade"),vv=row.querySelector(".value");
+    gv.textContent=g;vv.textContent=e.target.value;
+    gv.className=`grade grade-${g}`;vv.className=`value grade-${g}`;const ov=overall(current());overallGrade.textContent=grade(ov);overallNum.textContent=ov});
 saveAbilities.onclick=()=>{save();dirty=false;saveState.textContent="保存済み・ランキング更新完了";saveAbilities.disabled=true;renderRanking();playerStrip.querySelectorAll(".player-chip").forEach(()=>{})};
 number.oninput=()=>{current().number=+number.value||0};name.oninput=()=>{current().name=name.value};
 throwHand.onchange=()=>{current().throwHand=throwHand.value;save();render()};batHand.onchange=()=>{current().batHand=batHand.value;save();render()};
@@ -203,12 +277,142 @@ note.oninput=()=>{current().note=note.value;save()};
 aiAssess.onclick=()=>{aiAssessPlayer(current());save();render()};
 addPlayer.onclick=()=>{const p=normalizePlayer({id:crypto.randomUUID(),number:data.players.length+1,name:"新規選手"});data.players.push(p);data.selected=p.id;save();render()};
 applySeason.onclick=()=>{const existing=new Map(data.players.map(p=>[p.name.replace(/\s/g,""),p]));for(const raw of clone(BASE_PLAYERS)){const key=raw.name.replace(/\s/g,"");const old=existing.get(key);if(old){old.stats=raw.stats;aiAssessPlayer(old)}else{const p=normalizePlayer(raw);aiAssessPlayer(p);data.players.push(p)}}data.teamResults={games:7,wins:2,losses:5,runsFor:33,runsAgainst:56};save();render()};
-saveJson.onclick=()=>{const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="kusayakyu_ai_v20.json";a.click();URL.revokeObjectURL(a.href)};
+
+deletePlayer.onclick=()=>{
+  if(data.players.length<=1){alert("最後の1人は削除できません");return}
+  const p=current();
+  if(!confirm(`${p.name}を削除しますか？`))return;
+  const idx=data.players.findIndex(x=>x.id===p.id);
+  data.players.splice(idx,1);
+  data.selected=data.players[Math.max(0,idx-1)].id;
+  save();render();
+};
+
+function parseSmartText(text){
+  const rows=[];
+  for(const raw of String(text).split(/\n+/)){
+    const parts=raw.trim().split(/\s+/);
+    if(!parts.length)continue;
+    let number=0,start=0;
+    if(/^\d+$/.test(parts[0])){number=+parts[0];start=1}
+    let rateIdx=-1;
+    for(let i=start+1;i<parts.length;i++){
+      if(/^(\.\d{3}|1\.000|-)$/.test(parts[i])){rateIdx=i;break}
+    }
+    if(rateIdx<start+1)continue;
+    const name=parts.slice(start,rateIdx).join(" ");
+    const v=parts.slice(rateIdx);
+    if(v.length<18)continue;
+    const n=x=>x==="-"?0:(Number(x)||0);
+    rows.push({number,name,stats:{games:n(v[4]),pa:n(v[5]),ab:n(v[6]),hits:n(v[7]),doubles:n(v[9]),triples:n(v[10]),hr:n(v[11]),runs:n(v[12]),rbi:n(v[13]),sac:n(v[14]),walks:n(v[15]),so:n(v[16]),sb:n(v[18]),cs:n(v[19])}});
+  }
+  return rows;
+}
+
+function applySmartRows(rows){
+  let added=0,updated=0;
+  for(const row of rows){
+    const key=row.name.replace(/\s/g,"");
+    let p=data.players.find(x=>x.name.replace(/\s/g,"")===key);
+    if(!p){
+      p=normalizePlayer({id:crypto.randomUUID(),number:row.number,name:row.name});
+      data.players.push(p);added++;
+    }else updated++;
+    p.number=row.number||p.number;
+    p.stats=Object.assign(p.stats,row.stats);
+    aiAssessPlayer(p);
+  }
+  save();render();
+  return {added,updated};
+}
+
+smartTextButton.onclick=()=>{
+  const rows=parseSmartText(smartText.value);
+  if(!rows.length){smartStatus.className="smart-status error";smartStatus.textContent="選手データを検出できませんでした";return}
+  const result=applySmartRows(rows);
+  smartStatus.className="smart-status success";
+  smartStatus.textContent=`読込完了：${result.added}人追加、${result.updated}人更新`;
+};
+
+smartImportTop.onclick=()=>smartImportCard.scrollIntoView({behavior:"smooth"});
+smartPdfButton.onclick=()=>smartPdfFile.click();
+smartPdfFile.onchange=async()=>{
+  const file=smartPdfFile.files?.[0];if(!file)return;
+  smartStatus.className="smart-status";smartStatus.textContent="PDF解析中…";
+  try{
+    const pdfjs=await import("https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.min.mjs");
+    pdfjs.GlobalWorkerOptions.workerSrc="https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.worker.min.mjs";
+    const pdf=await pdfjs.getDocument({data:new Uint8Array(await file.arrayBuffer())}).promise;
+    let text="";
+    for(let i=1;i<=pdf.numPages;i++){
+      const page=await pdf.getPage(i);
+      const content=await page.getTextContent();
+      const lines={};
+      for(const item of content.items){
+        const y=Math.round(item.transform[5]);
+        (lines[y]??=[]).push({x:item.transform[4],t:item.str});
+      }
+      text+=Object.entries(lines).sort((a,b)=>b[0]-a[0]).map(([,items])=>items.sort((a,b)=>a.x-b.x).map(x=>x.t).join(" ")).join("\n")+"\n";
+    }
+    const rows=parseSmartText(text);
+    if(!rows.length)throw new Error("スタッツを検出できません");
+    const result=applySmartRows(rows);
+    smartStatus.className="smart-status success";
+    smartStatus.textContent=`PDF読込完了：${result.added}人追加、${result.updated}人更新`;
+  }catch(err){
+    smartStatus.className="smart-status error";
+    smartStatus.textContent="PDFを解析できませんでした。下の文字貼り付け読込を使ってください。";
+  }finally{smartPdfFile.value=""}
+};
+
+
+function createBackupFile(){
+  save();
+  const stamp=new Date().toISOString().slice(0,10).replaceAll("-","");
+  const json=JSON.stringify(data,null,2);
+  return new File([json],`kusayakyu_ai_backup_${stamp}.json`,{type:"application/json"});
+}
+
+async function shareAppData(){
+  try{
+    const file=createBackupFile();
+    if(navigator.share && navigator.canShare?.({files:[file]})){
+      await navigator.share({
+        title:"草野球AI査定 データ",
+        text:`${data.teamName||"チーム"}の選手データです。`,
+        files:[file]
+      });
+      return;
+    }
+    downloadBackupFile();
+    alert("この環境では直接共有できないため、JSONファイルを保存しました。");
+  }catch(err){
+    if(err?.name==="AbortError")return;
+    downloadBackupFile();
+    alert("共有できなかったため、JSONファイルを保存しました。");
+  }
+}
+
+function downloadBackupFile(){
+  const file=createBackupFile();
+  const url=URL.createObjectURL(file);
+  const a=document.createElement("a");
+  a.href=url;
+  a.download=file.name;
+  a.click();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+
+shareData.onclick=shareAppData;
+shareDataMain.onclick=shareAppData;
+downloadBackup.onclick=downloadBackupFile;
+
+saveJson.onclick=downloadBackupFile;
 loadJson.onclick=()=>jsonFile.click();jsonFile.onchange=async()=>{try{const obj=JSON.parse(await jsonFile.files[0].text());if(!obj.players)throw 0;data=obj;data.players=data.players.map(normalizePlayer);save();render()}catch{alert("JSONを読み込めませんでした")}jsonFile.value=""};
 document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>document.querySelector(b.dataset.go)?.scrollIntoView({behavior:"smooth"}));
 window.addEventListener("beforeunload",e=>{if(dirty){e.preventDefault();e.returnValue=""}});
 save();render();
-if("serviceWorker"in navigator)navigator.serviceWorker.register("./sw.js?v=20").catch(()=>{});
+if("serviceWorker"in navigator)navigator.serviceWorker.register("./sw.js?v=22").catch(()=>{});
 </script>
 </body>
 </html>
