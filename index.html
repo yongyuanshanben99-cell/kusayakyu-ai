@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#061a4d">
-<link rel="manifest" href="./manifest.webmanifest?v=33">
-<title>草野球AI査定 Ver.33</title>
+<link rel="manifest" href="./manifest.webmanifest?v=34">
+<title>草野球AI査定 Ver.34</title>
 <style>
 :root{--navy:#061a4d;--blue:#086bd3;--cyan:#55e7ff;--gold:#ffc928;--panel:#eef6ff}
 *{box-sizing:border-box}
@@ -171,14 +171,14 @@ repeating-linear-gradient(100deg,#58bd48 0 26px,#4eaf42 26px 52px)}
 .viewer-guide{padding:12px;background:#f4f8ff;color:#24476f}
 .viewer-guide p{margin:0 0 8px;font-size:12px;line-height:1.6;font-weight:800}
 .viewer-guide ul{margin:0 0 12px;padding-left:20px;font-size:11px;line-height:1.8}
-.viewer-direct-note{display:block;text-align:center;border-radius:10px;padding:12px;background:linear-gradient(#20a86a,#087947);color:#fff;font-weight:900;font-size:12px;line-height:1.5}
+.viewer-guide a{display:block;text-align:center;text-decoration:none;border-radius:10px;padding:12px;background:linear-gradient(#20a86a,#087947);color:#fff;font-weight:900}
 #shareReadonly,#shareReadonlyMain{background:linear-gradient(#20a86a,#087947)}
 
 </style>
 </head>
 <body>
 <div class="app">
-<header class="header"><h1>草野球AI査定</h1><div class="version">Ver.33 ワンタップ閲覧共有</div></header>
+<header class="header"><h1>草野球AI査定</h1><div class="version">Ver.34 起動修正版</div></header>
 <section class="top-actions">
 <button id="addPlayer">＋選手</button><button id="deletePlayer">選手削除</button><button id="applySeason">29選手反映</button><button id="smartImportTop">SmartScorer</button><button id="saveJson">JSON保存</button><button id="shareData">編集用データ共有</button><button id="shareReadonly">閲覧専用HTML共有</button><button id="teamPageBtn">チーム分析</button><button id="bestNineBtn">AIベストナイン</button><button id="loadJson">JSON読込</button>
 </section>
@@ -218,14 +218,14 @@ repeating-linear-gradient(100deg,#58bd48 0 26px,#4eaf42 26px 52px)}
 <section class="card" id="viewerGuideCard">
 <div class="card-title">閲覧専用HTML共有</div>
 <div class="viewer-guide">
-  <p>閲覧専用HTMLを送ると、相手はファイルを開くだけで選手・能力・成績・守備適性・ランキングを確認できます。</p>
+  <p>閲覧専用データを送ると、相手は選手・能力・成績・守備適性・ランキングを確認できます。</p>
   <ul>
     <li>選手追加・削除はできません</li>
     <li>能力値や守備適性は変更できません</li>
     <li>AI査定やデータ保存はできません</li>
     <li>あなたの元データには影響しません</li>
   </ul>
-  <div class="viewer-direct-note">相手側でJSONを選ぶ操作は不要です。受け取ったHTMLを開くだけで閲覧できます。</div>
+  <a href="./viewer.html" target="_blank" rel="noopener">閲覧専用ビューアを開く</a>
 </div>
 </section>
 <section class="card" id="shareCard">
@@ -594,11 +594,13 @@ smartPdfFile.onchange=async()=>{
 
 
 
+const READONLY_VIEWER_TEMPLATE_B64="PCFkb2N0eXBlIGh0bWw+CjxodG1sIGxhbmc9ImphIj4KPGhlYWQ+CjxtZXRhIGNoYXJzZXQ9InV0Zi04Ij4KPG1ldGEgbmFtZT0idmlld3BvcnQiIGNvbnRlbnQ9IndpZHRoPWRldmljZS13aWR0aCxpbml0aWFsLXNjYWxlPTEsdmlld3BvcnQtZml0PWNvdmVyIj4KPG1ldGEgbmFtZT0idGhlbWUtY29sb3IiIGNvbnRlbnQ9IiMwNjFhNGQiPgo8dGl0bGU+6I2J6YeO55CDQUnmn7vlrpog6Zay6Kan5bCC55So44OT44Ol44O844KiPC90aXRsZT4KPHN0eWxlPgo6cm9vdHstLW5hdnk6IzA2MWE0ZDstLWJsdWU6IzA4NmJkMzstLWN5YW46IzU1ZTdmZjstLWdvbGQ6I2ZmYzkyOH0KKntib3gtc2l6aW5nOmJvcmRlci1ib3h9CmJvZHl7bWFyZ2luOjA7YmFja2dyb3VuZDojMDYxYTRkO2ZvbnQtZmFtaWx5Oi1hcHBsZS1zeXN0ZW0sQmxpbmtNYWNTeXN0ZW1Gb250LCJIaXJhZ2lubyBLYWt1IEdvdGhpYyBQcm9OIiwiWXUgR290aGljIixzYW5zLXNlcmlmO2NvbG9yOiMxMDI4NTh9CmJ1dHRvbixpbnB1dHtmb250OmluaGVyaXR9Ci5hcHB7bWF4LXdpZHRoOjY0MHB4O21hcmdpbjphdXRvO3BhZGRpbmctYm90dG9tOjQwcHh9Ci5oZWFkZXJ7cG9zaXRpb246c3RpY2t5O3RvcDowO3otaW5kZXg6MzA7cGFkZGluZzpjYWxjKGVudihzYWZlLWFyZWEtaW5zZXQtdG9wKSArIDEycHgpIDEycHggMTJweDtiYWNrZ3JvdW5kOmxpbmVhci1ncmFkaWVudCgjMGE4MGVkLCMwMzI0NTcpO2JvcmRlci1ib3R0b206M3B4IHNvbGlkIHZhcigtLWN5YW4pO3RleHQtYWxpZ246Y2VudGVyO2NvbG9yOiNmZmZ9Ci5oZWFkZXIgaDF7bWFyZ2luOjA7Y29sb3I6I2ZmZGYzODtmb250LXNpemU6MjRweDt0ZXh0LXNoYWRvdzoycHggMnB4ICMwNjQ1OWJ9Ci5iYWRnZXtkaXNwbGF5OmlubGluZS1ibG9jazttYXJnaW4tdG9wOjZweDtwYWRkaW5nOjRweCAxMHB4O2JvcmRlci1yYWRpdXM6OTk5cHg7YmFja2dyb3VuZDojMjFhODZiO2NvbG9yOiNmZmY7Zm9udC1zaXplOjExcHg7Zm9udC13ZWlnaHQ6OTAwfQoubG9hZC1wYW5lbHttYXJnaW46MTBweDtib3JkZXI6MnB4IHNvbGlkIHZhcigtLWN5YW4pO2JvcmRlci1yYWRpdXM6MTRweDtwYWRkaW5nOjEycHg7YmFja2dyb3VuZDojZjNmOGZmfQoubG9hZC1wYW5lbCBwe21hcmdpbjowIDAgMTBweDtmb250LXNpemU6MTJweDtsaW5lLWhlaWdodDoxLjY7Zm9udC13ZWlnaHQ6ODAwfQoubG9hZC1wYW5lbCBidXR0b257d2lkdGg6MTAwJTtib3JkZXI6MDtib3JkZXItcmFkaXVzOjEwcHg7cGFkZGluZzoxMnB4O2JhY2tncm91bmQ6bGluZWFyLWdyYWRpZW50KCMwZDc5ZGQsIzA3MzQ3Nyk7Y29sb3I6I2ZmZjtmb250LXdlaWdodDo5MDB9Ci5zdGF0dXN7bWFyZ2luLXRvcDo4cHg7cGFkZGluZzo4cHg7Ym9yZGVyLXJhZGl1czo4cHg7YmFja2dyb3VuZDojZTVlZWY4O2ZvbnQtc2l6ZToxMXB4O2ZvbnQtd2VpZ2h0OjgwMH0KLnBsYXllci1zdHJpcHtkaXNwbGF5OmZsZXg7Z2FwOjdweDtvdmVyZmxvdzphdXRvO3BhZGRpbmc6OHB4O2JhY2tncm91bmQ6IzA2MzE2ZX0KLnBsYXllci1jaGlwe2ZsZXg6MCAwIGF1dG87Ym9yZGVyOjJweCBzb2xpZCAjNzVlOGZmO2JvcmRlci1yYWRpdXM6MTBweDtwYWRkaW5nOjhweCAxMnB4O2JhY2tncm91bmQ6IzBiNjFiODtjb2xvcjojZmZmO2ZvbnQtd2VpZ2h0OjkwMH0KLnBsYXllci1jaGlwLmFjdGl2ZXtib3JkZXItY29sb3I6I2ZmZDMyOTtiYWNrZ3JvdW5kOiMwOTQwODd9Ci5jYXJke21hcmdpbjo4cHg7Ym9yZGVyOjJweCBzb2xpZCB2YXIoLS1jeWFuKTtib3JkZXItcmFkaXVzOjE2cHg7b3ZlcmZsb3c6aGlkZGVuO2JhY2tncm91bmQ6I2ZmZjtib3gtc2hhZG93OjAgNHB4IDEwcHggIzAwMDZ9Ci5jYXJkLXRpdGxle3BhZGRpbmc6MTBweDtiYWNrZ3JvdW5kOmxpbmVhci1ncmFkaWVudCgjMGI3M2RiLCMwNTI2NjEpO2NvbG9yOiNmZmY7dGV4dC1hbGlnbjpjZW50ZXI7Zm9udC1zaXplOjE4cHg7Zm9udC13ZWlnaHQ6OTAwfQoucGxheWVyLWhlYWR7ZGlzcGxheTpncmlkO2dyaWQtdGVtcGxhdGUtY29sdW1uczo2MHB4IDFmciA5MHB4O2dhcDo4cHg7cGFkZGluZzoxMHB4O2JhY2tncm91bmQ6bGluZWFyLWdyYWRpZW50KCMwZDdlZWEsIzA1Mzk4Nyk7Y29sb3I6I2ZmZjthbGlnbi1pdGVtczpjZW50ZXJ9Ci5wbGF5ZXItaGVhZCAubnVtYmVye2ZvbnQtc2l6ZToyOHB4O2ZvbnQtd2VpZ2h0OjEwMDA7dGV4dC1hbGlnbjpjZW50ZXJ9Ci5wbGF5ZXItaGVhZCAubmFtZXtmb250LXNpemU6MjJweDtmb250LXdlaWdodDoxMDAwfQoucGxheWVyLWhlYWQgLm92ZXJhbGx7dGV4dC1hbGlnbjpjZW50ZXJ9Ci5wbGF5ZXItaGVhZCAub3ZlcmFsbCBzdHJvbmd7ZGlzcGxheTpibG9jaztmb250LXNpemU6MzZweDtjb2xvcjojZmZjZjI4fQouaW5mby1ncmlke2Rpc3BsYXk6Z3JpZDtncmlkLXRlbXBsYXRlLWNvbHVtbnM6cmVwZWF0KDMsMWZyKTtnYXA6MXB4O2JhY2tncm91bmQ6I2JmZDFlNn0KLmluZm8tZ3JpZCBkaXZ7YmFja2dyb3VuZDojZmZmO3BhZGRpbmc6MTBweCA0cHg7dGV4dC1hbGlnbjpjZW50ZXJ9Ci5pbmZvLWdyaWQgc3BhbntkaXNwbGF5OmJsb2NrO2ZvbnQtc2l6ZToxMHB4O2ZvbnQtd2VpZ2h0OjkwMDtjb2xvcjojNTU3MDhkfQouaW5mby1ncmlkIHN0cm9uZ3tkaXNwbGF5OmJsb2NrO21hcmdpbi10b3A6NHB4fQouYWJpbGl0aWVzIC5yb3d7ZGlzcGxheTpncmlkO2dyaWQtdGVtcGxhdGUtY29sdW1uczoxMDBweCAzNnB4IDQ2cHggMWZyO2FsaWduLWl0ZW1zOmNlbnRlcjtib3JkZXItdG9wOjFweCBzb2xpZCAjY2NkOWU4fQouYWJpbGl0aWVzIGxhYmVse3BhZGRpbmc6MTJweDtiYWNrZ3JvdW5kOiNlOWYzZmY7Zm9udC13ZWlnaHQ6OTAwfQouYWJpbGl0aWVzIC5ncmFkZSwuYWJpbGl0aWVzIC52YWx1ZXtmb250LXdlaWdodDoxMDAwO3RleHQtYWxpZ246Y2VudGVyfQouYmFye2hlaWdodDoxNnB4O2JvcmRlci1yYWRpdXM6OTk5cHg7YmFja2dyb3VuZDojZGNlNGVkO292ZXJmbG93OmhpZGRlbjttYXJnaW4tcmlnaHQ6MTBweH0KLmJhciBpe2Rpc3BsYXk6YmxvY2s7aGVpZ2h0OjEwMCU7YmFja2dyb3VuZDpsaW5lYXItZ3JhZGllbnQoOTBkZWcsIzQyYjgzNCwjOWJkYzQyKX0KLmdyYWRlLUF7Y29sb3I6I2VjM2Q4OX0uZ3JhZGUtQntjb2xvcjojZmY3YTUyfS5ncmFkZS1De2NvbG9yOiNmMWJkMDB9LmdyYWRlLUR7Y29sb3I6IzUyYmU0NX0uZ3JhZGUtRXtjb2xvcjojMmM5ZGUwfS5ncmFkZS1Ge2NvbG9yOiM3NzYyZDd9LmdyYWRlLUd7Y29sb3I6IzZmNzg4NH0KLnN0YXRzLWdyaWR7ZGlzcGxheTpncmlkO2dyaWQtdGVtcGxhdGUtY29sdW1uczpyZXBlYXQoNSwxZnIpfQouc3RhdHtwYWRkaW5nOjlweCAzcHg7Ym9yZGVyOjFweCBzb2xpZCAjMWE0ZDg2O2JhY2tncm91bmQ6IzA4MzY3NTtjb2xvcjojZmZmO3RleHQtYWxpZ246Y2VudGVyfQouc3RhdCBie2Rpc3BsYXk6YmxvY2s7Zm9udC1zaXplOjEwcHh9LnN0YXQgc3Bhbntmb250LXNpemU6MTlweDtmb250LXdlaWdodDo5MDB9Ci5maWVsZHtwb3NpdGlvbjpyZWxhdGl2ZTtoZWlnaHQ6MzQwcHg7bWFyZ2luOjEwcHg7Ym9yZGVyLXJhZGl1czoxNnB4O292ZXJmbG93OmhpZGRlbjtiYWNrZ3JvdW5kOnJlcGVhdGluZy1saW5lYXItZ3JhZGllbnQoMTAwZGVnLCM1OGJkNDggMCAyNnB4LCM0ZWFmNDIgMjZweCA1MnB4KX0KLmluZmllbGQtZGlydHtwb3NpdGlvbjphYnNvbHV0ZTtsZWZ0OjUwJTt0b3A6NTglO3dpZHRoOjIyMHB4O2hlaWdodDoyMjBweDt0cmFuc2Zvcm06dHJhbnNsYXRlKC01MCUsLTUwJSkgcm90YXRlKDQ1ZGVnKTtiYWNrZ3JvdW5kOiNjOTg3NDM7Ym9yZGVyOjNweCBzb2xpZCAjZTliNzc3fQouaW5maWVsZC1ncmFzc3twb3NpdGlvbjphYnNvbHV0ZTtsZWZ0OjUwJTt0b3A6NTglO3dpZHRoOjE0NXB4O2hlaWdodDoxNDVweDt0cmFuc2Zvcm06dHJhbnNsYXRlKC01MCUsLTUwJSkgcm90YXRlKDQ1ZGVnKTtiYWNrZ3JvdW5kOiM0M2FhM2V9Ci5iYXNle3Bvc2l0aW9uOmFic29sdXRlO3dpZHRoOjE4cHg7aGVpZ2h0OjE4cHg7YmFja2dyb3VuZDojZmZmO2JvcmRlcjoxcHggc29saWQgI2RkZDt0cmFuc2Zvcm06cm90YXRlKDQ1ZGVnKTt6LWluZGV4OjN9Ci5ob21le2xlZnQ6Y2FsYyg1MCUgLSA5cHgpO3RvcDo4NiV9LmZpcnN0e2xlZnQ6NzIlO3RvcDo2MyV9LnNlY29uZHtsZWZ0OmNhbGMoNTAlIC0gOXB4KTt0b3A6NDAlfS50aGlyZHtsZWZ0OjI3JTt0b3A6NjMlfQoucG9ze3Bvc2l0aW9uOmFic29sdXRlO3otaW5kZXg6NTt0cmFuc2Zvcm06dHJhbnNsYXRlKC01MCUsLTUwJSk7cGFkZGluZzo1cHggOHB4O2JvcmRlci1yYWRpdXM6OHB4O2JhY2tncm91bmQ6I2ZmZjtib3JkZXI6MnB4IHNvbGlkICMyNDVlOWY7dGV4dC1hbGlnbjpjZW50ZXI7Zm9udC13ZWlnaHQ6OTAwfQoucC1we2xlZnQ6NTAlO3RvcDo1OCV9LnAtY3tsZWZ0OjUwJTt0b3A6OTAlfS5wLTF7bGVmdDo3NyU7dG9wOjY0JX0ucC0ye2xlZnQ6NjQlO3RvcDo0MyV9LnAtM3tsZWZ0OjIzJTt0b3A6NjQlfS5wLXNze2xlZnQ6MzYlO3RvcDo0MyV9LnAtbGZ7bGVmdDoxOCU7dG9wOjIwJX0ucC1jZntsZWZ0OjUwJTt0b3A6MTIlfS5wLXJme2xlZnQ6ODIlO3RvcDoyMCV9Ci5yYW5rLXRhYnN7ZGlzcGxheTpmbGV4O2dhcDo3cHg7b3ZlcmZsb3c6YXV0bztwYWRkaW5nOjlweDtiYWNrZ3JvdW5kOiNlOGYzZmZ9Ci5yYW5rLXRhYnMgYnV0dG9ue2ZsZXg6MCAwIGF1dG87Ym9yZGVyOjA7Ym9yZGVyLXJhZGl1czo5OTlweDtwYWRkaW5nOjlweCAxM3B4O2JhY2tncm91bmQ6I2Q0ZTZmYjtjb2xvcjojMTIzYTcwO2ZvbnQtd2VpZ2h0OjkwMH0KLnJhbmstdGFicyBidXR0b24uYWN0aXZle2JhY2tncm91bmQ6dmFyKC0tZ29sZCk7Y29sb3I6IzEzMjM0Yn0KLnJhbmstZ3VpZGV7cGFkZGluZzo4cHggMTJweDtiYWNrZ3JvdW5kOiNmNWY5ZmY7Zm9udC1zaXplOjExcHg7Zm9udC13ZWlnaHQ6ODAwO2NvbG9yOiM0NjYyN2Z9Ci5yYW5rLXJvd3t3aWR0aDoxMDAlO2Rpc3BsYXk6Z3JpZDtncmlkLXRlbXBsYXRlLWNvbHVtbnM6NDRweCAxZnIgOTBweDthbGlnbi1pdGVtczpjZW50ZXI7Ym9yZGVyOjA7Ym9yZGVyLXRvcDoxcHggc29saWQgI2Q3ZTFlZDtwYWRkaW5nOjExcHg7YmFja2dyb3VuZDojZmZmO2NvbG9yOiMxMDI4NTg7dGV4dC1hbGlnbjpsZWZ0fQoucmFuay1yb3cuZ29sZHtiYWNrZ3JvdW5kOmxpbmVhci1ncmFkaWVudCg5MGRlZywjZmZmN2JmLCNmZmQ5NGYgNDUlLCNmZmY4ZDUpfQoucmFuay1yb3cuc2lsdmVye2JhY2tncm91bmQ6bGluZWFyLWdyYWRpZW50KDkwZGVnLCNmOGZiZmYsI2NmZDhlMyA0NSUsI2Y3ZjlmYyl9Ci5yYW5rLXJvdy5icm9uemV7YmFja2dyb3VuZDpsaW5lYXItZ3JhZGllbnQoOTBkZWcsI2ZmZTJjYiwjYzk4MzQ5IDQ1JSwjZmZlOGQ2KX0KLnJhbmstbm97Zm9udC1zaXplOjIwcHg7Zm9udC13ZWlnaHQ6MTAwMDt0ZXh0LWFsaWduOmNlbnRlcn0ucmFuay1uYW1le2ZvbnQtd2VpZ2h0OjEwMDB9LnJhbmstbmFtZSBzbWFsbHtkaXNwbGF5OmJsb2NrO2NvbG9yOiM3MTgwOWF9LnJhbmstdmFsdWV7dGV4dC1hbGlnbjpyaWdodDtmb250LXNpemU6MjBweDtmb250LXdlaWdodDoxMDAwfQoubm90ZXtwYWRkaW5nOjEycHg7d2hpdGUtc3BhY2U6cHJlLXdyYXA7bGluZS1oZWlnaHQ6MS43fQoucmVhZG9ubHktd2FybmluZ3ttYXJnaW46OHB4O3BhZGRpbmc6MTBweDtib3JkZXItcmFkaXVzOjEwcHg7YmFja2dyb3VuZDojZmZmMGJkO2NvbG9yOiM2ZTRmMDA7Zm9udC1zaXplOjExcHg7Zm9udC13ZWlnaHQ6OTAwfQo8L3N0eWxlPgo8L2hlYWQ+Cjxib2R5Pgo8ZGl2IGNsYXNzPSJhcHAiPgo8aGVhZGVyIGNsYXNzPSJoZWFkZXIiPjxoMT7ojYnph47nkINBSeafu+WumjwvaDE+PGRpdiBjbGFzcz0iYmFkZ2UiPumWsuimp+WwgueUqOODu+e3qOmbhuS4jeWPrzwvZGl2PjwvaGVhZGVyPgo8ZGl2IGNsYXNzPSJyZWFkb25seS13YXJuaW5nIj7jgZPjga7jg5XjgqHjgqTjg6vjga/plrLopqflsILnlKjjgafjgZnjgILlhaXlipvjg7vkv53lrZjjg7vliYrpmaTjg7tBSeafu+WumuOBr+OBp+OBjeOBvuOBm+OCk+OAgjwvZGl2Pgo8ZGl2IGNsYXNzPSJyZWFkb25seS13YXJuaW5nIj7jgZPjga7jg5rjg7zjgrjjga/plrLopqflsILnlKjjgafjgZnjgILlhaXlipvjg7vkv53lrZjjg7vliYrpmaTjg7tBSeafu+WumuOBr+OBp+OBjeOBvuOBm+OCk+OAgjwvZGl2Pgo8c2VjdGlvbiBjbGFzcz0iY2FyZCI+PGRpdiBjbGFzcz0icGxheWVyLXN0cmlwIiBpZD0icGxheWVyU3RyaXAiPjwvZGl2Pjwvc2VjdGlvbj4KPHNlY3Rpb24gY2xhc3M9ImNhcmQiIGlkPSJwbGF5ZXJDYXJkIj4KPGRpdiBjbGFzcz0icGxheWVyLWhlYWQiPjxkaXYgY2xhc3M9Im51bWJlciIgaWQ9Im51bWJlciI+LTwvZGl2PjxkaXY+PGRpdiBjbGFzcz0ibmFtZSIgaWQ9Im5hbWUiPuODh+ODvOOCv+acquiqrei+vDwvZGl2PjxzbWFsbCBpZD0iaGFuZCI+LTwvc21hbGw+PC9kaXY+PGRpdiBjbGFzcz0ib3ZlcmFsbCI+PHNtYWxsPue3j+WQiDwvc21hbGw+PHN0cm9uZyBpZD0ib3ZlcmFsbCI+LTwvc3Ryb25nPjwvZGl2PjwvZGl2Pgo8ZGl2IGNsYXNzPSJpbmZvLWdyaWQiPjxkaXY+PHNwYW4+44Oh44Kk44OzPC9zcGFuPjxzdHJvbmcgaWQ9Im1haW5Qb3NpdGlvbiI+LTwvc3Ryb25nPjwvZGl2PjxkaXY+PHNwYW4+5bm05bqmPC9zcGFuPjxzdHJvbmcgaWQ9InNlYXNvbiI+LTwvc3Ryb25nPjwvZGl2PjxkaXY+PHNwYW4+55m76Yyy5Lq65pWwPC9zcGFuPjxzdHJvbmcgaWQ9InBsYXllckNvdW50Ij4wPC9zdHJvbmc+PC9kaXY+PC9kaXY+Cjwvc2VjdGlvbj4KPHNlY3Rpb24gY2xhc3M9ImNhcmQiPjxkaXYgY2xhc3M9ImNhcmQtdGl0bGUiPuiDveWKmzwvZGl2PjxkaXYgY2xhc3M9ImFiaWxpdGllcyIgaWQ9ImFiaWxpdGllcyI+PC9kaXY+PC9zZWN0aW9uPgo8c2VjdGlvbiBjbGFzcz0iY2FyZCI+PGRpdiBjbGFzcz0iY2FyZC10aXRsZSI+5oiQ57i+PC9kaXY+PGRpdiBjbGFzcz0ic3RhdHMtZ3JpZCIgaWQ9InN0YXRzIj48L2Rpdj48L3NlY3Rpb24+CjxzZWN0aW9uIGNsYXNzPSJjYXJkIj48ZGl2IGNsYXNzPSJjYXJkLXRpdGxlIj7lrojlgpnpganmgKc8L2Rpdj48ZGl2IGNsYXNzPSJmaWVsZCIgaWQ9ImZpZWxkIj48L2Rpdj48L3NlY3Rpb24+CjxzZWN0aW9uIGNsYXNzPSJjYXJkIj48ZGl2IGNsYXNzPSJjYXJkLXRpdGxlIj7jg4Hjg7zjg6DlhoXjg6njg7Pjgq3jg7PjgrA8L2Rpdj48ZGl2IGNsYXNzPSJyYW5rLWd1aWRlIiBpZD0icmFua0d1aWRlIj48L2Rpdj48ZGl2IGNsYXNzPSJyYW5rLXRhYnMiIGlkPSJyYW5rVGFicyI+PC9kaXY+PGRpdiBpZD0icmFua0xpc3QiPjwvZGl2Pjwvc2VjdGlvbj4KPHNlY3Rpb24gY2xhc3M9ImNhcmQiPjxkaXYgY2xhc3M9ImNhcmQtdGl0bGUiPuebo+edo+ODoeODojwvZGl2PjxkaXYgY2xhc3M9Im5vdGUiIGlkPSJub3RlIj4tPC9kaXY+PC9zZWN0aW9uPgo8L2Rpdj4KPHNjcmlwdCBpZD0iZW1iZWRkZWRSZWFkb25seURhdGEiIHR5cGU9ImFwcGxpY2F0aW9uL2pzb24iPl9fRU1CRURERURfREFUQV9fPC9zY3JpcHQ+CjxzY3JpcHQ+CmNvbnN0IFBPU0lUSU9OUz1bIuaKleaJiyIsIuaNleaJiyIsIuS4gOWhgeaJiyIsIuS6jOWhgeaJiyIsIuS4ieWhgeaJiyIsIumBiuaSg+aJiyIsIuW3pue/vOaJiyIsIuS4reWgheaJiyIsIuWPs+e/vOaJiyJdOwpjb25zdCBBQklMSVRJRVM9W1siY29udGFjdCIsIuODn+ODvOODiCJdLFsicG93ZXIiLCLjg5Hjg6/jg7wiXSxbImRpc2NpcGxpbmUiLCLpgbjnkIPnnLwiXSxbInNwZWVkIiwi6LWw5YqbIl0sWyJhcm0iLCLogqnlipsiXSxbImZpZWxkaW5nIiwi5a6I5YKZ5YqbIl0sWyJjYXRjaGluZyIsIuaNleeQgyJdXTsKbGV0IGRhdGE9SlNPTi5wYXJzZShkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgiZW1iZWRkZWRSZWFkb25seURhdGEiKS50ZXh0Q29udGVudCksc2VsZWN0ZWQ9ZGF0YS5wbGF5ZXJzWzBdPy5pZHx8bnVsbCxyYW5raW5nS2V5PSJvdmVyYWxsIjsKZnVuY3Rpb24gZ3JhZGUodil7cmV0dXJuIHY+PTg1PyJBIjp2Pj03MD8iQiI6dj49NjA/IkMiOnY+PTUwPyJEIjp2Pj00MD8iRSI6dj49MzA/IkYiOiJHIn0KZnVuY3Rpb24gb3ZlcmFsbChwKXtyZXR1cm4gTWF0aC5yb3VuZChPYmplY3QudmFsdWVzKHAuYWJpbGl0aWVzfHx7fSkucmVkdWNlKChzLHYpPT5zKygrdnx8MCksMCkvNyl9CmZ1bmN0aW9uIGNhbGMocCl7Y29uc3Qgcz1wLnN0YXRzfHx7fSxhYj0rcy5hYnx8MCxoPStzLmhpdHN8fDAscGE9K3MucGF8fDAsZDI9K3MuZG91Ymxlc3x8MCxkMz0rcy50cmlwbGVzfHwwLGhyPStzLmhyfHwwLGJiPStzLndhbGtzfHwwO2NvbnN0IHNpbmdsZXM9TWF0aC5tYXgoMCxoLWQyLWQzLWhyKSx0Yj1zaW5nbGVzK2QyKjIrZDMqMytocio0O2NvbnN0IGF2Zz1hYj9oL2FiOjAsb2JwPXBhPyhoK2JiKS9wYTowLHNsZz1hYj90Yi9hYjowO3JldHVybnthdmcsb2JwLHNsZyxvcHM6b2JwK3NsZ319CmZ1bmN0aW9uIHF1YWxpZmljYXRpb24oKXtyZXR1cm4gTWF0aC5jZWlsKCgrZGF0YT8udGVhbVJlc3VsdHM/LmdhbWVzfHxNYXRoLm1heCgwLC4uLmRhdGEucGxheWVycy5tYXAocD0+K3Auc3RhdHM/LmdhbWVzfHwwKSkpKjEuNSl9CmZ1bmN0aW9uIHJhbmtWYWx1ZShwLGspe2NvbnN0IHM9cC5zdGF0c3x8e30sYz1jYWxjKHApO2lmKGs9PT0ib3ZlcmFsbCIpcmV0dXJuIG92ZXJhbGwocCk7aWYoayBpbiAocC5hYmlsaXRpZXN8fHt9KSlyZXR1cm4gK3AuYWJpbGl0aWVzW2tdfHwwO3JldHVybnthdmc6Yy5hdmcsaGl0czorcy5oaXRzfHwwLGhyOitzLmhyfHwwLHJiaTorcy5yYml8fDAsc2I6K3Muc2J8fDAsb2JwOmMub2JwLHNsZzpjLnNsZyxvcHM6Yy5vcHN9W2tdfHwwfQpmdW5jdGlvbiByZW5kZXIoKXsKIGlmKCFkYXRhPy5wbGF5ZXJzPy5sZW5ndGgpcmV0dXJuOwogY29uc3QgcD1kYXRhLnBsYXllcnMuZmluZCh4PT54LmlkPT09c2VsZWN0ZWQpfHxkYXRhLnBsYXllcnNbMF07c2VsZWN0ZWQ9cC5pZDsKIHBsYXllclN0cmlwLmlubmVySFRNTD1kYXRhLnBsYXllcnMubWFwKHg9PmA8YnV0dG9uIGNsYXNzPSJwbGF5ZXItY2hpcCAke3guaWQ9PT1zZWxlY3RlZD8iYWN0aXZlIjoiIn0iIGRhdGEtaWQ9IiR7eC5pZH0iPiR7eC5udW1iZXJ9ICR7eC5uYW1lfTwvYnV0dG9uPmApLmpvaW4oIiIpOwogbnVtYmVyLnRleHRDb250ZW50PXAubnVtYmVyO25hbWUudGV4dENvbnRlbnQ9cC5uYW1lO2hhbmQudGV4dENvbnRlbnQ9YCR7cC50aHJvd0hhbmR8fCLlj7MifeaKlSR7cC5iYXRIYW5kfHwi5Y+zIn3miZNgO292ZXJhbGwudGV4dENvbnRlbnQ9YCR7Z3JhZGUob3ZlcmFsbChwKSl9JHtvdmVyYWxsKHApfWA7bWFpblBvc2l0aW9uLnRleHRDb250ZW50PXAubWFpblBvc2l0aW9ufHwiLSI7c2Vhc29uLnRleHRDb250ZW50PXAuc2Vhc29ufHwiLSI7cGxheWVyQ291bnQudGV4dENvbnRlbnQ9ZGF0YS5wbGF5ZXJzLmxlbmd0aDsKIGFiaWxpdGllcy5pbm5lckhUTUw9QUJJTElUSUVTLm1hcCgoW2ssbF0pPT57Y29uc3Qgdj0rcC5hYmlsaXRpZXM/LltrXXx8MCxnPWdyYWRlKHYpO3JldHVybmA8ZGl2IGNsYXNzPSJyb3ciPjxsYWJlbD4ke2x9PC9sYWJlbD48c3BhbiBjbGFzcz0iZ3JhZGUtJHtnfSI+JHtnfTwvc3Bhbj48c3BhbiBjbGFzcz0iZ3JhZGUtJHtnfSB2YWx1ZSI+JHt2fTwvc3Bhbj48ZGl2IGNsYXNzPSJiYXIiPjxpIHN0eWxlPSJ3aWR0aDoke3Z9JSI+PC9pPjwvZGl2PjwvZGl2PmB9KS5qb2luKCIiKTsKIGNvbnN0IHM9cC5zdGF0c3x8e30sYz1jYWxjKHApO2NvbnN0IGl0ZW1zPVtbIuippuWQiCIscy5nYW1lc3x8MF0sWyLmiZPluK0iLHMucGF8fDBdLFsi5omT5pWwIixzLmFifHwwXSxbIuWuieaJkyIscy5oaXRzfHwwXSxbIuaJk+eOhyIsYy5hdmcudG9GaXhlZCgzKS5yZXBsYWNlKC9eMC8sIiIpXSxbIuacrOWhgeaJkyIscy5ocnx8MF0sWyLmiZPngrkiLHMucmJpfHwwXSxbIuebl+WhgSIscy5zYnx8MF0sWyLlh7rloYHnjociLGMub2JwLnRvRml4ZWQoMykucmVwbGFjZSgvXjAvLCIiKV0sWyJPUFMiLGMub3BzLnRvRml4ZWQoMykucmVwbGFjZSgvXjAvLCIiKV1dOwogc3RhdHMuaW5uZXJIVE1MPWl0ZW1zLm1hcCgoW2wsdl0pPT5gPGRpdiBjbGFzcz0ic3RhdCI+PGI+JHtsfTwvYj48c3Bhbj4ke3Z9PC9zcGFuPjwvZGl2PmApLmpvaW4oIiIpOwogY29uc3QgY2xzPXsi5oqV5omLIjoicC1wIiwi5o2V5omLIjoicC1jIiwi5LiA5aGB5omLIjoicC0xIiwi5LqM5aGB5omLIjoicC0yIiwi5LiJ5aGB5omLIjoicC0zIiwi6YGK5pKD5omLIjoicC1zcyIsIuW3pue/vOaJiyI6InAtbGYiLCLkuK3loIXmiYsiOiJwLWNmIiwi5Y+z57+85omLIjoicC1yZiJ9OwogZmllbGQuaW5uZXJIVE1MPWA8ZGl2IGNsYXNzPSJpbmZpZWxkLWRpcnQiPjwvZGl2PjxkaXYgY2xhc3M9ImluZmllbGQtZ3Jhc3MiPjwvZGl2PjxkaXYgY2xhc3M9ImJhc2UgaG9tZSI+PC9kaXY+PGRpdiBjbGFzcz0iYmFzZSBmaXJzdCI+PC9kaXY+PGRpdiBjbGFzcz0iYmFzZSBzZWNvbmQiPjwvZGl2PjxkaXYgY2xhc3M9ImJhc2UgdGhpcmQiPjwvZGl2PmArUE9TSVRJT05TLm1hcChwb3M9PmA8ZGl2IGNsYXNzPSJwb3MgJHtjbHNbcG9zXX0iPiR7cG9zfTxicj48c3BhbiBjbGFzcz0iZ3JhZGUtJHtwLmdyYWRlcz8uW3Bvc118fCJHIn0iPiR7cC5ncmFkZXM/Lltwb3NdfHwiRyJ9PC9zcGFuPjwvZGl2PmApLmpvaW4oIiIpOwogbm90ZS50ZXh0Q29udGVudD1wLm5vdGV8fCIiOwogcmVuZGVyUmFua2luZygpOwp9CmZ1bmN0aW9uIHJlbmRlclJhbmtpbmcoKXsKIGNvbnN0IHRhYnM9W1sib3ZlcmFsbCIsIue3j+WQiCJdLFsiY29udGFjdCIsIuODn+ODvOODiCJdLFsicG93ZXIiLCLjg5Hjg6/jg7wiXSxbInNwZWVkIiwi6LWw5YqbIl0sWyJhdmciLCLmiZPnjociXSxbImhpdHMiLCLlronmiZMiXSxbImhyIiwi5pys5aGB5omTIl0sWyJyYmkiLCLmiZPngrkiXSxbInNiIiwi55uX5aGBIl0sWyJvYnAiLCLlh7rloYHnjociXSxbInNsZyIsIumVt+aJk+eOhyJdLFsib3BzIiwiT1BTIl1dOwogcmFua1RhYnMuaW5uZXJIVE1MPXRhYnMubWFwKChbayxsXSk9PmA8YnV0dG9uIGRhdGEtcmFuaz0iJHtrfSIgY2xhc3M9IiR7cmFua2luZ0tleT09PWs/ImFjdGl2ZSI6IiJ9Ij4ke2x9PC9idXR0b24+YCkuam9pbigiIik7CiBjb25zdCBxdWFsaWZpZWQ9WyJhdmciLCJvYnAiLCJzbGciLCJvcHMiXSxxPXF1YWxpZmljYXRpb24oKTsKIGxldCBsaXN0PVsuLi5kYXRhLnBsYXllcnNdO2lmKHF1YWxpZmllZC5pbmNsdWRlcyhyYW5raW5nS2V5KSlsaXN0PWxpc3QuZmlsdGVyKHA9PigrcC5zdGF0cz8ucGF8fDApPj1xKTsKIGxpc3Quc29ydCgoYSxiKT0+cmFua1ZhbHVlKGIscmFua2luZ0tleSktcmFua1ZhbHVlKGEscmFua2luZ0tleSl8fCgrYi5zdGF0cz8ucGF8fDApLSgrYS5zdGF0cz8ucGF8fDApKTsKIHJhbmtHdWlkZS50ZXh0Q29udGVudD1xdWFsaWZpZWQuaW5jbHVkZXMocmFua2luZ0tleSk/YOimj+WumuaJk+W4rSAke3F95omT5bit5Lul5LiK44Gu44G/6KGo56S6YDoi6KaP5a6a5omT5bit5pyq5Yiw6YGU6ICF44KC6KGo56S6IjsKIGxldCBwcmV2PW51bGwscHJldlJhbms9MDsKIHJhbmtMaXN0LmlubmVySFRNTD1saXN0LnNsaWNlKDAsMTApLm1hcCgocCxpKT0+e2NvbnN0IHJhdz1yYW5rVmFsdWUocCxyYW5raW5nS2V5KSx2YWx1ZT1xdWFsaWZpZWQuaW5jbHVkZXMocmFua2luZ0tleSk/TnVtYmVyKHJhdy50b0ZpeGVkKDMpKTpNYXRoLnJvdW5kKHJhdykscmFuaz1wcmV2IT09bnVsbCYmdmFsdWU9PT1wcmV2P3ByZXZSYW5rOmkrMTtwcmV2PXZhbHVlO3ByZXZSYW5rPXJhbms7Y29uc3QgY2xzPXJhbms9PT0xPyJnb2xkIjpyYW5rPT09Mj8ic2lsdmVyIjpyYW5rPT09Mz8iYnJvbnplIjoiIjtyZXR1cm5gPGJ1dHRvbiBjbGFzcz0icmFuay1yb3cgJHtjbHN9IiBkYXRhLWlkPSIke3AuaWR9Ij48c3BhbiBjbGFzcz0icmFuay1ubyI+JHtyYW5rfeS9jTwvc3Bhbj48c3BhbiBjbGFzcz0icmFuay1uYW1lIj4ke3AubmFtZX08c21hbGw+JHtwLnN0YXRzPy5wYXx8MH3miZPluK08L3NtYWxsPjwvc3Bhbj48c3BhbiBjbGFzcz0icmFuay12YWx1ZSI+JHtxdWFsaWZpZWQuaW5jbHVkZXMocmFua2luZ0tleSk/dmFsdWUudG9GaXhlZCgzKS5yZXBsYWNlKC9eMC8sIiIpOnZhbHVlfTwvc3Bhbj48L2J1dHRvbj5gfSkuam9pbigiIil8fGA8ZGl2IHN0eWxlPSJwYWRkaW5nOjIwcHg7dGV4dC1hbGlnbjpjZW50ZXIiPuWvvuixoemBuOaJi+OBjOOBhOOBvuOBm+OCkzwvZGl2PmA7Cn0KCnBsYXllclN0cmlwLmFkZEV2ZW50TGlzdGVuZXIoImNsaWNrIixlPT57Y29uc3QgYj1lLnRhcmdldC5jbG9zZXN0KCJbZGF0YS1pZF0iKTtpZighYilyZXR1cm47c2VsZWN0ZWQ9Yi5kYXRhc2V0LmlkO3JlbmRlcigpfSk7CnJhbmtUYWJzLmFkZEV2ZW50TGlzdGVuZXIoImNsaWNrIixlPT57Y29uc3QgYj1lLnRhcmdldC5jbG9zZXN0KCJbZGF0YS1yYW5rXSIpO2lmKCFiKXJldHVybjtyYW5raW5nS2V5PWIuZGF0YXNldC5yYW5rO3JlbmRlclJhbmtpbmcoKX0pOwpyYW5rTGlzdC5hZGRFdmVudExpc3RlbmVyKCJjbGljayIsZT0+e2NvbnN0IGI9ZS50YXJnZXQuY2xvc2VzdCgiW2RhdGEtaWRdIik7aWYoIWIpcmV0dXJuO3NlbGVjdGVkPWIuZGF0YXNldC5pZDtyZW5kZXIoKTtwbGF5ZXJDYXJkLnNjcm9sbEludG9WaWV3KHtiZWhhdmlvcjoic21vb3RoIn0pfSk7cmVuZGVyKCk7Cjwvc2NyaXB0Pgo8L2JvZHk+CjwvaHRtbD4=";
+
 function createReadonlyPayload(){
   save();
   return {
     type:"kusayakyu-ai-readonly",
-    version:33,
+    version:34,
     exportedAt:new Date().toISOString(),
     teamName:data.teamName||"チーム",
     teamResults:data.teamResults||{},
@@ -619,143 +621,21 @@ function createReadonlyPayload(){
   };
 }
 
-function escapeStandaloneJson(value){
-  return JSON.stringify(value)
-    .replace(/</g,"\u003c")
-    .replace(/>/g,"\u003e")
-    .replace(/&/g,"\u0026")
-    .replace(/<\/script/gi,"<\/script");
-}
-
-function createReadonlyHtml(){
-  const payload=createReadonlyPayload();
-  const embedded=escapeStandaloneJson(payload);
-
-  return `<!doctype html>
-<html lang="ja">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#061a4d">
-<title>${payload.teamName} 閲覧専用</title>
-<style>
-:root{--navy:#061a4d;--blue:#086bd3;--cyan:#55e7ff;--gold:#ffc928}
-*{box-sizing:border-box}
-body{margin:0;background:#061a4d;font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;color:#102858}
-button{font:inherit}
-.app{max-width:640px;margin:auto;padding-bottom:40px}
-.header{position:sticky;top:0;z-index:30;padding:calc(env(safe-area-inset-top) + 12px) 12px 12px;background:linear-gradient(#0a80ed,#032457);border-bottom:3px solid var(--cyan);text-align:center;color:#fff}
-.header h1{margin:0;color:#ffdf38;font-size:24px;text-shadow:2px 2px #06459b}
-.badge{display:inline-block;margin-top:6px;padding:4px 10px;border-radius:999px;background:#21a86b;color:#fff;font-size:11px;font-weight:900}
-.notice{margin:8px;padding:10px;border-radius:10px;background:#fff0bd;color:#6e4f00;font-size:11px;font-weight:900}
-.player-strip{display:flex;gap:7px;overflow:auto;padding:8px;background:#06316e}
-.player-chip{flex:0 0 auto;border:2px solid #75e8ff;border-radius:10px;padding:8px 12px;background:#0b61b8;color:#fff;font-weight:900}
-.player-chip.active{border-color:#ffd329;background:#094087}
-.card{margin:8px;border:2px solid var(--cyan);border-radius:16px;overflow:hidden;background:#fff;box-shadow:0 4px 10px #0006}
-.card-title{padding:10px;background:linear-gradient(#0b73db,#052661);color:#fff;text-align:center;font-size:18px;font-weight:900}
-.player-head{display:grid;grid-template-columns:60px 1fr 90px;gap:8px;padding:10px;background:linear-gradient(#0d7eea,#053987);color:#fff;align-items:center}
-.player-head .number{font-size:28px;font-weight:1000;text-align:center}
-.player-head .name{font-size:22px;font-weight:1000}
-.player-head .overall{text-align:center}
-.player-head .overall strong{display:block;font-size:36px;color:#ffcf28}
-.info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:#bfd1e6}
-.info-grid div{background:#fff;padding:10px 4px;text-align:center}
-.info-grid span{display:block;font-size:10px;font-weight:900;color:#55708d}
-.info-grid strong{display:block;margin-top:4px}
-.abilities .row{display:grid;grid-template-columns:100px 36px 46px 1fr;align-items:center;border-top:1px solid #ccd9e8}
-.abilities label{padding:12px;background:#e9f3ff;font-weight:900}
-.abilities .grade,.abilities .value{font-weight:1000;text-align:center}
-.bar{height:16px;border-radius:999px;background:#dce4ed;overflow:hidden;margin-right:10px}
-.bar i{display:block;height:100%;background:linear-gradient(90deg,#42b834,#9bdc42)}
-.grade-A{color:#ec3d89}.grade-B{color:#ff7a52}.grade-C{color:#f1bd00}.grade-D{color:#52be45}.grade-E{color:#2c9de0}.grade-F{color:#7762d7}.grade-G{color:#6f7884}
-.stats-grid{display:grid;grid-template-columns:repeat(5,1fr)}
-.stat{padding:9px 3px;border:1px solid #1a4d86;background:#083675;color:#fff;text-align:center}
-.stat b{display:block;font-size:10px}.stat span{font-size:19px;font-weight:900}
-.field{position:relative;height:340px;margin:10px;border-radius:16px;overflow:hidden;background:repeating-linear-gradient(100deg,#58bd48 0 26px,#4eaf42 26px 52px)}
-.infield-dirt{position:absolute;left:50%;top:58%;width:220px;height:220px;transform:translate(-50%,-50%) rotate(45deg);background:#c98743;border:3px solid #e9b777}
-.infield-grass{position:absolute;left:50%;top:58%;width:145px;height:145px;transform:translate(-50%,-50%) rotate(45deg);background:#43aa3e}
-.base{position:absolute;width:18px;height:18px;background:#fff;border:1px solid #ddd;transform:rotate(45deg);z-index:3}
-.home{left:calc(50% - 9px);top:86%}.first{left:72%;top:63%}.second{left:calc(50% - 9px);top:40%}.third{left:27%;top:63%}
-.pos{position:absolute;z-index:5;transform:translate(-50%,-50%);padding:5px 8px;border-radius:8px;background:#fff;border:2px solid #245e9f;text-align:center;font-weight:900}
-.p-p{left:50%;top:58%}.p-c{left:50%;top:90%}.p-1{left:77%;top:64%}.p-2{left:64%;top:43%}.p-3{left:23%;top:64%}.p-ss{left:36%;top:43%}.p-lf{left:18%;top:20%}.p-cf{left:50%;top:12%}.p-rf{left:82%;top:20%}
-.rank-tabs{display:flex;gap:7px;overflow:auto;padding:9px;background:#e8f3ff}
-.rank-tabs button{flex:0 0 auto;border:0;border-radius:999px;padding:9px 13px;background:#d4e6fb;color:#123a70;font-weight:900}
-.rank-tabs button.active{background:var(--gold);color:#13234b}
-.rank-guide{padding:8px 12px;background:#f5f9ff;font-size:11px;font-weight:800;color:#46627f}
-.rank-row{width:100%;display:grid;grid-template-columns:44px 1fr 90px;align-items:center;border:0;border-top:1px solid #d7e1ed;padding:11px;background:#fff;color:#102858;text-align:left}
-.rank-row.gold{background:linear-gradient(90deg,#fff7bf,#ffd94f 45%,#fff8d5)}
-.rank-row.silver{background:linear-gradient(90deg,#f8fbff,#cfd8e3 45%,#f7f9fc)}
-.rank-row.bronze{background:linear-gradient(90deg,#ffe2cb,#c98349 45%,#ffe8d6)}
-.rank-no{font-size:20px;font-weight:1000;text-align:center}.rank-name{font-weight:1000}.rank-name small{display:block;color:#71809a}.rank-value{text-align:right;font-size:20px;font-weight:1000}
-.note{padding:12px;white-space:pre-wrap;line-height:1.7}
-</style>
-</head>
-<body>
-<div class="app">
-<header class="header"><h1>草野球AI査定</h1><div class="badge">閲覧専用・編集不可</div></header>
-<div class="notice">このファイルは閲覧専用です。選手追加・削除・能力変更・保存はできません。</div>
-<section class="card"><div class="player-strip" id="playerStrip"></div></section>
-<section class="card" id="playerCard">
-<div class="player-head"><div class="number" id="number">-</div><div><div class="name" id="name">-</div><small id="hand">-</small></div><div class="overall"><small>総合</small><strong id="overall">-</strong></div></div>
-<div class="info-grid"><div><span>メイン</span><strong id="mainPosition">-</strong></div><div><span>年度</span><strong id="season">-</strong></div><div><span>登録人数</span><strong id="playerCount">0</strong></div></div>
-</section>
-<section class="card"><div class="card-title">能力</div><div class="abilities" id="abilities"></div></section>
-<section class="card"><div class="card-title">成績</div><div class="stats-grid" id="stats"></div></section>
-<section class="card"><div class="card-title">守備適性</div><div class="field" id="field"></div></section>
-<section class="card"><div class="card-title">チーム内ランキング</div><div class="rank-guide" id="rankGuide"></div><div class="rank-tabs" id="rankTabs"></div><div id="rankList"></div></section>
-<section class="card"><div class="card-title">監督メモ</div><div class="note" id="note">-</div></section>
-</div>
-<script id="embeddedData" type="application/json">${embedded}</script>
-<script>
-const data=JSON.parse(document.getElementById("embeddedData").textContent);
-const POSITIONS=["投手","捕手","一塁手","二塁手","三塁手","遊撃手","左翼手","中堅手","右翼手"];
-const ABILITIES=[["contact","ミート"],["power","パワー"],["discipline","選球眼"],["speed","走力"],["arm","肩力"],["fielding","守備力"],["catching","捕球"]];
-let selected=data.players[0]?.id,rankingKey="overall";
-function grade(v){return v>=85?"A":v>=70?"B":v>=60?"C":v>=50?"D":v>=40?"E":v>=30?"F":"G"}
-function overallValue(p){return Math.round(Object.values(p.abilities||{}).reduce((s,v)=>s+(+v||0),0)/7)}
-function calc(p){const s=p.stats||{},ab=+s.ab||0,h=+s.hits||0,pa=+s.pa||0,d2=+s.doubles||0,d3=+s.triples||0,hr=+s.hr||0,bb=+s.walks||0;const singles=Math.max(0,h-d2-d3-hr),tb=singles+d2*2+d3*3+hr*4;const avg=ab?h/ab:0,obp=pa?(h+bb)/pa:0,slg=ab?tb/ab:0;return{avg,obp,slg,ops:obp+slg}}
-function qualification(){return Math.ceil((+data.teamResults?.games||Math.max(0,...data.players.map(p=>+p.stats?.games||0)))*1.5)}
-function rankValue(p,k){const s=p.stats||{},c=calc(p);if(k==="overall")return overallValue(p);if(k in (p.abilities||{}))return +p.abilities[k]||0;return{avg:c.avg,hits:+s.hits||0,hr:+s.hr||0,rbi:+s.rbi||0,sb:+s.sb||0,obp:c.obp,slg:c.slg,ops:c.ops}[k]||0}
-function render(){
- const p=data.players.find(x=>x.id===selected)||data.players[0];if(!p)return;selected=p.id;
- playerStrip.innerHTML=data.players.map(x=>`<button class="player-chip ${x.id===selected?"active":""}" data-id="${x.id}">${x.number} ${x.name}</button>`).join("");
- number.textContent=p.number;name.textContent=p.name;hand.textContent=`${p.throwHand||"右"}投${p.batHand||"右"}打`;const ov=overallValue(p);overall.textContent=`${grade(ov)}${ov}`;mainPosition.textContent=p.mainPosition||"-";season.textContent=p.season||"-";playerCount.textContent=data.players.length;
- abilities.innerHTML=ABILITIES.map(([k,l])=>{const v=+p.abilities?.[k]||0,g=grade(v);return`<div class="row"><label>${l}</label><span class="grade-${g}">${g}</span><span class="grade-${g} value">${v}</span><div class="bar"><i style="width:${v}%"></i></div></div>`}).join("");
- const s=p.stats||{},c=calc(p);const items=[["試合",s.games||0],["打席",s.pa||0],["打数",s.ab||0],["安打",s.hits||0],["打率",c.avg.toFixed(3).replace(/^0/,"")],["本塁打",s.hr||0],["打点",s.rbi||0],["盗塁",s.sb||0],["出塁率",c.obp.toFixed(3).replace(/^0/,"")],["OPS",c.ops.toFixed(3).replace(/^0/,"")]];
- stats.innerHTML=items.map(([l,v])=>`<div class="stat"><b>${l}</b><span>${v}</span></div>`).join("");
- const cls={"投手":"p-p","捕手":"p-c","一塁手":"p-1","二塁手":"p-2","三塁手":"p-3","遊撃手":"p-ss","左翼手":"p-lf","中堅手":"p-cf","右翼手":"p-rf"};
- field.innerHTML=`<div class="infield-dirt"></div><div class="infield-grass"></div><div class="base home"></div><div class="base first"></div><div class="base second"></div><div class="base third"></div>`+POSITIONS.map(pos=>`<div class="pos ${cls[pos]}">${pos}<br><span class="grade-${p.grades?.[pos]||"G"}">${p.grades?.[pos]||"G"}</span></div>`).join("");
- note.textContent=p.note||"";
- renderRanking();
-}
-function renderRanking(){
- const tabs=[["overall","総合"],["contact","ミート"],["power","パワー"],["speed","走力"],["avg","打率"],["hits","安打"],["hr","本塁打"],["rbi","打点"],["sb","盗塁"],["obp","出塁率"],["slg","長打率"],["ops","OPS"]];
- rankTabs.innerHTML=tabs.map(([k,l])=>`<button data-rank="${k}" class="${rankingKey===k?"active":""}">${l}</button>`).join("");
- const qualified=["avg","obp","slg","ops"],q=qualification();
- let list=[...data.players];if(qualified.includes(rankingKey))list=list.filter(p=>(+p.stats?.pa||0)>=q);
- list.sort((a,b)=>rankValue(b,rankingKey)-rankValue(a,rankingKey)||(+b.stats?.pa||0)-(+a.stats?.pa||0));
- rankGuide.textContent=qualified.includes(rankingKey)?`規定打席 ${q}打席以上のみ表示`:"規定打席未到達者も表示";
- let prev=null,prevRank=0;
- rankList.innerHTML=list.slice(0,10).map((p,i)=>{const raw=rankValue(p,rankingKey),value=qualified.includes(rankingKey)?Number(raw.toFixed(3)):Math.round(raw),rank=prev!==null&&value===prev?prevRank:i+1;prev=value;prevRank=rank;const cls=rank===1?"gold":rank===2?"silver":rank===3?"bronze":"";return`<button class="rank-row ${cls}" data-id="${p.id}"><span class="rank-no">${rank}位</span><span class="rank-name">${p.name}<small>${p.stats?.pa||0}打席</small></span><span class="rank-value">${qualified.includes(rankingKey)?value.toFixed(3).replace(/^0/,""):value}</span></button>`}).join("")||`<div style="padding:20px;text-align:center">対象選手がいません</div>`;
-}
-playerStrip.addEventListener("click",e=>{const b=e.target.closest("[data-id]");if(!b)return;selected=b.dataset.id;render()});
-rankTabs.addEventListener("click",e=>{const b=e.target.closest("[data-rank]");if(!b)return;rankingKey=b.dataset.rank;renderRanking()});
-rankList.addEventListener("click",e=>{const b=e.target.closest("[data-id]");if(!b)return;selected=b.dataset.id;render();playerCard.scrollIntoView({behavior:"smooth"})});
-render();
-</script>
-</body>
-</html>`;
+function decodeReadonlyViewerTemplate(){
+  const bytes=Uint8Array.from(atob(READONLY_VIEWER_TEMPLATE_B64),ch=>ch.charCodeAt(0));
+  return new TextDecoder().decode(bytes);
 }
 
 function createReadonlyHtmlFile(){
-  const html=createReadonlyHtml();
+  const payload=createReadonlyPayload();
+  const safeJson=JSON.stringify(payload)
+    .replace(/</g,"\\u003c")
+    .replace(/>/g,"\\u003e")
+    .replace(/&/g,"\\u0026");
+  const fileHtml=decodeReadonlyViewerTemplate().replace("__EMBEDDED_DATA__",safeJson);
   const stamp=new Date().toISOString().slice(0,10).replaceAll("-","");
-  const safeTeam=(data.teamName||"team").replace(/[\/:*?"<>|]/g,"_");
-  return new File(
-    [html],
-    `${safeTeam}_閲覧専用_${stamp}.html`,
-    {type:"text/html"}
-  );
+  const safeTeam=(payload.teamName||"team").replace(/[\\/:*?"<>|]/g,"_");
+  return new File([fileHtml],`${safeTeam}_閲覧専用_${stamp}.html`,{type:"text/html"});
 }
 
 async function shareReadonlyData(){
@@ -769,16 +649,16 @@ async function shareReadonlyData(){
       });
       return;
     }
-
     const url=URL.createObjectURL(file);
-    const a=document.createElement("a");
-    a.href=url;
-    a.download=file.name;
-    a.click();
+    const link=document.createElement("a");
+    link.href=url;
+    link.download=file.name;
+    link.click();
     setTimeout(()=>URL.revokeObjectURL(url),1000);
     alert("閲覧専用HTMLを保存しました。このHTMLファイルだけを相手へ送ってください。");
-  }catch(err){
-    if(err?.name==="AbortError")return;
+  }catch(error){
+    if(error?.name==="AbortError")return;
+    console.error(error);
     alert("閲覧専用HTMLを共有できませんでした。");
   }
 }
@@ -841,7 +721,7 @@ sharePlayerCard.onclick=()=>{
 document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>document.querySelector(b.dataset.go)?.scrollIntoView({behavior:"smooth"}));
 window.addEventListener("beforeunload",e=>{if(dirty){e.preventDefault();e.returnValue=""}});
 save();render();
-if("serviceWorker"in navigator)navigator.serviceWorker.register("./sw.js?v=33").catch(()=>{});
+if("serviceWorker"in navigator)navigator.serviceWorker.register("./sw.js?v=34").catch(()=>{});
 </script>
 </body>
 </html>
