@@ -1,0 +1,685 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+  <meta name="theme-color" content="#061a4d">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="草野球AI査定">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <title>草野球AI査定</title>
+  <style>
+    :root{
+      --navy:#061a4d; --blue:#075fd2; --blue2:#0a88ff; --cyan:#4fe8ff;
+      --gold:#ffcc21; --white:#fff; --ink:#0b1c3c; --soft:#edf5ff;
+      --danger:#ff4d61;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;background:#03112e;color:#fff;font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",sans-serif}
+    body{min-height:100svh;background:
+      radial-gradient(circle at 20% 10%,rgba(40,130,255,.28),transparent 30%),
+      linear-gradient(155deg,#020818,#061a4d 48%,#003f91);}
+    button,input,select,textarea{font:inherit}
+    button{cursor:pointer}
+    .app{max-width:540px;margin:auto;min-height:100svh;padding:calc(env(safe-area-inset-top) + 8px) 10px calc(env(safe-area-inset-bottom) + 90px)}
+    .panel{
+      background:linear-gradient(180deg,rgba(18,132,255,.98),rgba(4,33,96,.98));
+      border:2px solid rgba(111,236,255,.9); border-radius:16px; box-shadow:0 5px 14px rgba(0,0,0,.35);
+      overflow:hidden;
+    }
+    .header{padding:12px 14px;display:flex;align-items:center;justify-content:space-between}
+    .logo-main{font-size:25px;font-weight:1000;color:#ffe533;text-shadow:2px 2px 0 #1149a1,-1px -1px 0 #fff}
+    .logo-sub{display:inline-block;margin-top:2px;background:#ef354c;border-radius:999px;padding:2px 10px;font-size:12px;font-weight:900}
+    .ball{font-size:38px;filter:drop-shadow(0 2px 2px #000)}
+    .toolbar{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px 0}
+    .tool{border:0;color:#fff;padding:9px 4px;border-radius:12px;font-weight:900;background:linear-gradient(#168cff,#073f9d);box-shadow:inset 0 1px #8eefff,0 3px 6px #00153d}
+    .tool.gold{background:linear-gradient(#ffe75d,#ffb300);color:#15234d}
+    .players{display:flex;gap:8px;overflow:auto;padding:8px;scroll-snap-type:x mandatory}
+    .player-chip{flex:0 0 148px;scroll-snap-align:start;padding:9px;border-radius:12px;background:linear-gradient(#0b68d2,#05245e);border:2px solid #5bdfff;color:#fff;text-align:left}
+    .player-chip.active{border:4px solid var(--gold);padding:7px}
+    .chip-name{font-weight:900;line-height:1.15}
+    .chip-meta{display:flex;gap:7px;margin-top:6px;align-items:center}
+    .pos-badge{background:#0a75e8;border-radius:6px;padding:2px 7px;font-weight:900}
+    .grade{font-weight:1000;text-shadow:0 1px #000}
+    .A{color:#ff4a83}.B{color:#ff6d4d}.C{color:#ffd72e}.D{color:#61db57}.E{color:#4ce5ed}.F{color:#8096ff}.G{color:#aeb9ca}
+    .hero{margin-top:10px;background:#fff;color:var(--ink);border-radius:16px;border:2px solid var(--cyan);overflow:hidden}
+    .namebar{display:grid;grid-template-columns:58px 1fr 106px;gap:7px;padding:10px;background:linear-gradient(#fff,#dfeeff)}
+    .namebar input,.namebar select{width:100%;border:1px solid #8da5c4;border-radius:9px;padding:9px;background:#fff;color:#0b1c3c;font-weight:900;text-align:center}
+    .hero-body{display:grid;grid-template-columns:136px 1fr;gap:10px;padding:10px}
+    .avatar{height:176px;border-radius:14px;background:linear-gradient(#fff,#d9efff);position:relative;overflow:hidden;border:1px solid #a4c8ed}
+    .cap{position:absolute;left:17px;top:18px;width:102px;height:64px;border-radius:58px 58px 25px 25px;background:linear-gradient(#0d2b72,#010817)}
+    .cap:after{content:"R";position:absolute;left:41px;top:14px;color:#f22;font-size:30px;font-weight:1000;text-shadow:1px 0 #fff,-1px 0 #fff,0 1px #fff,0 -1px #fff}
+    .face{position:absolute;left:29px;top:53px;width:78px;height:78px;border-radius:50%;background:#ffc994}
+    .eye{position:absolute;top:26px;width:13px;height:18px;border-radius:50%;background:#111}
+    .eye.l{left:17px}.eye.r{right:17px}
+    .body{position:absolute;left:15px;bottom:-2px;width:106px;height:77px;border-radius:30px 30px 8px 8px;background:linear-gradient(#fff,#dceaff);border:2px solid #a4c8ed}
+    .body:after{content:"Romance";position:absolute;left:13px;top:23px;color:#e33;font-weight:1000;font-style:italic}
+    .overall{display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--soft);border-radius:14px;padding:8px}
+    .overall-label{font-weight:900}
+    .overall-line{display:flex;align-items:end;gap:6px}
+    .overall-grade{font-size:62px;font-weight:1000;line-height:1}
+    .overall-num{font-size:43px;font-weight:1000;color:#111}
+    .section{margin-top:10px;background:#fff;color:var(--ink);border-radius:14px;border:2px solid var(--cyan);overflow:hidden}
+    .section-title{background:linear-gradient(#148cff,#063e9b);color:#fff;font-weight:1000;text-align:center;padding:9px}
+    .ability-row{display:grid;grid-template-columns:84px 29px 38px 1fr;align-items:center;border-bottom:1px solid #d4deeb}
+    .ability-row label{background:linear-gradient(#168cff,#063e9b);color:#fff;font-weight:900;padding:11px 7px}
+    .ability-row input[type=range]{width:100%}
+    .ability-row .grade{font-size:19px;text-align:center}
+    .ability-row .num{text-align:center;font-weight:900}
+    .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:#cfdded;padding:1px}
+    .stat{background:#fff;text-align:center;padding:8px 2px;min-height:58px}
+    .stat b{display:block;font-size:12px;color:#17386d}.stat span{font-size:18px;font-weight:1000;color:#111}
+    .field-wrap{padding:10px;background:linear-gradient(#fff,#e8f4ff)}
+    .field{height:335px;position:relative;overflow:hidden}
+    .outfield{
+      position:absolute;left:3%;right:3%;top:2%;bottom:4%;
+      clip-path:polygon(50% 100%,0 36%,7% 20%,18% 8%,33% 1%,50% 0,67% 1%,82% 8%,93% 20%,100% 36%);
+      background:linear-gradient(#54c95d,#2f9e44);
+    }
+    .dirt{
+      position:absolute;left:17%;right:17%;top:35%;bottom:12%;
+      clip-path:polygon(50% 100%,0 38%,16% 8%,50% 0,84% 8%,100% 38%);
+      background:#c98d57;
+    }
+    .diamond{
+      position:absolute;left:27%;right:27%;top:42%;bottom:19%;
+      clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);
+      background:#54b85c;
+    }
+    .foul-l,.foul-r{position:absolute;bottom:7%;height:68%;width:3px;background:#fff;transform-origin:bottom}
+    .foul-l{left:49%;transform:rotate(-44deg)}.foul-r{right:49%;transform:rotate(44deg)}
+    .mound{position:absolute;left:calc(50% - 26px);top:58%;width:52px;height:52px;border-radius:50%;background:#d49761}
+    .pos{position:absolute;transform:translate(-50%,-50%);background:#fff;border:1px solid #8495ac;border-radius:8px;padding:3px 7px;min-width:46px;text-align:center;box-shadow:0 2px 4px #0003}
+    .pos small{display:block;color:#111;font-weight:900;font-size:10px}.pos strong{font-size:21px}
+    .p-left{left:18%;top:23%}.p-center{left:50%;top:12%}.p-right{left:82%;top:23%}
+    .p-third{left:23%;top:57%}.p-short{left:39%;top:41%}.p-second{left:62%;top:41%}.p-first{left:78%;top:57%}
+    .p-pitcher{left:50%;top:65%}.p-catcher{left:50%;top:89%}
+    .grade-editor{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:10px}
+    .grade-editor label{font-size:12px;font-weight:900}.grade-editor select{width:100%;padding:7px;border-radius:8px;border:1px solid #9cafc8;background:#fff;color:#111}
+    .inputs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:10px}
+    .inputs label{font-size:11px;font-weight:900;text-align:center}.inputs input{width:100%;padding:8px;border-radius:8px;border:1px solid #aac0d8;text-align:center;color:#111;background:#fff}
+    .primary{display:block;width:calc(100% - 20px);margin:0 10px 10px;border:0;border-radius:12px;padding:13px;font-weight:1000;background:linear-gradient(#ffe75d,#ffb300);color:#15234d}
+    .actions{display:grid;gap:8px;padding:10px}.actions button{border:0;border-radius:10px;padding:12px;font-weight:900;color:#fff;background:linear-gradient(#168cff,#073f9d)}
+    .actions button.danger{background:linear-gradient(#ff697b,#c6223c)}
+    .bottom-nav{position:fixed;left:0;right:0;bottom:0;padding:8px 10px calc(env(safe-area-inset-bottom) + 8px);background:rgba(2,11,35,.94);backdrop-filter:blur(12px);z-index:10}
+    .bottom-nav-inner{max-width:540px;margin:auto;display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+    .bottom-nav button{border:0;border-radius:12px;padding:10px 3px;color:#fff;background:linear-gradient(#0d6bd8,#06285f);font-size:12px;font-weight:900}
+    .toast{position:fixed;left:50%;bottom:110px;transform:translateX(-50%);background:#111d;color:#fff;padding:10px 16px;border-radius:999px;opacity:0;pointer-events:none;transition:.2s;z-index:20}
+    .toast.show{opacity:1}
+
+
+    .team-name-section{margin-top:10px}
+    .team-name-row{display:grid;grid-template-columns:72px 1fr;align-items:center;gap:8px;padding:10px;background:linear-gradient(#fff,#e8f4ff);color:#17386d;font-weight:900}
+    .team-name-row input{width:100%;border:1px solid #9cafc8;border-radius:9px;padding:10px;background:#fff;color:#111;font-weight:900}
+    .lineup-controls{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:10px}
+    .lineup-controls label{font-size:12px;font-weight:900;color:#17386d}
+    .lineup-controls select{width:100%;margin-top:4px;border:1px solid #9cafc8;border-radius:9px;padding:10px;background:#fff;color:#111}
+    .lineup-note{padding:0 12px 10px;color:#5b6f8c;font-size:12px;line-height:1.5}
+    .lineup-list{background:#fff}
+    .lineup-row{display:grid;grid-template-columns:42px 1fr 68px 74px;gap:6px;align-items:center;padding:8px;border-top:1px solid #dce5f0;color:#102858}
+    .lineup-order{font-size:20px;font-weight:1000;text-align:center}
+    .lineup-player{font-weight:1000}
+    .lineup-player small{display:block;color:#71809a;font-size:10px}
+    .lineup-pos select{width:100%;padding:7px 3px;border-radius:8px;border:1px solid #9cafc8;background:#fff;color:#111;font-weight:900}
+    .lineup-moves{display:flex;gap:4px}
+    .lineup-moves button{border:0;border-radius:7px;background:#0b68d2;color:#fff;font-weight:1000;width:32px;height:32px}
+    .lineup-summary{padding:10px;background:#eef6ff;color:#17386d;font-size:12px;font-weight:800;line-height:1.6}
+    .dashboard-section{margin-top:10px}
+    .team-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:#c8d8eb;padding:1px}
+    .summary-card{background:#fff;color:#102858;text-align:center;padding:10px 3px;min-height:72px}
+    .summary-card b{display:block;font-size:11px}.summary-card strong{display:block;font-size:22px;margin-top:5px}
+    .filter-row{display:grid;grid-template-columns:1fr 135px;gap:8px;padding:10px}
+    .filter-row input,.filter-row select,.season-row select{border:1px solid #9cafc8;border-radius:9px;padding:10px;color:#111;background:#fff;width:100%}
+    .season-row{padding:0 10px 10px;background:linear-gradient(#dfeeff,#fff);color:#17386d;font-size:12px;font-weight:900}
+    .season-row label{display:grid;grid-template-columns:70px 1fr;align-items:center;gap:8px}
+    .ai-comment{padding:14px;background:linear-gradient(#fff,#edf5ff);color:#102858;line-height:1.75;font-weight:700;white-space:pre-line}
+    .ranking-tabs{display:flex;gap:7px;overflow:auto;padding:9px;background:#eef6ff}
+    .ranking-tabs button{flex:0 0 auto;border:0;border-radius:999px;padding:8px 12px;background:#d7e9ff;color:#12366d;font-weight:900}
+    .ranking-tabs button.active{background:linear-gradient(#ffe75d,#ffb300);color:#16234a}
+    .ranking-list{background:#fff}
+    .rank-row{display:grid;grid-template-columns:42px 1fr 72px;align-items:center;padding:10px;border-top:1px solid #dce5f0;color:#102858}
+    .rank-no{font-size:20px;font-weight:1000;text-align:center}.rank-name{font-weight:900}.rank-value{text-align:right;font-weight:1000}
+    .mode-badge{display:block;font-style:normal;font-size:9px;line-height:1;margin-top:3px;padding:2px 4px;border-radius:999px;text-align:center}
+    .mode-badge.ai{background:#ffcc21;color:#16234a}.mode-badge.manual{background:#dff3ff;color:#063e9b}
+    .special-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;padding:10px}
+    .special-item{display:flex;align-items:center;gap:8px;background:#eef6ff;color:#102858;padding:10px;border-radius:10px;font-weight:900}
+    .special-item input{width:20px;height:20px}
+    .memo-wrap{padding:10px}.memo-wrap textarea{width:100%;resize:vertical;border:1px solid #9cafc8;border-radius:10px;padding:12px;color:#111;background:#fff;line-height:1.6}
+
+    @media print{
+      body{background:#fff}.app{max-width:none;padding:0}.toolbar,.players,.bottom-nav,.actions,.inputs,.grade-editor,.primary{display:none!important}
+      .panel,.hero,.section{box-shadow:none;break-inside:avoid}.header{background:#061a4d!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <section class="panel header">
+    <div><div class="logo-main">草野球AI査定</div><div class="logo-sub">POWER STYLE</div></div>
+    <div class="ball">⚾️</div>
+  </section>
+
+  <section class="section team-name-section">
+    <div class="team-name-row">
+      <label>チーム名</label>
+      <input id="teamName" placeholder="チーム名を入力">
+    </div>
+  </section>
+
+  <div class="toolbar">
+    <button class="tool gold" id="addPlayer">＋ 選手</button>
+    <button class="tool" id="saveJsonTop">JSON保存</button>
+    <button class="tool" id="loadJsonTop">読込</button>
+    <button class="tool" id="printTop">PDF</button>
+  </div>
+
+  <section class="section dashboard-section">
+    <div class="section-title">チーム概要</div>
+    <div class="team-summary" id="teamSummary"></div>
+  </section>
+
+  <section class="section">
+    <div class="section-title">選手検索・並び替え</div>
+    <div class="filter-row">
+      <input id="playerSearch" placeholder="選手名で検索">
+      <select id="sortPlayers">
+        <option value="number">背番号順</option>
+        <option value="overall">総合力順</option>
+        <option value="contact">ミート順</option>
+        <option value="power">パワー順</option>
+        <option value="speed">走力順</option>
+        <option value="fielding">守備力順</option>
+        <option value="ops">OPS順</option>
+      </select>
+    </div>
+  </section>
+
+  <section class="panel"><div class="players" id="players"></div></section>
+
+  <section class="hero">
+    <div class="namebar">
+      <input id="number" type="number" inputmode="numeric" min="0" max="999">
+      <input id="name" placeholder="選手名">
+      <select id="hand">
+        <option>右投右打</option><option>右投左打</option><option>左投左打</option><option>左投右打</option>
+      </select>
+    </div>
+    <div class="season-row">
+      <label>対象年度
+        <select id="season">
+          <option>2026</option><option>2025</option><option>2024</option>
+        </select>
+      </label>
+    </div>
+    <div class="hero-body">
+      <div class="avatar"><div class="cap"></div><div class="face"><i class="eye l"></i><i class="eye r"></i></div><div class="body"></div></div>
+      <div class="overall">
+        <div class="overall-label">総合力</div>
+        <div class="overall-line"><span id="overallGrade" class="overall-grade grade">C</span><span id="overallNum" class="overall-num">60</span></div>
+        <select id="mainPosition"></select>
+        <small>メインポジション</small>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-title">能力</div>
+    <div id="abilities"></div>
+  </section>
+
+  <section class="section">
+    <div class="section-title">通算成績</div>
+    <div class="stats" id="stats"></div>
+  </section>
+
+  <section class="section">
+    <div class="section-title">適性一覧（守備ポジション）</div>
+    <div class="field-wrap">
+      <div class="field">
+        <div class="outfield"></div><div class="dirt"></div><div class="diamond"></div>
+        <div class="foul-l"></div><div class="foul-r"></div><div class="mound"></div>
+        <div class="pos p-left" data-pos="左翼手"></div>
+        <div class="pos p-center" data-pos="中堅手"></div>
+        <div class="pos p-right" data-pos="右翼手"></div>
+        <div class="pos p-third" data-pos="三塁手"></div>
+        <div class="pos p-short" data-pos="遊撃手"></div>
+        <div class="pos p-second" data-pos="二塁手"></div>
+        <div class="pos p-first" data-pos="一塁手"></div>
+        <div class="pos p-pitcher" data-pos="投手"></div>
+        <div class="pos p-catcher" data-pos="捕手"></div>
+      </div>
+    </div>
+    <div class="grade-editor" id="gradeEditor"></div>
+  </section>
+
+  <section class="section">
+    <div class="section-title">打撃成績入力（AI査定用）</div>
+    <div class="inputs" id="inputs"></div>
+    <button class="primary" id="assess">✨ AI査定を実行</button>
+  </section>
+
+  <section class="section">
+    <div class="section-title">AIスタメン作成</div>
+    <div class="lineup-controls">
+      <label>DH
+        <select id="dhMode">
+          <option value="off">なし（9人）</option>
+          <option value="on">あり（10人）</option>
+        </select>
+      </label>
+      <label>方針
+        <select id="lineupStyle">
+          <option value="balance">バランス型</option>
+          <option value="attack">攻撃重視</option>
+          <option value="defense">守備重視</option>
+          <option value="speed">機動力重視</option>
+        </select>
+      </label>
+    </div>
+    <button class="primary" id="generateLineup">⚾ AIスタメンを作成</button>
+    <div class="lineup-note" id="lineupNote">登録選手が9人以上になるとスタメンを作成できます。</div>
+    <div class="lineup-list" id="lineupList"></div>
+  </section>
+
+  <section class="section">
+    <div class="section-title">AIスカウトコメント</div>
+    <div class="ai-comment" id="aiComment"></div>
+  </section>
+
+  <section class="section">
+    <div class="section-title">チーム内ランキング</div>
+    <div class="ranking-tabs" id="rankingTabs"></div>
+    <div class="ranking-list" id="rankingList"></div>
+  </section>
+
+  <section class="section">
+    <div class="section-title">特殊能力</div>
+    <div class="special-grid" id="specialGrid"></div>
+  </section>
+
+  <section class="section">
+    <div class="section-title">監督メモ</div>
+    <div class="memo-wrap">
+      <textarea id="managerNote" rows="5" placeholder="例：高めの速球に強い／終盤は代走向き／捕手時のリードが安定"></textarea>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-title">共有・データ管理</div>
+    <div class="actions">
+      <button id="shareReport">選手査定表を共有</button>
+      <button id="saveJson">全選手データをJSON保存</button>
+      <button id="loadJson">JSONバックアップを読み込む</button>
+      <button id="deletePlayer" class="danger">この選手を削除</button>
+    </div>
+  </section>
+</div>
+
+<input id="fileInput" type="file" accept="application/json,.json" hidden>
+<div class="bottom-nav">
+  <div class="bottom-nav-inner">
+    <button onclick="scrollTo({top:0,behavior:'smooth'})">選手</button>
+    <button onclick="document.querySelector('#abilities').scrollIntoView({behavior:'smooth'})">能力</button>
+    <button onclick="document.querySelector('.field').scrollIntoView({behavior:'smooth'})">守備</button>
+    <button onclick="document.querySelector('.actions').scrollIntoView({behavior:'smooth'})">共有</button>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const POSITIONS=["投手","捕手","一塁手","二塁手","三塁手","遊撃手","左翼手","中堅手","右翼手"];
+const GRADES=["A","B","C","D","E","F","G"];
+const ABILITIES=[
+  ["contact","ミート","AI"],["power","パワー","AI"],["discipline","選球眼","AI"],
+  ["speed","走力","手動"],["arm","肩力","手動"],["fielding","守備力","手動"],["catching","捕球","手動"]
+];
+const SPECIALS=["チャンス○","対左投手○","粘り打ち","初球○","満塁男","流し打ち","広角打法","守備職人","レーザービーム","キャッチャー○","送球○","バント○"];
+const STAT_INPUTS=[
+  ["games","試合"],["pa","打席"],["ab","打数"],["hits","安打"],
+  ["doubles","二塁打"],["triples","三塁打"],["hr","本塁打"],["rbi","打点"],
+  ["runs","得点"],["walks","四死球"],["so","三振"],["sb","盗塁"]
+];
+
+let data=loadLocal()||{selected:null,teamName:"Romance",lineup:[],players:[samplePlayer()]};
+let rankingKey="overall";
+let playerFilter="";
+let playerSort="number";
+data.teamName ??= "Romance";
+data.lineup ??= [];
+if(!data.selected && data.players.length)data.selected=data.players[0].id;
+
+function samplePlayer(){
+  return {
+    id:crypto.randomUUID(),name:"山本 永遠",number:8,hand:"右投右打",mainPosition:"捕手",season:"2026",
+    abilities:{contact:72,power:65,discipline:68,speed:60,arm:75,fielding:78,catching:73},
+    grades:{"投手":"G","捕手":"A","一塁手":"D","二塁手":"D","三塁手":"D","遊撃手":"C","左翼手":"D","中堅手":"D","右翼手":"D"},
+    stats:{games:7,pa:25,ab:21,hits:6,doubles:0,triples:0,hr:0,rbi:4,runs:1,walks:4,so:3,sb:0},
+    specials:["キャッチャー○","送球○"],note:"捕手時のリードが安定。終盤は三塁でも起用可能。"
+  };
+}
+function current(){return data.players.find(p=>p.id===data.selected)||data.players[0]}
+function gradeFrom(v){return v>=85?"A":v>=70?"B":v>=55?"C":v>=40?"D":v>=25?"E":v>=10?"F":"G"}
+function esc(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m]))}
+function saveLocal(){localStorage.setItem("kusayakyu_ai_pwa_v1",JSON.stringify(data))}
+function loadLocal(){try{return JSON.parse(localStorage.getItem("kusayakyu_ai_pwa_v1"))}catch{return null}}
+function toast(msg){const el=document.getElementById("toast");el.textContent=msg;el.classList.add("show");setTimeout(()=>el.classList.remove("show"),1800)}
+
+function renderTeamSummary(){
+  const count=data.players.length;
+  const avg=count?Math.round(data.players.reduce((s,p)=>s+overall(p),0)/count):0;
+  const attack=count?Math.round(data.players.reduce((s,p)=>s+(p.abilities.contact+p.abilities.power+p.abilities.discipline)/3,0)/count):0;
+  const defense=count?Math.round(data.players.reduce((s,p)=>s+(p.abilities.arm+p.abilities.fielding+p.abilities.catching)/3,0)/count):0;
+  teamSummary.innerHTML=[
+    ["登録人数",count+"人"],["総合平均",gradeFrom(avg)+" "+avg],["攻撃",gradeFrom(attack)+" "+attack],["守備",gradeFrom(defense)+" "+defense]
+  ].map(([a,b])=>`<div class="summary-card"><b>${a}</b><strong>${b}</strong></div>`).join("");
+}
+function rankingValue(p,key){
+  if(key==="overall")return overall(p);
+  if(key==="ops")return calcStats(p).ops;
+  return p.abilities[key]||0;
+}
+function renderRanking(){
+  const tabs=[["overall","総合"],["contact","ミート"],["power","パワー"],["speed","走力"],["fielding","守備"],["ops","OPS"]];
+  rankingTabs.innerHTML=tabs.map(([k,l])=>`<button data-rank="${k}" class="${rankingKey===k?"active":""}">${l}</button>`).join("");
+  document.querySelectorAll("[data-rank]").forEach(b=>b.onclick=()=>{rankingKey=b.dataset.rank;renderRanking()});
+  const sorted=[...data.players].sort((a,b)=>rankingValue(b,rankingKey)-rankingValue(a,rankingKey)).slice(0,10);
+  rankingList.innerHTML=sorted.map((p,i)=>{
+    const v=rankingValue(p,rankingKey);
+    const shown=rankingKey==="ops"?v.toFixed(3):Math.round(v);
+    return `<div class="rank-row"><div class="rank-no">${i+1}</div><div class="rank-name">${esc(p.name)}<small style="display:block;color:#71809a">${p.mainPosition}</small></div><div class="rank-value">${shown}</div></div>`;
+  }).join("");
+}
+function buildAIComment(p){
+  const st=calcStats(p), lines=[];
+  if(p.abilities.contact>=75)lines.push("高いミート力を持つ安打製造タイプです。");
+  else if(p.abilities.contact>=60)lines.push("安定したコンタクト能力があります。");
+  else lines.push("打撃では確実性の向上が今後のポイントです。");
+  if(p.abilities.power>=75||st.slg>=.55)lines.push("長打力があり、中軸での起用に向いています。");
+  if(p.abilities.discipline>=70||st.obp>=.4)lines.push("選球眼が良く、上位打線でも出塁が期待できます。");
+  if(p.abilities.speed>=75)lines.push("走力は手動評価で高く、リードオフマンや代走でも有効です。");
+  if(p.abilities.fielding>=75&&p.abilities.catching>=70)lines.push("守備の安定感が高く、重要な守備位置を任せられます。");
+  const best=Object.entries(p.grades).sort((a,b)=>GRADES.indexOf(a[1])-GRADES.indexOf(b[1]))[0];
+  if(best)lines.push(`守備適性では${best[0]}の${best[1]}評価が最も高くなっています。`);
+  lines.push("※走力・肩力・守備力・捕球・守備適性は手入力評価です。");
+  return lines.join("\n");
+}
+function calcStats(p){
+  const s=p.stats; const avg=s.ab? s.hits/s.ab:0;
+  const singles=Math.max(0,s.hits-s.doubles-s.triples-s.hr);
+  const slg=s.ab?(singles+s.doubles*2+s.triples*3+s.hr*4)/s.ab:0;
+  const obp=(s.ab+s.walks)?(s.hits+s.walks)/(s.ab+s.walks):0;
+  return {avg,slg,obp,ops:slg+obp}
+}
+function overall(p){
+  const keys=["contact","power","discipline","speed","arm","fielding","catching"];
+  return Math.round(keys.reduce((sum,k)=>sum+(Number(p.abilities[k])||0),0)/keys.length)
+}
+
+
+function positionScore(p,pos){
+  const g=p.grades?.[pos]||"G";
+  return 100-GRADES.indexOf(g)*14;
+}
+function lineupScore(p,style){
+  const a=p.abilities;
+  const st=calcStats(p);
+  if(style==="attack")return a.contact*0.35+a.power*0.35+a.discipline*0.15+st.ops*15;
+  if(style==="defense")return a.fielding*0.35+a.catching*0.25+a.arm*0.2+overall(p)*0.2;
+  if(style==="speed")return a.speed*0.45+a.contact*0.25+a.discipline*0.15+st.obp*15;
+  return overall(p)*0.55+(a.contact+a.power+a.speed)/3*0.25+(a.fielding+a.catching)/2*0.2;
+}
+function bestPositionForPlayer(p,used,allowDH){
+  const candidates=POSITIONS.filter(pos=>!used.has(pos));
+  candidates.sort((a,b)=>positionScore(p,b)-positionScore(p,a));
+  const best=candidates[0];
+  if(best && positionScore(p,best)>=30)return best;
+  return allowDH?"DH":(best||p.mainPosition);
+}
+function generateAILineup(){
+  const count=dhMode.value==="on"?10:9;
+  if(data.players.length<count){
+    alert(`スタメン作成には${count}人以上の登録が必要です。`);
+    return;
+  }
+  const selected=[...data.players]
+    .sort((a,b)=>lineupScore(b,lineupStyle.value)-lineupScore(a,lineupStyle.value))
+    .slice(0,count);
+
+  // Batting order heuristic
+  selected.sort((a,b)=>{
+    const sa=calcStats(a), sb=calcStats(b);
+    const leadA=a.abilities.contact*0.35+a.abilities.discipline*0.3+a.abilities.speed*0.35+sa.obp*10;
+    const leadB=b.abilities.contact*0.35+b.abilities.discipline*0.3+b.abilities.speed*0.35+sb.obp*10;
+    return leadB-leadA;
+  });
+
+  const powerSorted=[...selected].sort((a,b)=>(b.abilities.power+b.abilities.contact)-(a.abilities.power+a.abilities.contact));
+  const cleanup=powerSorted.slice(0,3);
+  const remaining=selected.filter(p=>!cleanup.includes(p));
+  const order=[];
+  if(remaining[0])order.push(remaining[0]);
+  if(remaining[1])order.push(remaining[1]);
+  if(cleanup[1])order.push(cleanup[1]);
+  if(cleanup[0])order.push(cleanup[0]);
+  if(cleanup[2])order.push(cleanup[2]);
+  remaining.slice(2).forEach(p=>order.push(p));
+
+  const used=new Set();
+  const rows=order.map(p=>{
+    let pos=bestPositionForPlayer(p,used,dhMode.value==="on");
+    if(pos!=="DH")used.add(pos);
+    return {playerId:p.id,position:pos};
+  });
+  if(dhMode.value==="on" && !rows.some(r=>r.position==="DH")){
+    const weakest=rows
+      .map((r,i)=>({i,score:positionScore(currentPlayerById(r.playerId),r.position)}))
+      .sort((a,b)=>a.score-b.score)[0];
+    if(weakest)rows[weakest.i].position="DH";
+  }
+  data.lineup=rows;
+  saveLocal();
+  renderLineup();
+}
+function currentPlayerById(id){return data.players.find(p=>p.id===id)}
+function renderLineup(){
+  const valid=data.lineup.filter(r=>currentPlayerById(r.playerId));
+  data.lineup=valid;
+  if(!valid.length){
+    lineupList.innerHTML="";
+    lineupNote.textContent=`登録選手が${dhMode.value==="on"?10:9}人以上になるとスタメンを作成できます。`;
+    return;
+  }
+  lineupNote.textContent="▲▼で打順を変更できます。守備位置は手動で調整できます。";
+  lineupList.innerHTML=valid.map((row,i)=>{
+    const p=currentPlayerById(row.playerId);
+    const options=[...POSITIONS,"DH"].map(pos=>`<option ${pos===row.position?"selected":""}>${pos}</option>`).join("");
+    return `<div class="lineup-row">
+      <div class="lineup-order">${i+1}</div>
+      <div class="lineup-player">${esc(p.name)}<small>総合 ${gradeFrom(overall(p))}${overall(p)} / ${p.mainPosition}</small></div>
+      <div class="lineup-pos"><select data-lineup-pos="${i}">${options}</select></div>
+      <div class="lineup-moves"><button data-up="${i}">▲</button><button data-down="${i}">▼</button></div>
+    </div>`;
+  }).join("")+`<div class="lineup-summary">${buildLineupSummary(valid)}</div>`;
+
+  document.querySelectorAll("[data-lineup-pos]").forEach(s=>s.onchange=e=>{
+    data.lineup[+e.target.dataset.lineupPos].position=e.target.value;saveLocal();renderLineup()
+  });
+  document.querySelectorAll("[data-up]").forEach(b=>b.onclick=()=>{
+    const i=+b.dataset.up;if(i<=0)return;
+    [data.lineup[i-1],data.lineup[i]]=[data.lineup[i],data.lineup[i-1]];saveLocal();renderLineup()
+  });
+  document.querySelectorAll("[data-down]").forEach(b=>b.onclick=()=>{
+    const i=+b.dataset.down;if(i>=data.lineup.length-1)return;
+    [data.lineup[i+1],data.lineup[i]]=[data.lineup[i],data.lineup[i+1]];saveLocal();renderLineup()
+  });
+}
+function buildLineupSummary(rows){
+  const ps=rows.map(r=>currentPlayerById(r.playerId)).filter(Boolean);
+  const avg=ps.reduce((s,p)=>s+p.abilities.contact,0)/ps.length;
+  const power=ps.reduce((s,p)=>s+p.abilities.power,0)/ps.length;
+  const speed=ps.reduce((s,p)=>s+p.abilities.speed,0)/ps.length;
+  return `平均ミート ${Math.round(avg)} ／ 平均パワー ${Math.round(power)} ／ 平均走力 ${Math.round(speed)}<br>作成方針：${lineupStyle.options[lineupStyle.selectedIndex].text}`;
+}
+function render(){
+  const p=current(); if(!p)return;
+  p.abilities.discipline ??= 50;
+  p.season ??= "2026";
+  p.specials ??= [];
+  p.note ??= "";
+  p.grades ??= Object.fromEntries(POSITIONS.map(x=>[x,"G"]));
+  const visiblePlayers=getVisiblePlayers();
+  document.getElementById("players").innerHTML=visiblePlayers.map(x=>`
+    <button class="player-chip ${x.id===p.id?'active':''}" data-id="${x.id}">
+      <div class="chip-name">${x.number} ${esc(x.name)}</div>
+      <div class="chip-meta"><span class="pos-badge">${x.mainPosition[0]}</span>
+      <span class="grade ${gradeFrom(overall(x))}">${gradeFrom(overall(x))}</span>
+      <b>${overall(x)}</b></div>
+    </button>`).join("") || '<div style="padding:16px">該当する選手がいません</div>';
+  document.querySelectorAll(".player-chip").forEach(b=>b.onclick=()=>{data.selected=b.dataset.id;saveLocal();render()});
+
+  number.value=p.number; name.value=p.name; hand.value=p.hand; season.value=p.season;
+  mainPosition.innerHTML=POSITIONS.map(x=>`<option ${x===p.mainPosition?'selected':''}>${x}</option>`).join("");
+
+  const ov=overall(p),g=gradeFrom(ov);
+  overallGrade.textContent=g; overallGrade.className=`overall-grade grade ${g}`; overallNum.textContent=ov;
+
+  abilities.innerHTML=ABILITIES.map(([key,label,mode])=>`
+    <div class="ability-row">
+      <label>${label}<em class="mode-badge ${mode==="AI"?"ai":"manual"}">${mode}</em></label>
+      <span id="g-${key}" class="grade ${gradeFrom(p.abilities[key])}">${gradeFrom(p.abilities[key])}</span>
+      <span id="n-${key}" class="num">${p.abilities[key]}</span>
+      <input data-ability="${key}" type="range" min="1" max="100" value="${p.abilities[key]}">
+    </div>`).join("");
+  document.querySelectorAll("[data-ability]").forEach(r=>r.oninput=e=>{
+    const k=e.target.dataset.ability;p.abilities[k]=+e.target.value;
+    document.getElementById("n-"+k).textContent=p.abilities[k];
+    const gg=gradeFrom(p.abilities[k]),ge=document.getElementById("g-"+k);ge.textContent=gg;ge.className=`grade ${gg}`;
+    const ovv=overall(p),og=gradeFrom(ovv);overallNum.textContent=ovv;overallGrade.textContent=og;overallGrade.className=`overall-grade grade ${og}`;
+    saveLocal();renderPlayersOnly();
+  });
+
+  const st=calcStats(p);
+  const statsRows=[["試合",p.stats.games],["打席",p.stats.pa],["打数",p.stats.ab],["安打",p.stats.hits],
+    ["打率",st.avg.toFixed(3)],["本塁打",p.stats.hr],["打点",p.stats.rbi],["得点",p.stats.runs],
+    ["四死球",p.stats.walks],["三振",p.stats.so],["盗塁",p.stats.sb],["OPS",st.ops.toFixed(3)]];
+  stats.innerHTML=statsRows.map(([a,b])=>`<div class="stat"><b>${a}</b><span>${b}</span></div>`).join("");
+
+  document.querySelectorAll(".pos").forEach(el=>{
+    const pos=el.dataset.pos,gr=p.grades[pos]||"G";
+    el.innerHTML=`<small>${pos}</small><strong class="${gr}">${gr}</strong>`;
+  });
+  gradeEditor.innerHTML=POSITIONS.map(pos=>`
+    <label>${pos}<select data-grade="${pos}">${GRADES.map(g=>`<option ${g===(p.grades[pos]||"G")?'selected':''}>${g}</option>`).join("")}</select></label>
+  `).join("");
+  document.querySelectorAll("[data-grade]").forEach(s=>s.onchange=e=>{p.grades[e.target.dataset.grade]=e.target.value;saveLocal();render()});
+
+  inputs.innerHTML=STAT_INPUTS.map(([key,label])=>`
+    <label>${label}<input type="number" min="0" inputmode="numeric" data-stat="${key}" value="${p.stats[key]||0}"></label>`).join("");
+  document.querySelectorAll("[data-stat]").forEach(i=>i.oninput=e=>{p.stats[e.target.dataset.stat]=Math.max(0,+e.target.value||0);saveLocal();renderStatsOnly()});
+
+  teamName.value=data.teamName;
+  renderTeamSummary();
+  renderLineup();
+  renderRanking();
+  aiComment.textContent=buildAIComment(p);
+
+  specialGrid.innerHTML=SPECIALS.map(sp=>`
+    <label class="special-item"><input type="checkbox" data-special="${sp}" ${p.specials.includes(sp)?"checked":""}><span>${sp}</span></label>
+  `).join("");
+  document.querySelectorAll("[data-special]").forEach(ch=>ch.onchange=e=>{
+    const sp=e.target.dataset.special;
+    if(e.target.checked){if(!p.specials.includes(sp))p.specials.push(sp)}
+    else p.specials=p.specials.filter(x=>x!==sp);
+    saveLocal();
+  });
+  managerNote.value=p.note;
+  managerNote.oninput=e=>{p.note=e.target.value;saveLocal()};
+}
+function getVisiblePlayers(){
+  const list=data.players.filter(x=>x.name.toLowerCase().includes(playerFilter.toLowerCase()));
+  return [...list].sort((a,b)=>{
+    if(playerSort==="overall")return overall(b)-overall(a);
+    if(playerSort==="ops")return calcStats(b).ops-calcStats(a).ops;
+    if(["contact","power","speed","fielding"].includes(playerSort))return (b.abilities[playerSort]||0)-(a.abilities[playerSort]||0);
+    return (a.number||0)-(b.number||0);
+  });
+}
+function renderPlayersOnly(){
+  const p=current(), list=getVisiblePlayers();
+  document.getElementById("players").innerHTML=list.map(x=>`
+    <button class="player-chip ${x.id===p.id?'active':''}" data-id="${x.id}">
+      <div class="chip-name">${x.number} ${esc(x.name)}</div>
+      <div class="chip-meta"><span class="pos-badge">${x.mainPosition[0]}</span>
+      <span class="grade ${gradeFrom(overall(x))}">${gradeFrom(overall(x))}</span><b>${overall(x)}</b></div>
+    </button>`).join("") || '<div style="padding:16px">該当する選手がいません</div>';
+  document.querySelectorAll(".player-chip").forEach(b=>b.onclick=()=>{data.selected=b.dataset.id;saveLocal();render()});
+}
+function renderStatsOnly(){
+  const p=current(),st=calcStats(p);
+  const rows=[["試合",p.stats.games],["打席",p.stats.pa],["打数",p.stats.ab],["安打",p.stats.hits],["打率",st.avg.toFixed(3)],["本塁打",p.stats.hr],["打点",p.stats.rbi],["得点",p.stats.runs],["四死球",p.stats.walks],["三振",p.stats.so],["盗塁",p.stats.sb],["OPS",st.ops.toFixed(3)]];
+  stats.innerHTML=rows.map(([a,b])=>`<div class="stat"><b>${a}</b><span>${b}</span></div>`).join("");
+}
+teamName.oninput=e=>{data.teamName=e.target.value;saveLocal()}
+generateLineup.onclick=generateAILineup;
+dhMode.onchange=renderLineup;
+number.oninput=e=>{current().number=+e.target.value||0;saveLocal();renderPlayersOnly()}
+name.oninput=e=>{current().name=e.target.value;saveLocal();renderPlayersOnly()}
+hand.onchange=e=>{current().hand=e.target.value;saveLocal()}
+season.onchange=e=>{current().season=e.target.value;saveLocal()}
+playerSearch.oninput=e=>{playerFilter=e.target.value;renderPlayersOnly()}
+sortPlayers.onchange=e=>{playerSort=e.target.value;renderPlayersOnly()}
+mainPosition.onchange=e=>{current().mainPosition=e.target.value;saveLocal();renderPlayersOnly()}
+
+addPlayer.onclick=()=>{
+  const p=samplePlayer();p.name="新規選手";p.number=Math.max(0,...data.players.map(x=>x.number))+1;
+  p.abilities={contact:50,power:50,discipline:50,speed:50,arm:50,fielding:50,catching:50};
+  p.stats={games:0,pa:0,ab:0,hits:0,doubles:0,triples:0,hr:0,rbi:0,runs:0,walks:0,so:0,sb:0};
+  p.grades=Object.fromEntries(POSITIONS.map(x=>[x,"G"]));p.mainPosition="捕手";p.season="2026";
+  data.players.push(p);data.selected=p.id;saveLocal();render();toast("選手を追加しました")
+};
+deletePlayer.onclick=()=>{
+  if(data.players.length<=1){toast("最後の1人は削除できません");return}
+  if(!confirm("この選手を削除しますか？"))return;
+  const idx=data.players.findIndex(x=>x.id===data.selected);data.players.splice(idx,1);
+  data.lineup=data.lineup.filter(r=>r.playerId!==data.selected);
+  data.selected=data.players[Math.max(0,idx-1)].id;saveLocal();render()
+};
+assess.onclick=()=>{
+  const p=current(),s=calcStats(p),st=p.stats;
+  p.abilities.contact=Math.max(1,Math.min(100,Math.round(s.avg*220+(st.pa?st.walks/st.pa*25:0))));
+  p.abilities.power=Math.max(1,Math.min(100,Math.round(s.slg*105)));
+  p.abilities.discipline=Math.max(1,Math.min(100,Math.round(st.pa?45+(st.walks/st.pa)*300-(st.so/st.pa)*80:50)));
+  saveLocal();render();toast("打撃能力だけAI査定しました")
+};
+function downloadJson(){
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="草野球AI査定バックアップ.json";a.click();URL.revokeObjectURL(a.href)
+}
+function openFile(){fileInput.click()}
+fileInput.onchange=async e=>{
+  const f=e.target.files[0];if(!f)return;
+  try{
+    const obj=JSON.parse(await f.text());
+    if(!obj.players||!Array.isArray(obj.players))throw new Error();
+    data=obj;if(!data.selected&&data.players[0])data.selected=data.players[0].id;saveLocal();render();toast("バックアップを読み込みました")
+  }catch{alert("JSONファイルを読み込めませんでした")}
+  e.target.value=""
+};
+saveJson.onclick=downloadJson;saveJsonTop.onclick=downloadJson;loadJson.onclick=openFile;loadJsonTop.onclick=openFile;
+printTop.onclick=()=>window.print();
+shareReport.onclick=async()=>{
+  const p=current(),st=calcStats(p);
+  const text=`【草野球AI査定】\n${p.number} ${p.name}\n${p.hand} / ${p.mainPosition}\n総合 ${gradeFrom(overall(p))} ${overall(p)}\n打率 ${st.avg.toFixed(3)} / OPS ${st.ops.toFixed(3)}\nミート ${p.abilities.contact} パワー ${p.abilities.power} 選球眼 ${p.abilities.discipline}
+走力 ${p.abilities.speed} 肩力 ${p.abilities.arm} 守備 ${p.abilities.fielding} 捕球 ${p.abilities.catching}`;
+  const lineupText=data.lineup.length?"\n\n【現在のスタメン】\n"+data.lineup.map((r,i)=>`${i+1}. ${currentPlayerById(r.playerId)?.name||""}（${r.position}）`).join("\n"):"";
+  const shareText=text+lineupText;
+  if(navigator.share){try{await navigator.share({title:"草野球AI査定",text:shareText});return}catch{}}
+  await navigator.clipboard.writeText(shareText);toast("査定内容をコピーしました")
+};
+if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));
+render();
+</script>
+</body>
+</html>

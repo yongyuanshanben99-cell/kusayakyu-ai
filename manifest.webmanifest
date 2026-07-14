@@ -1,0 +1,21 @@
+{
+  "name": "草野球AI査定",
+  "short_name": "草野球AI",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#03112e",
+  "theme_color": "#061a4d",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
