@@ -1,4 +1,4 @@
-const CACHE="kusayakyu-ai-github-v15";
+const CACHE="kusayakyu-ai-github-v16";
 const ASSETS=["./icon-192.png","./icon-512.png","./manifest.webmanifest"];
 
 self.addEventListener("install",event=>{
