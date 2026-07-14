@@ -7,9 +7,9 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="草野球AI査定">
-  <link rel="manifest" href="manifest.webmanifest">
-  <link rel="apple-touch-icon" href="icons/icon-192.png">
-  <title>草野球AI査定</title>
+  <link rel="manifest" href="./manifest.webmanifest?v=5">
+  <link rel="apple-touch-icon" href="./icon-192.png?v=5">
+  <title>草野球AI査定 Ver.5</title>
   <style>
     :root{
       --navy:#061a4d; --blue:#075fd2; --blue2:#0a88ff; --cyan:#4fe8ff;
@@ -33,6 +33,9 @@
     .logo-main{font-size:25px;font-weight:1000;color:#ffe533;text-shadow:2px 2px 0 #1149a1,-1px -1px 0 #fff}
     .logo-sub{display:inline-block;margin-top:2px;background:#ef354c;border-radius:999px;padding:2px 10px;font-size:12px;font-weight:900}
     .ball{font-size:38px;filter:drop-shadow(0 2px 2px #000)}
+    .install-notice{position:relative;margin:10px 0;padding:10px 38px 10px 12px;border-radius:12px;background:linear-gradient(#fff8bf,#ffd63d);color:#16234a;box-shadow:0 3px 8px #0005}
+    .install-notice strong{display:block;font-size:14px}.install-notice span{font-size:11px;font-weight:800}
+    .install-notice button{position:absolute;right:8px;top:50%;transform:translateY(-50%);border:0;background:#ffffffaa;color:#16234a;border-radius:50%;width:26px;height:26px;font-weight:1000}
     .toolbar{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px 0}
     .tool{border:0;color:#fff;padding:9px 4px;border-radius:12px;font-weight:900;background:linear-gradient(#168cff,#073f9d);box-shadow:inset 0 1px #8eefff,0 3px 6px #00153d}
     .tool.gold{background:linear-gradient(#ffe75d,#ffb300);color:#15234d}
@@ -167,6 +170,12 @@
       <input id="teamName" placeholder="チーム名を入力">
     </div>
   </section>
+
+  <div class="install-notice" id="installNotice">
+    <strong>公開版 Ver.5</strong>
+    <span>Safariの共有ボタンから「ホーム画面に追加」できます。</span>
+    <button type="button" id="dismissNotice">×</button>
+  </div>
 
   <div class="toolbar">
     <button class="tool gold" id="addPlayer">＋ 選手</button>
@@ -678,7 +687,16 @@ shareReport.onclick=async()=>{
   if(navigator.share){try{await navigator.share({title:"草野球AI査定",text:shareText});return}catch{}}
   await navigator.clipboard.writeText(shareText);toast("査定内容をコピーしました")
 };
-if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));
+dismissNotice.onclick=()=>{installNotice.style.display="none";localStorage.setItem("hide_install_notice_v5","1")};
+if(localStorage.getItem("hide_install_notice_v5")==="1")installNotice.style.display="none";
+if("serviceWorker" in navigator){
+  window.addEventListener("load",async()=>{
+    try{
+      const reg=await navigator.serviceWorker.register("./sw.js?v=5");
+      reg.update();
+    }catch{}
+  });
+}
 render();
 </script>
 </body>
