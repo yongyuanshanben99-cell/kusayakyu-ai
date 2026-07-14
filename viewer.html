@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#061a4d">
+<title>草野球AI査定 閲覧専用ビューア</title>
+<style>
+:root{--navy:#061a4d;--blue:#086bd3;--cyan:#55e7ff;--gold:#ffc928}
+*{box-sizing:border-box}
+body{margin:0;background:#061a4d;font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;color:#102858}
+button,input{font:inherit}
+.app{max-width:640px;margin:auto;padding-bottom:40px}
+.header{position:sticky;top:0;z-index:30;padding:calc(env(safe-area-inset-top) + 12px) 12px 12px;background:linear-gradient(#0a80ed,#032457);border-bottom:3px solid var(--cyan);text-align:center;color:#fff}
+.header h1{margin:0;color:#ffdf38;font-size:24px;text-shadow:2px 2px #06459b}
+.badge{display:inline-block;margin-top:6px;padding:4px 10px;border-radius:999px;background:#21a86b;color:#fff;font-size:11px;font-weight:900}
+.load-panel{margin:10px;border:2px solid var(--cyan);border-radius:14px;padding:12px;background:#f3f8ff}
+.load-panel p{margin:0 0 10px;font-size:12px;line-height:1.6;font-weight:800}
+.load-panel button{width:100%;border:0;border-radius:10px;padding:12px;background:linear-gradient(#0d79dd,#073477);color:#fff;font-weight:900}
+.status{margin-top:8px;padding:8px;border-radius:8px;background:#e5eef8;font-size:11px;font-weight:800}
+.player-strip{display:flex;gap:7px;overflow:auto;padding:8px;background:#06316e}
+.player-chip{flex:0 0 auto;border:2px solid #75e8ff;border-radius:10px;padding:8px 12px;background:#0b61b8;color:#fff;font-weight:900}
+.player-chip.active{border-color:#ffd329;background:#094087}
+.card{margin:8px;border:2px solid var(--cyan);border-radius:16px;overflow:hidden;background:#fff;box-shadow:0 4px 10px #0006}
+.card-title{padding:10px;background:linear-gradient(#0b73db,#052661);color:#fff;text-align:center;font-size:18px;font-weight:900}
+.player-head{display:grid;grid-template-columns:60px 1fr 90px;gap:8px;padding:10px;background:linear-gradient(#0d7eea,#053987);color:#fff;align-items:center}
+.player-head .number{font-size:28px;font-weight:1000;text-align:center}
+.player-head .name{font-size:22px;font-weight:1000}
+.player-head .overall{text-align:center}
+.player-head .overall strong{display:block;font-size:36px;color:#ffcf28}
+.info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:#bfd1e6}
+.info-grid div{background:#fff;padding:10px 4px;text-align:center}
+.info-grid span{display:block;font-size:10px;font-weight:900;color:#55708d}
+.info-grid strong{display:block;margin-top:4px}
+.abilities .row{display:grid;grid-template-columns:100px 36px 46px 1fr;align-items:center;border-top:1px solid #ccd9e8}
+.abilities label{padding:12px;background:#e9f3ff;font-weight:900}
+.abilities .grade,.abilities .value{font-weight:1000;text-align:center}
+.bar{height:16px;border-radius:999px;background:#dce4ed;overflow:hidden;margin-right:10px}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,#42b834,#9bdc42)}
+.grade-A{color:#ec3d89}.grade-B{color:#ff7a52}.grade-C{color:#f1bd00}.grade-D{color:#52be45}.grade-E{color:#2c9de0}.grade-F{color:#7762d7}.grade-G{color:#6f7884}
+.stats-grid{display:grid;grid-template-columns:repeat(5,1fr)}
+.stat{padding:9px 3px;border:1px solid #1a4d86;background:#083675;color:#fff;text-align:center}
+.stat b{display:block;font-size:10px}.stat span{font-size:19px;font-weight:900}
+.field{position:relative;height:340px;margin:10px;border-radius:16px;overflow:hidden;background:repeating-linear-gradient(100deg,#58bd48 0 26px,#4eaf42 26px 52px)}
+.infield-dirt{position:absolute;left:50%;top:58%;width:220px;height:220px;transform:translate(-50%,-50%) rotate(45deg);background:#c98743;border:3px solid #e9b777}
+.infield-grass{position:absolute;left:50%;top:58%;width:145px;height:145px;transform:translate(-50%,-50%) rotate(45deg);background:#43aa3e}
+.base{position:absolute;width:18px;height:18px;background:#fff;border:1px solid #ddd;transform:rotate(45deg);z-index:3}
+.home{left:calc(50% - 9px);top:86%}.first{left:72%;top:63%}.second{left:calc(50% - 9px);top:40%}.third{left:27%;top:63%}
+.pos{position:absolute;z-index:5;transform:translate(-50%,-50%);padding:5px 8px;border-radius:8px;background:#fff;border:2px solid #245e9f;text-align:center;font-weight:900}
+.p-p{left:50%;top:58%}.p-c{left:50%;top:90%}.p-1{left:77%;top:64%}.p-2{left:64%;top:43%}.p-3{left:23%;top:64%}.p-ss{left:36%;top:43%}.p-lf{left:18%;top:20%}.p-cf{left:50%;top:12%}.p-rf{left:82%;top:20%}
+.rank-tabs{display:flex;gap:7px;overflow:auto;padding:9px;background:#e8f3ff}
+.rank-tabs button{flex:0 0 auto;border:0;border-radius:999px;padding:9px 13px;background:#d4e6fb;color:#123a70;font-weight:900}
+.rank-tabs button.active{background:var(--gold);color:#13234b}
+.rank-guide{padding:8px 12px;background:#f5f9ff;font-size:11px;font-weight:800;color:#46627f}
+.rank-row{width:100%;display:grid;grid-template-columns:44px 1fr 90px;align-items:center;border:0;border-top:1px solid #d7e1ed;padding:11px;background:#fff;color:#102858;text-align:left}
+.rank-row.gold{background:linear-gradient(90deg,#fff7bf,#ffd94f 45%,#fff8d5)}
+.rank-row.silver{background:linear-gradient(90deg,#f8fbff,#cfd8e3 45%,#f7f9fc)}
+.rank-row.bronze{background:linear-gradient(90deg,#ffe2cb,#c98349 45%,#ffe8d6)}
+.rank-no{font-size:20px;font-weight:1000;text-align:center}.rank-name{font-weight:1000}.rank-name small{display:block;color:#71809a}.rank-value{text-align:right;font-size:20px;font-weight:1000}
+.note{padding:12px;white-space:pre-wrap;line-height:1.7}
+.readonly-warning{margin:8px;padding:10px;border-radius:10px;background:#fff0bd;color:#6e4f00;font-size:11px;font-weight:900}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="header"><h1>草野球AI査定</h1><div class="badge">閲覧専用ビューア Ver.32</div></header>
+<section class="load-panel">
+<p>共有された閲覧専用JSONを選択してください。この画面ではデータを変更できません。</p>
+<button id="loadButton">閲覧専用データを開く</button>
+<div class="status" id="status">データはまだ読み込まれていません。</div>
+</section>
+<div class="readonly-warning">このページは閲覧専用です。入力・保存・削除・AI査定はできません。</div>
+<section class="card"><div class="player-strip" id="playerStrip"></div></section>
+<section class="card" id="playerCard">
+<div class="player-head"><div class="number" id="number">-</div><div><div class="name" id="name">データ未読込</div><small id="hand">-</small></div><div class="overall"><small>総合</small><strong id="overall">-</strong></div></div>
+<div class="info-grid"><div><span>メイン</span><strong id="mainPosition">-</strong></div><div><span>年度</span><strong id="season">-</strong></div><div><span>登録人数</span><strong id="playerCount">0</strong></div></div>
+</section>
+<section class="card"><div class="card-title">能力</div><div class="abilities" id="abilities"></div></section>
+<section class="card"><div class="card-title">成績</div><div class="stats-grid" id="stats"></div></section>
+<section class="card"><div class="card-title">守備適性</div><div class="field" id="field"></div></section>
+<section class="card"><div class="card-title">チーム内ランキング</div><div class="rank-guide" id="rankGuide"></div><div class="rank-tabs" id="rankTabs"></div><div id="rankList"></div></section>
+<section class="card"><div class="card-title">監督メモ</div><div class="note" id="note">-</div></section>
+</div>
+<input id="fileInput" type="file" accept=".json,application/json" hidden>
+<script>
+const POSITIONS=["投手","捕手","一塁手","二塁手","三塁手","遊撃手","左翼手","中堅手","右翼手"];
+const ABILITIES=[["contact","ミート"],["power","パワー"],["discipline","選球眼"],["speed","走力"],["arm","肩力"],["fielding","守備力"],["catching","捕球"]];
+let data=null,selected=null,rankingKey="overall";
+function grade(v){return v>=85?"A":v>=70?"B":v>=60?"C":v>=50?"D":v>=40?"E":v>=30?"F":"G"}
+function overall(p){return Math.round(Object.values(p.abilities||{}).reduce((s,v)=>s+(+v||0),0)/7)}
+function calc(p){const s=p.stats||{},ab=+s.ab||0,h=+s.hits||0,pa=+s.pa||0,d2=+s.doubles||0,d3=+s.triples||0,hr=+s.hr||0,bb=+s.walks||0;const singles=Math.max(0,h-d2-d3-hr),tb=singles+d2*2+d3*3+hr*4;const avg=ab?h/ab:0,obp=pa?(h+bb)/pa:0,slg=ab?tb/ab:0;return{avg,obp,slg,ops:obp+slg}}
+function qualification(){return Math.ceil((+data?.teamResults?.games||Math.max(0,...data.players.map(p=>+p.stats?.games||0)))*1.5)}
+function rankValue(p,k){const s=p.stats||{},c=calc(p);if(k==="overall")return overall(p);if(k in (p.abilities||{}))return +p.abilities[k]||0;return{avg:c.avg,hits:+s.hits||0,hr:+s.hr||0,rbi:+s.rbi||0,sb:+s.sb||0,obp:c.obp,slg:c.slg,ops:c.ops}[k]||0}
+function render(){
+ if(!data?.players?.length)return;
+ const p=data.players.find(x=>x.id===selected)||data.players[0];selected=p.id;
+ playerStrip.innerHTML=data.players.map(x=>`<button class="player-chip ${x.id===selected?"active":""}" data-id="${x.id}">${x.number} ${x.name}</button>`).join("");
+ number.textContent=p.number;name.textContent=p.name;hand.textContent=`${p.throwHand||"右"}投${p.batHand||"右"}打`;overall.textContent=`${grade(overall(p))}${overall(p)}`;mainPosition.textContent=p.mainPosition||"-";season.textContent=p.season||"-";playerCount.textContent=data.players.length;
+ abilities.innerHTML=ABILITIES.map(([k,l])=>{const v=+p.abilities?.[k]||0,g=grade(v);return`<div class="row"><label>${l}</label><span class="grade-${g}">${g}</span><span class="grade-${g} value">${v}</span><div class="bar"><i style="width:${v}%"></i></div></div>`}).join("");
+ const s=p.stats||{},c=calc(p);const items=[["試合",s.games||0],["打席",s.pa||0],["打数",s.ab||0],["安打",s.hits||0],["打率",c.avg.toFixed(3).replace(/^0/,"")],["本塁打",s.hr||0],["打点",s.rbi||0],["盗塁",s.sb||0],["出塁率",c.obp.toFixed(3).replace(/^0/,"")],["OPS",c.ops.toFixed(3).replace(/^0/,"")]];
+ stats.innerHTML=items.map(([l,v])=>`<div class="stat"><b>${l}</b><span>${v}</span></div>`).join("");
+ const cls={"投手":"p-p","捕手":"p-c","一塁手":"p-1","二塁手":"p-2","三塁手":"p-3","遊撃手":"p-ss","左翼手":"p-lf","中堅手":"p-cf","右翼手":"p-rf"};
+ field.innerHTML=`<div class="infield-dirt"></div><div class="infield-grass"></div><div class="base home"></div><div class="base first"></div><div class="base second"></div><div class="base third"></div>`+POSITIONS.map(pos=>`<div class="pos ${cls[pos]}">${pos}<br><span class="grade-${p.grades?.[pos]||"G"}">${p.grades?.[pos]||"G"}</span></div>`).join("");
+ note.textContent=p.note||"";
+ renderRanking();
+}
+function renderRanking(){
+ const tabs=[["overall","総合"],["contact","ミート"],["power","パワー"],["speed","走力"],["avg","打率"],["hits","安打"],["hr","本塁打"],["rbi","打点"],["sb","盗塁"],["obp","出塁率"],["slg","長打率"],["ops","OPS"]];
+ rankTabs.innerHTML=tabs.map(([k,l])=>`<button data-rank="${k}" class="${rankingKey===k?"active":""}">${l}</button>`).join("");
+ const qualified=["avg","obp","slg","ops"],q=qualification();
+ let list=[...data.players];if(qualified.includes(rankingKey))list=list.filter(p=>(+p.stats?.pa||0)>=q);
+ list.sort((a,b)=>rankValue(b,rankingKey)-rankValue(a,rankingKey)||(+b.stats?.pa||0)-(+a.stats?.pa||0));
+ rankGuide.textContent=qualified.includes(rankingKey)?`規定打席 ${q}打席以上のみ表示`:"規定打席未到達者も表示";
+ let prev=null,prevRank=0;
+ rankList.innerHTML=list.slice(0,10).map((p,i)=>{const raw=rankValue(p,rankingKey),value=qualified.includes(rankingKey)?Number(raw.toFixed(3)):Math.round(raw),rank=prev!==null&&value===prev?prevRank:i+1;prev=value;prevRank=rank;const cls=rank===1?"gold":rank===2?"silver":rank===3?"bronze":"";return`<button class="rank-row ${cls}" data-id="${p.id}"><span class="rank-no">${rank}位</span><span class="rank-name">${p.name}<small>${p.stats?.pa||0}打席</small></span><span class="rank-value">${qualified.includes(rankingKey)?value.toFixed(3).replace(/^0/,""):value}</span></button>`}).join("")||`<div style="padding:20px;text-align:center">対象選手がいません</div>`;
+}
+loadButton.onclick=()=>fileInput.click();
+fileInput.onchange=async()=>{try{const obj=JSON.parse(await fileInput.files[0].text());if(obj.type!=="kusayakyu-ai-readonly"||!Array.isArray(obj.players))throw 0;data=obj;selected=data.players[0]?.id;status.textContent=`${obj.teamName}：${obj.players.length}人を読み込みました`;render()}catch{status.textContent="閲覧専用データを読み込めませんでした"}fileInput.value=""};
+playerStrip.addEventListener("click",e=>{const b=e.target.closest("[data-id]");if(!b)return;selected=b.dataset.id;render()});
+rankTabs.addEventListener("click",e=>{const b=e.target.closest("[data-rank]");if(!b)return;rankingKey=b.dataset.rank;renderRanking()});
+rankList.addEventListener("click",e=>{const b=e.target.closest("[data-id]");if(!b)return;selected=b.dataset.id;render();playerCard.scrollIntoView({behavior:"smooth"})});
+</script>
+</body>
+</html>

@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#061a4d">
-<link rel="manifest" href="./manifest.webmanifest?v=31">
-<title>草野球AI査定 Ver.31</title>
+<link rel="manifest" href="./manifest.webmanifest?v=32">
+<title>草野球AI査定 Ver.32</title>
 <style>
 :root{--navy:#061a4d;--blue:#086bd3;--cyan:#55e7ff;--gold:#ffc928;--panel:#eef6ff}
 *{box-sizing:border-box}
@@ -167,13 +167,20 @@ repeating-linear-gradient(100deg,#58bd48 0 26px,#4eaf42 26px 52px)}
 .rank-row.rank-silver .rank-no::before{content:"🥈";margin-right:3px}
 .rank-row.rank-bronze .rank-no::before{content:"🥉";margin-right:3px}
 
+
+.viewer-guide{padding:12px;background:#f4f8ff;color:#24476f}
+.viewer-guide p{margin:0 0 8px;font-size:12px;line-height:1.6;font-weight:800}
+.viewer-guide ul{margin:0 0 12px;padding-left:20px;font-size:11px;line-height:1.8}
+.viewer-guide a{display:block;text-align:center;text-decoration:none;border-radius:10px;padding:12px;background:linear-gradient(#20a86a,#087947);color:#fff;font-weight:900}
+#shareReadonly,#shareReadonlyMain{background:linear-gradient(#20a86a,#087947)}
+
 </style>
 </head>
 <body>
 <div class="app">
-<header class="header"><h1>草野球AI査定</h1><div class="version">Ver.31 同順位対応</div></header>
+<header class="header"><h1>草野球AI査定</h1><div class="version">Ver.32 閲覧専用共有</div></header>
 <section class="top-actions">
-<button id="addPlayer">＋選手</button><button id="deletePlayer">選手削除</button><button id="applySeason">29選手反映</button><button id="smartImportTop">SmartScorer</button><button id="saveJson">JSON保存</button><button id="shareData">データ共有</button><button id="teamPageBtn">チーム分析</button><button id="bestNineBtn">AIベストナイン</button><button id="loadJson">JSON読込</button>
+<button id="addPlayer">＋選手</button><button id="deletePlayer">選手削除</button><button id="applySeason">29選手反映</button><button id="smartImportTop">SmartScorer</button><button id="saveJson">JSON保存</button><button id="shareData">編集用データ共有</button><button id="shareReadonly">閲覧専用共有</button><button id="teamPageBtn">チーム分析</button><button id="bestNineBtn">AIベストナイン</button><button id="loadJson">JSON読込</button>
 </section>
 <section class="card"><div class="player-strip" id="playerStrip"></div></section>
 <section class="card" id="detailCard">
@@ -208,11 +215,24 @@ repeating-linear-gradient(100deg,#58bd48 0 26px,#4eaf42 26px 52px)}
       </div>
     </div>
     <div class="grade-editor" id="gradeEditor"></div></section>
+<section class="card" id="viewerGuideCard">
+<div class="card-title">閲覧専用共有</div>
+<div class="viewer-guide">
+  <p>閲覧専用データを送ると、相手は選手・能力・成績・守備適性・ランキングを確認できます。</p>
+  <ul>
+    <li>選手追加・削除はできません</li>
+    <li>能力値や守備適性は変更できません</li>
+    <li>AI査定やデータ保存はできません</li>
+    <li>あなたの元データには影響しません</li>
+  </ul>
+  <a href="./viewer.html" target="_blank" rel="noopener">閲覧専用ビューアを開く</a>
+</div>
+</section>
 <section class="card" id="shareCard">
 <div class="card-title">データ共有</div>
 <div class="share-panel">
   <p>全選手の能力・成績・守備適性・メモをJSONファイルにして共有します。</p>
-  <button id="shareDataMain">アプリデータを共有</button><button id="sharePlayerCard">選手査定表を共有・PDF保存</button>
+  <button id="shareDataMain">編集用データを共有</button><button id="shareReadonlyMain">閲覧専用データを共有</button><button id="sharePlayerCard">選手査定表を共有・PDF保存</button>
   <button id="downloadBackup">共有できない場合：JSONを保存</button>
   <div class="share-note">iPhoneではLINE、メール、AirDrop、ファイル保存などを選べます。</div>
 </div>
@@ -572,6 +592,70 @@ smartPdfFile.onchange=async()=>{
 };
 
 
+
+function createReadonlyPayload(){
+  save();
+  return {
+    type:"kusayakyu-ai-readonly",
+    version:32,
+    exportedAt:new Date().toISOString(),
+    teamName:data.teamName||"チーム",
+    teamResults:data.teamResults||{},
+    players:data.players.map(player=>({
+      id:player.id,
+      number:player.number,
+      name:player.name,
+      throwHand:player.throwHand,
+      batHand:player.batHand,
+      pose:player.pose,
+      mainPosition:player.mainPosition,
+      season:player.season,
+      abilities:player.abilities,
+      grades:player.grades,
+      stats:player.stats,
+      note:player.note||""
+    }))
+  };
+}
+
+function createReadonlyFile(){
+  const payload=createReadonlyPayload();
+  const stamp=new Date().toISOString().slice(0,10).replaceAll("-","");
+  const safeTeam=(payload.teamName||"team").replace(/[\\/:*?"<>|]/g,"_");
+  return new File(
+    [JSON.stringify(payload,null,2)],
+    `${safeTeam}_readonly_${stamp}.json`,
+    {type:"application/json"}
+  );
+}
+
+async function shareReadonlyData(){
+  try{
+    const file=createReadonlyFile();
+    if(navigator.share && navigator.canShare?.({files:[file]})){
+      await navigator.share({
+        title:`${data.teamName||"チーム"} 閲覧専用データ`,
+        text:"草野球AI査定の閲覧専用データです。viewer.htmlで開いてください。",
+        files:[file]
+      });
+      return;
+    }
+    const url=URL.createObjectURL(file);
+    const a=document.createElement("a");
+    a.href=url;
+    a.download=file.name;
+    a.click();
+    setTimeout(()=>URL.revokeObjectURL(url),1000);
+    alert("閲覧専用JSONを保存しました。viewer.htmlと一緒に相手へ送ってください。");
+  }catch(err){
+    if(err?.name==="AbortError")return;
+    alert("閲覧専用データを共有できませんでした。");
+  }
+}
+
+shareReadonly.onclick=shareReadonlyData;
+shareReadonlyMain.onclick=shareReadonlyData;
+
 function createBackupFile(){
   save();
   const stamp=new Date().toISOString().slice(0,10).replaceAll("-","");
@@ -627,7 +711,7 @@ sharePlayerCard.onclick=()=>{
 document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>document.querySelector(b.dataset.go)?.scrollIntoView({behavior:"smooth"}));
 window.addEventListener("beforeunload",e=>{if(dirty){e.preventDefault();e.returnValue=""}});
 save();render();
-if("serviceWorker"in navigator)navigator.serviceWorker.register("./sw.js?v=31").catch(()=>{});
+if("serviceWorker"in navigator)navigator.serviceWorker.register("./sw.js?v=32").catch(()=>{});
 </script>
 </body>
 </html>
