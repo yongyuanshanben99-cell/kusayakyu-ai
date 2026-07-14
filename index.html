@@ -163,6 +163,9 @@
     .preloaded-data-panel p{margin:10px;color:#314d75;font-size:12px;line-height:1.6;font-weight:700}
     .embedded-status{margin:0 10px 10px;padding:9px;border-radius:8px;background:#e7f2ff;color:#23436c;font-size:11px;font-weight:800}
     .embedded-status.success{background:#d8f4d3;color:#1f5a26}
+    .secondary-data-button,.danger-data-button{display:block;width:calc(100% - 20px);margin:0 10px 8px;border:0;border-radius:9px;padding:11px;font-weight:1000}
+    .secondary-data-button{background:linear-gradient(#168bf2,#07429a);color:#fff}
+    .danger-data-button{background:linear-gradient(#ff7482,#cb263d);color:#fff}
     @media(max-width:420px){.quick-actions-five{grid-template-columns:repeat(3,1fr)}}
 
 
@@ -181,6 +184,7 @@
     .header-star{font-size:25px;color:#ffd62b}
     .game-logo{text-align:center;line-height:1}
     .game-logo .logo-main{font-size:22px;text-shadow:2px 2px 0 #063d8d}
+    .visible-version{display:inline-block;margin-top:4px;padding:3px 8px;border-radius:999px;background:#ffcf23;color:#10214a;font-size:9px;font-weight:1000;letter-spacing:.04em}
     .game-logo .logo-sub{margin-top:5px;background:none;padding:0;color:#bcecff;font-size:8px;letter-spacing:.13em}
     .top-game-tabs{position:sticky;top:64px;z-index:29;display:grid;grid-template-columns:repeat(5,1fr);gap:2px;background:#02143f;padding:4px;border-bottom:1px solid #2cdfff}
     .top-game-tabs button{border:0;border-radius:6px;padding:8px 1px;background:linear-gradient(#0d72d6,#052b6d);color:#fff;font-size:11px;font-weight:900}
@@ -284,6 +288,66 @@
       .stats{grid-template-columns:repeat(5,1fr)}
     }
 
+
+    .hero-body{grid-template-columns:minmax(190px,46%) 1fr;align-items:stretch}
+    .character-image-card{
+      position:relative;
+      height:285px;
+      padding:0;
+      overflow:hidden;
+      background:
+        radial-gradient(circle at 40% 18%,rgba(255,255,255,.95),rgba(162,215,255,.35) 35%,transparent 58%),
+        linear-gradient(#79c2ed 0 43%,#3e9b42 44% 100%);
+      border:2px solid #9eeeff;
+      box-shadow:inset 0 1px #fff,0 3px 8px #0005;
+    }
+    .character-image-card:before{
+      content:"";
+      position:absolute;
+      left:-10%;right:-10%;bottom:-35px;
+      height:115px;
+      border-radius:50% 50% 0 0;
+      background:repeating-linear-gradient(100deg,#4bac42 0 25px,#419b3c 25px 50px);
+    }
+    .character-image-card:after{
+      content:"";
+      position:absolute;
+      left:11%;right:11%;bottom:8px;
+      height:22px;
+      border-radius:50%;
+      background:#0004;
+      filter:blur(6px);
+    }
+    .character-image-card img{
+      position:absolute;
+      z-index:3;
+      left:50%;
+      bottom:-4px;
+      transform:translateX(-50%);
+      width:108%;
+      height:auto;
+      max-width:none;
+      filter:drop-shadow(0 5px 3px rgba(0,0,0,.32));
+      user-select:none;
+      pointer-events:none;
+    }
+    .character-light{
+      position:absolute;
+      z-index:1;
+      left:12px;right:12px;top:14px;
+      height:8px;
+      background:#fff;
+      box-shadow:0 0 18px 8px #fff9;
+      transform:rotate(-4deg);
+    }
+    @media(max-width:420px){
+      .hero-body{grid-template-columns:48% 1fr;gap:7px}
+      .character-image-card{height:250px}
+      .character-image-card img{width:114%}
+      .overall-grade{font-size:52px}
+      .overall-num{font-size:37px}
+    }
+
     @media print{
       body{background:#fff}.app{max-width:none;padding:0}.toolbar,.players,.bottom-nav,.actions,.inputs,.grade-editor,.primary{display:none!important}
       .panel,.hero,.section{box-shadow:none;break-inside:avoid}.header{background:#061a4d!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
@@ -297,7 +361,7 @@
     <button class="header-back" type="button" onclick="scrollTo({top:0,behavior:'smooth'})">‹</button>
     <div class="game-logo">
       <div class="logo-main">草野球AI査定</div>
-      <div class="logo-sub">BASEBALL SCOUTING SYSTEM</div>
+      <div class="logo-sub">BASEBALL SCOUTING SYSTEM</div><div class="visible-version">Ver.11・新キャラクター</div>
     </div>
     <button class="header-star" type="button">★</button>
   </section>
@@ -349,7 +413,7 @@
 
   <section class="quick-actions quick-actions-five">
     <button id="addPlayer">＋ 選手追加</button>
-    <button id="loadSeasonData">2026データ</button>
+    <button id="loadSeasonData">29選手反映</button>
     <button id="importPdfTop">PDF読込</button>
     <button id="saveJsonTop">保存</button>
     <button id="printTop">共有</button>
@@ -372,7 +436,10 @@
       </label>
     </div>
     <div class="hero-body">
-      <div class="avatar"><div class="cap"></div><div class="face"><i class="eye l"></i><i class="eye r"></i></div><div class="body"></div></div>
+      <div class="avatar character-image-card">
+        <div class="character-light"></div>
+        <img src="./assets/player-character.png?v=11" alt="野球ゲーム風デフォルメ選手キャラクター">
+      </div>
       <div class="overall">
         <div class="overall-label">総合力</div>
         <div class="overall-line"><span id="overallGrade" class="overall-grade grade">C</span><span id="overallNum" class="overall-num">60</span></div>
@@ -475,7 +542,9 @@
     </div>
     <p>アップロードされたSmartScorer PDFの内容を、アプリへ直接組み込んであります。</p>
     <button class="primary" id="applyEmbeddedSeasonData">29選手の2026成績を反映</button>
-    <div class="embedded-status" id="embeddedStatus">既存の手動能力と守備適性は保持して更新します。</div>
+    <div class="embedded-status" id="embeddedStatus">既存の手動能力と守備適性は保持して、29選手を必ず追加・更新します。</div>
+    <button class="secondary-data-button" id="forceReloadEmbeddedData">データを強制再反映</button>
+    <button class="danger-data-button" id="resetAppData">端末内データを初期化して29選手を入れる</button>
   </section>
 
   <section class="section pdf-wizard">
@@ -854,11 +923,11 @@ function applyEmbedded2026Data(){
   data.teamName=EMBEDDED_2026_DATA.teamName;
   data.teamResults={...EMBEDDED_2026_DATA.teamResults,importedAt:new Date().toISOString()};
   if(!data.selected && data.players[0])data.selected=data.players[0].id;
-  data.embeddedDatasetVersion="2026-07-13-v1";
+  data.embeddedDatasetVersion="2026-07-13-v2";
   saveLocal();
   render();
   embeddedStatus.className="embedded-status success";
-  embeddedStatus.textContent=`反映完了：${added}人追加、${updated}人更新。手動能力と守備適性は保持されています。`;
+  embeddedStatus.textContent=`反映完了：登録${data.players.length}人（追加${added}・更新${updated}）。手動能力と守備適性は保持されています。`;
   toast("2026シーズンデータを反映しました");
 }
 
@@ -869,8 +938,12 @@ let playerSort="number";
 data.teamName ??= "Romance";
 data.lineup ??= [];
 if(!data.selected && data.players.length)data.selected=data.players[0].id;
-if(!data.embeddedDatasetVersion && data.players.length===1 && normalizeEmbeddedName(data.players[0].name)==="山本永遠"){
-  setTimeout(()=>applyEmbedded2026Data(),0);
+if(data.embeddedDatasetVersion!=="2026-07-13-v2"){
+  setTimeout(()=>{
+    applyEmbedded2026Data();
+    embeddedStatus.className="embedded-status success";
+    embeddedStatus.textContent=`Ver.10更新完了：現在${data.players.length}人を登録しています。`;
+  },150);
 }
 
 function samplePlayer(){
@@ -1107,6 +1180,9 @@ function render(){
   document.querySelectorAll("[data-stat]").forEach(i=>i.oninput=e=>{p.stats[e.target.dataset.stat]=Math.max(0,+e.target.value||0);saveLocal();renderStatsOnly()});
 
   teamName.value=data.teamName;
+  if(typeof embeddedStatus!=="undefined" && embeddedStatus && data.embeddedDatasetVersion==="2026-07-13-v2"){
+    embeddedStatus.textContent=`Ver.10データ適用済み：現在${data.players.length}人登録`;
+  }
   renderTeamSummary();
   renderLineup();
   renderRanking();
@@ -1224,6 +1300,22 @@ applyEmbeddedSeasonData.onclick=()=>{
 loadSeasonData.onclick=()=>{
   document.querySelector(".preloaded-data-panel")?.scrollIntoView({behavior:"smooth"});
   setTimeout(()=>applyEmbeddedSeasonData.click(),350);
+};
+forceReloadEmbeddedData.onclick=()=>{
+  applyEmbedded2026Data();
+  embeddedStatus.className="embedded-status success";
+  embeddedStatus.textContent=`強制反映完了：現在${data.players.length}人を登録しています。`;
+};
+resetAppData.onclick=()=>{
+  if(!confirm("端末内の選手データを初期化し、PDF記載の29選手を入れ直しますか？\n手動入力した内容も削除されます。"))return;
+  localStorage.removeItem("kusayakyu_ai_pwa_v1");
+  data={selected:null,teamName:"ロマンス",lineup:[],players:[]};
+  applyEmbedded2026Data();
+  data.selected=data.players.find(p=>normalizeEmbeddedName(p.name)==="山本永遠")?.id || data.players[0]?.id;
+  saveLocal();
+  render();
+  embeddedStatus.className="embedded-status success";
+  embeddedStatus.textContent=`初期化完了：${data.players.length}人を登録しました。`;
 };
 
 async function handlePdfImport(file){
