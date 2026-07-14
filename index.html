@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#061a4d">
-<link rel="manifest" href="./manifest.webmanifest?v=22">
-<title>草野球AI査定 Ver.22</title>
+<link rel="manifest" href="./manifest.webmanifest?v=23">
+<title>草野球AI査定 Ver.23</title>
 <style>
 :root{--navy:#061a4d;--blue:#086bd3;--cyan:#55e7ff;--gold:#ffc928;--panel:#eef6ff}
 *{box-sizing:border-box}
@@ -104,11 +104,42 @@ repeating-linear-gradient(100deg,#58bd48 0 26px,#4eaf42 26px 52px)}
 .share-note{padding:9px;border-radius:8px;background:#e5effa;color:#49627e;font-size:11px;font-weight:800;line-height:1.5}
 #shareData{background:linear-gradient(#20a86a,#087947)}
 
+
+.rank-row.rank-gold{
+  background:linear-gradient(90deg,#fff7bf,#ffd94f 45%,#fff8d5);
+  border-left:7px solid #d79d00;
+}
+.rank-row.rank-silver{
+  background:linear-gradient(90deg,#f8fbff,#cfd8e3 45%,#f7f9fc);
+  border-left:7px solid #8d9baa;
+}
+.rank-row.rank-bronze{
+  background:linear-gradient(90deg,#ffe2cb,#c98349 45%,#ffe8d6);
+  border-left:7px solid #985322;
+}
+.rank-row.rank-gold .rank-no{
+  color:#a76c00;
+  text-shadow:0 1px #fff;
+}
+.rank-row.rank-silver .rank-no{
+  color:#65717d;
+  text-shadow:0 1px #fff;
+}
+.rank-row.rank-bronze .rank-no{
+  color:#7c3f18;
+  text-shadow:0 1px #fff;
+}
+.rank-row.rank-gold .rank-value,
+.rank-row.rank-silver .rank-value,
+.rank-row.rank-bronze .rank-value{
+  color:#102858;
+}
+
 </style>
 </head>
 <body>
 <div class="app">
-<header class="header"><h1>草野球AI査定</h1><div class="version">Ver.22 保存・共有修正版</div></header>
+<header class="header"><h1>草野球AI査定</h1><div class="version">Ver.23 規定打席・順位色</div></header>
 <section class="top-actions">
 <button id="addPlayer">＋選手</button><button id="deletePlayer">選手削除</button><button id="applySeason">29選手反映</button><button id="smartImportTop">SmartScorer</button><button id="saveJson">JSON保存</button><button id="shareData">データ共有</button><button id="loadJson">JSON読込</button>
 </section>
@@ -255,10 +286,27 @@ function rankValue(p,k){const s=p.stats,c=calc(p);if(k==="overall")return overal
 function renderRanking(){
  const tabs=[["overall","総合"],["contact","ミート"],["power","パワー"],["speed","走力"],["arm","肩力"],["fielding","守備"],["catching","捕球"],["avg","打率"],["hits","安打"],["doubles","二塁打"],["triples","三塁打"],["hr","本塁打"],["rbi","打点"],["runs","得点"],["sb","盗塁"],["walks","四死球"],["so","三振"],["obp","出塁率"],["slg","長打率"],["ops","OPS"]];
  rankTabs.innerHTML=tabs.map(([k,l])=>`<button data-rank="${k}" class="${rankingKey===k?"active":""}">${l}</button>`).join("");
- let list=[...data.players];const q=qualification();if(rankingKey==="avg")list=list.filter(p=>(+p.stats.pa||0)>=q);
+ let list=[...data.players];
+ const q=qualification();
+ const qualifiedKeys=["avg","obp","slg","ops"];
+ if(qualifiedKeys.includes(rankingKey)){
+   list=list.filter(p=>(+p.stats.pa||0)>=q);
+ }
  list.sort((a,b)=>rankValue(b,rankingKey)-rankValue(a,rankingKey)||(+b.stats.pa||0)-(+a.stats.pa||0));
- rankGuide.textContent=rankingKey==="avg"?`規定打席 ${q}打席以上の選手のみ表示`:"規定打席未到達者も表示。選手をタップすると能力画面へ移動します。";
- rankList.innerHTML=list.slice(0,10).map((p,i)=>{let v=rankValue(p,rankingKey);const decimal=["avg","obp","slg","ops"].includes(rankingKey);return `<button class="rank-row ${p.id===data.selected?"selected":""}" data-player="${p.id}"><span class="rank-no">${i+1}</span><span class="rank-name">${p.name}<small>${p.mainPosition}・${p.stats.pa}打席</small></span><span class="rank-value">${decimal?v.toFixed(3).replace(/^0/,""):Math.round(v)}</span><span class="rank-arrow">›</span></button>`}).join("")||`<div style="padding:20px;text-align:center">対象選手がいません</div>`;
+ rankGuide.textContent=qualifiedKeys.includes(rankingKey)
+   ?`規定打席 ${q}打席以上の選手のみ表示`
+   :"規定打席未到達者も表示。選手をタップすると能力画面へ移動します。";
+ rankList.innerHTML=list.slice(0,10).map((p,i)=>{
+   let v=rankValue(p,rankingKey);
+   const decimal=qualifiedKeys.includes(rankingKey);
+   const rankClass=i===0?"rank-gold":i===1?"rank-silver":i===2?"rank-bronze":"";
+   return `<button class="rank-row ${rankClass} ${p.id===data.selected?"selected":""}" data-player="${p.id}">
+     <span class="rank-no">${i+1}</span>
+     <span class="rank-name">${p.name}<small>${p.mainPosition}・${p.stats.pa}打席</small></span>
+     <span class="rank-value">${decimal?v.toFixed(3).replace(/^0/,""):Math.round(v)}</span>
+     <span class="rank-arrow">›</span>
+   </button>`;
+ }).join("")||`<div style="padding:20px;text-align:center">規定打席 ${q}打席に到達した選手がいません</div>`;
 }
 playerStrip.addEventListener("click",e=>{const b=e.target.closest("[data-id]");if(!b)return;data.selected=b.dataset.id;save();render()});
 rankTabs.addEventListener("click",e=>{const b=e.target.closest("[data-rank]");if(!b)return;rankingKey=b.dataset.rank;renderRanking()});
@@ -412,7 +460,7 @@ loadJson.onclick=()=>jsonFile.click();jsonFile.onchange=async()=>{try{const obj=
 document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>document.querySelector(b.dataset.go)?.scrollIntoView({behavior:"smooth"}));
 window.addEventListener("beforeunload",e=>{if(dirty){e.preventDefault();e.returnValue=""}});
 save();render();
-if("serviceWorker"in navigator)navigator.serviceWorker.register("./sw.js?v=22").catch(()=>{});
+if("serviceWorker"in navigator)navigator.serviceWorker.register("./sw.js?v=23").catch(()=>{});
 </script>
 </body>
 </html>
