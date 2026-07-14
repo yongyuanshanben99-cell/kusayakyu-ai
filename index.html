@@ -177,11 +177,12 @@
     <button type="button" id="dismissNotice">×</button>
   </div>
 
-  <div class="toolbar">
+  <div class="toolbar toolbar-five">
     <button class="tool gold" id="addPlayer">＋ 選手</button>
+    <button class="tool pdf-import-btn" id="importPdfTop">PDF読込</button>
     <button class="tool" id="saveJsonTop">JSON保存</button>
-    <button class="tool" id="loadJsonTop">読込</button>
-    <button class="tool" id="printTop">PDF</button>
+    <button class="tool" id="loadJsonTop">JSON読込</button>
+    <button class="tool" id="printTop">PDF出力</button>
   </div>
 
   <section class="section dashboard-section">
@@ -316,6 +317,23 @@
   </section>
 
   <section class="section">
+    <div class="section-title">SmartScorer PDF読込</div>
+    <div class="pdf-import-box">
+      <div class="pdf-import-description">
+        SmartScorerから出力した「試合結果・集計・スタッツ」PDFを読み込みます。
+        選手名と背番号を照合し、新規選手の追加または成績の更新を行います。
+      </div>
+      <button class="primary" id="importPdf">📄 SmartScorer PDFを選択</button>
+      <div class="import-options">
+        <label><input type="radio" name="pdfMode" value="merge" checked> 既存選手へ上書き・新規選手を追加</label>
+        <label><input type="radio" name="pdfMode" value="replace"> 選手データを入れ替える</label>
+      </div>
+      <div class="pdf-import-status" id="pdfImportStatus">PDFはまだ読み込まれていません。</div>
+      <div class="pdf-preview" id="pdfPreview"></div>
+    </div>
+  </section>
+
+  <section class="section">
     <div class="section-title">共有・データ管理</div>
     <div class="actions">
       <button id="shareReport">選手査定表を共有</button>
@@ -327,6 +345,7 @@
 </div>
 
 <input id="fileInput" type="file" accept="application/json,.json" hidden>
+<input id="pdfFileInput" type="file" accept="application/pdf,.pdf" hidden>
 <div class="bottom-nav">
   <div class="bottom-nav-inner">
     <button onclick="scrollTo({top:0,behavior:'smooth'})">選手</button>
@@ -350,6 +369,210 @@ const STAT_INPUTS=[
   ["doubles","二塁打"],["triples","三塁打"],["hr","本塁打"],["rbi","打点"],
   ["runs","得点"],["walks","四死球"],["so","三振"],["sb","盗塁"]
 ];
+
+
+let pdfjsPromise=null;
+async function loadPdfJS(){
+  if(pdfjsPromise)return pdfjsPromise;
+  pdfjsPromise=import("https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.min.mjs").then(mod=>{
+    mod.GlobalWorkerOptions.workerSrc="https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.worker.min.mjs";
+    return mod;
+  });
+  return pdfjsPromise;
+}
+
+function normalizeJapaneseName(name){
+  return String(name||"")
+    .replace(/[\s　]+/g,"")
+    .replace(/[髙﨑]/g,m=>({"髙":"高","﨑":"崎"}[m]||m));
+}
+
+function splitPdfLine(text){
+  return String(text||"").trim().split(/\s+/).filter(Boolean);
+}
+
+async function extractPdfLines(file){
+  const pdfjs=await loadPdfJS();
+  const bytes=new Uint8Array(await file.arrayBuffer());
+  const pdf=await pdfjs.getDocument({data:bytes}).promise;
+  const pages=[];
+  for(let pageNo=1;pageNo<=pdf.numPages;pageNo++){
+    const page=await pdf.getPage(pageNo);
+    const content=await page.getTextContent();
+    const grouped=new Map();
+    for(const item of content.items){
+      if(!item.str || !item.str.trim())continue;
+      const y=Math.round(item.transform[5]*2)/2;
+      if(!grouped.has(y))grouped.set(y,[]);
+      grouped.get(y).push({x:item.transform[4],text:item.str});
+    }
+    const lines=[...grouped.entries()]
+      .sort((a,b)=>b[0]-a[0])
+      .map(([y,items])=>({
+        y,
+        text:items.sort((a,b)=>a.x-b.x).map(v=>v.text).join(" ").replace(/\s+/g," ").trim()
+      }))
+      .filter(x=>x.text);
+    pages.push(lines);
+  }
+  return pages;
+}
+
+function parseSmartScorerPdf(pages){
+  const allLines=pages.flat().map(x=>x.text);
+  const result={
+    teamName:"",
+    games:0,wins:0,losses:0,draws:0,runsFor:0,runsAgainst:0,
+    players:[],
+    warnings:[]
+  };
+
+  // Team name: line immediately containing VS
+  const vsLine=allLines.find(line=>line.includes(" VS "));
+  if(vsLine)result.teamName=vsLine.split(" VS ")[0].trim();
+
+  // Overall result row. Prefer a compact numeric line after headers.
+  for(let i=0;i<allLines.length;i++){
+    if(/試合.*勝.*負.*分.*得点/.test(allLines[i])){
+      for(let j=i+1;j<Math.min(i+5,allLines.length);j++){
+        const nums=allLines[j].match(/-?\d+(?:\.\d+)?/g);
+        if(nums && nums.length>=7){
+          result.games=+nums[0]||0;
+          result.wins=+nums[1]||0;
+          result.losses=+nums[2]||0;
+          result.draws=+nums[3]||0;
+          result.runsFor=+nums[4]||0;
+          result.runsAgainst=+nums[6]||0;
+          break;
+        }
+      }
+      if(result.games)break;
+    }
+  }
+
+  // Locate stats pages and rows.
+  const playerRows=[];
+  for(const page of pages){
+    const headerIndex=page.findIndex(x=>x.text.includes("打者") && x.text.includes("打率") && x.text.includes("打席") && x.text.includes("安打"));
+    if(headerIndex<0)continue;
+    for(let i=headerIndex+1;i<page.length;i++){
+      const line=page[i].text.trim();
+      if(!line || line.includes("規定打席数") || line.includes("SmartScorer"))continue;
+      if(line.startsWith("スタッツ") || line.startsWith("期間") || line.includes("試合のタイプ"))continue;
+
+      const parts=splitPdfLine(line);
+      const firstNumberIndex=parts.findIndex(v=>/^\d+$/.test(v));
+      if(firstNumberIndex!==0)continue;
+
+      const number=Number(parts[0]);
+      // Find first rate (.xxx or -), which marks the start after player name
+      let rateIdx=-1;
+      for(let k=1;k<parts.length;k++){
+        if(/^\.?\d*\.\d+$/.test(parts[k]) || parts[k]==="-"){
+          rateIdx=k; break;
+        }
+      }
+      if(rateIdx<2)continue;
+
+      const name=parts.slice(1,rateIdx).join(" ");
+      const values=parts.slice(rateIdx);
+      if(!name || values.length<18)continue;
+
+      const num=v=>v==="-"?0:(Number(v)||0);
+      // SmartScorer order:
+      // AVG OBP SLG RISP G PA AB H 1B 2B 3B HR R RBI SH/SF BB SO Ereach SB CS PO
+      const row={
+        number,name,
+        avg:values[0],obp:values[1],slg:values[2],risp:values[3],
+        games:num(values[4]),pa:num(values[5]),ab:num(values[6]),hits:num(values[7]),
+        singles:num(values[8]),doubles:num(values[9]),triples:num(values[10]),hr:num(values[11]),
+        runs:num(values[12]),rbi:num(values[13]),sacrifice:num(values[14]),
+        walks:num(values[15]),so:num(values[16]),errorReach:num(values[17]),
+        sb:num(values[18]),cs:num(values[19]),pickoff:num(values[20])
+      };
+      playerRows.push(row);
+    }
+  }
+
+  // Deduplicate number+name, keeping row with most PA
+  const unique=new Map();
+  for(const row of playerRows){
+    const key=`${row.number}:${normalizeJapaneseName(row.name)}`;
+    const old=unique.get(key);
+    if(!old || row.pa>old.pa)unique.set(key,row);
+  }
+  result.players=[...unique.values()];
+  if(!result.players.length)result.warnings.push("選手別スタッツを検出できませんでした。");
+  return result;
+}
+
+function findExistingPlayer(row){
+  const normalized=normalizeJapaneseName(row.name);
+  return data.players.find(p=>
+    (Number(p.number)===Number(row.number) && normalizeJapaneseName(p.name)===normalized) ||
+    normalizeJapaneseName(p.name)===normalized
+  );
+}
+
+function applySmartScorerImport(parsed,mode){
+  if(mode==="replace"){
+    data.players=[];
+    data.lineup=[];
+    data.selected=null;
+  }
+  let added=0,updated=0;
+  for(const row of parsed.players){
+    let p=findExistingPlayer(row);
+    if(!p){
+      p=samplePlayer();
+      p.id=crypto.randomUUID();
+      p.name=row.name.replace(/\s+/g," ").trim();
+      p.number=row.number;
+      p.mainPosition="捕手";
+      p.abilities={contact:50,power:50,discipline:50,speed:50,arm:50,fielding:50,catching:50};
+      p.grades=Object.fromEntries(POSITIONS.map(x=>[x,"G"]));
+      p.specials=[];
+      p.note="";
+      data.players.push(p);
+      added++;
+    }else updated++;
+
+    p.season="2026";
+    p.stats={
+      games:row.games,pa:row.pa,ab:row.ab,hits:row.hits,
+      doubles:row.doubles,triples:row.triples,hr:row.hr,
+      rbi:row.rbi,runs:row.runs,walks:row.walks,so:row.so,
+      sb:row.sb,cs:row.cs||0,sacrifice:row.sacrifice||0
+    };
+  }
+  if(parsed.teamName)data.teamName=parsed.teamName;
+  if(!data.selected && data.players[0])data.selected=data.players[0].id;
+  data.teamResults={
+    games:parsed.games,wins:parsed.wins,losses:parsed.losses,draws:parsed.draws,
+    runsFor:parsed.runsFor,runsAgainst:parsed.runsAgainst,
+    importedAt:new Date().toISOString()
+  };
+  saveLocal();
+  render();
+  return {added,updated};
+}
+
+function showPdfPreview(parsed){
+  const summary=`
+    <div class="pdf-team-summary">
+      <div>試合<strong>${parsed.games}</strong></div>
+      <div>勝敗<strong>${parsed.wins}勝${parsed.losses}敗</strong></div>
+      <div>得点<strong>${parsed.runsFor}</strong></div>
+      <div>失点<strong>${parsed.runsAgainst}</strong></div>
+    </div>`;
+  const rows=parsed.players.slice(0,30).map(p=>`
+    <div class="pdf-player-row">
+      <b>${p.number}</b><b>${esc(p.name)}</b>
+      <span>${p.hits}/${p.ab}</span><span>${p.avg}</span>
+    </div>`).join("");
+  pdfPreview.innerHTML=summary+rows+
+    (parsed.players.length>30?`<div style="padding:8px;text-align:center">ほか${parsed.players.length-30}人</div>`:"");
+}
 
 let data=loadLocal()||{selected:null,teamName:"Romance",lineup:[],players:[samplePlayer()]};
 let rankingKey="overall";
@@ -380,8 +603,12 @@ function renderTeamSummary(){
   const avg=count?Math.round(data.players.reduce((s,p)=>s+overall(p),0)/count):0;
   const attack=count?Math.round(data.players.reduce((s,p)=>s+(p.abilities.contact+p.abilities.power+p.abilities.discipline)/3,0)/count):0;
   const defense=count?Math.round(data.players.reduce((s,p)=>s+(p.abilities.arm+p.abilities.fielding+p.abilities.catching)/3,0)/count):0;
+  const record=data.teamResults;
   teamSummary.innerHTML=[
-    ["登録人数",count+"人"],["総合平均",gradeFrom(avg)+" "+avg],["攻撃",gradeFrom(attack)+" "+attack],["守備",gradeFrom(defense)+" "+defense]
+    ["登録人数",count+"人"],
+    ["総合平均",gradeFrom(avg)+" "+avg],
+    ["攻撃",gradeFrom(attack)+" "+attack],
+    [record?"チーム成績":"守備",record?`${record.wins}勝${record.losses}敗`:gradeFrom(defense)+" "+defense]
   ].map(([a,b])=>`<div class="summary-card"><b>${a}</b><strong>${b}</strong></div>`).join("");
 }
 function rankingValue(p,key){
@@ -687,6 +914,42 @@ shareReport.onclick=async()=>{
   if(navigator.share){try{await navigator.share({title:"草野球AI査定",text:shareText});return}catch{}}
   await navigator.clipboard.writeText(shareText);toast("査定内容をコピーしました")
 };
+
+async function handlePdfImport(file){
+  pdfImportStatus.className="pdf-import-status loading";
+  pdfImportStatus.textContent="PDFを解析しています。初回は解析ライブラリの読込に少し時間がかかります。";
+  pdfPreview.innerHTML="";
+  try{
+    const pages=await extractPdfLines(file);
+    const parsed=parseSmartScorerPdf(pages);
+    if(!parsed.players.length)throw new Error("選手別スタッツを検出できませんでした。SmartScorerのスタッツページを含むPDFを選択してください。");
+    showPdfPreview(parsed);
+    const mode=document.querySelector('input[name="pdfMode"]:checked')?.value||"merge";
+    const ok=confirm(`${parsed.players.length}人の成績を検出しました。\nチーム: ${parsed.teamName||"不明"}\nこのデータをアプリへ反映しますか？`);
+    if(!ok){
+      pdfImportStatus.className="pdf-import-status";
+      pdfImportStatus.textContent="解析結果を確認しましたが、反映はキャンセルされました。";
+      return;
+    }
+    const result=applySmartScorerImport(parsed,mode);
+    pdfImportStatus.className="pdf-import-status success";
+    pdfImportStatus.textContent=`読込完了：${result.added}人を追加、${result.updated}人を更新しました。チーム成績は${parsed.games}試合 ${parsed.wins}勝${parsed.losses}敗です。`;
+    toast("SmartScorer PDFを読み込みました");
+  }catch(err){
+    console.error(err);
+    pdfImportStatus.className="pdf-import-status error";
+    pdfImportStatus.textContent=`読込エラー：${err?.message||"PDFを解析できませんでした。"}`;
+  }finally{
+    pdfFileInput.value="";
+  }
+}
+importPdf.onclick=()=>pdfFileInput.click();
+importPdfTop.onclick=()=>pdfFileInput.click();
+pdfFileInput.onchange=e=>{
+  const file=e.target.files?.[0];
+  if(file)handlePdfImport(file);
+};
+
 dismissNotice.onclick=()=>{installNotice.style.display="none";localStorage.setItem("hide_install_notice_v5","1")};
 if(localStorage.getItem("hide_install_notice_v5")==="1")installNotice.style.display="none";
 if("serviceWorker" in navigator){
