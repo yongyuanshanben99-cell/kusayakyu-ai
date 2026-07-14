@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#061a4d">
-<link rel="manifest" href="./manifest.webmanifest?v=34">
-<title>草野球AI査定 Ver.34</title>
+<link rel="manifest" href="./manifest.webmanifest?v=35">
+<title>草野球AI査定 Ver.35</title>
 <style>
 :root{--navy:#061a4d;--blue:#086bd3;--cyan:#55e7ff;--gold:#ffc928;--panel:#eef6ff}
 *{box-sizing:border-box}
@@ -174,13 +174,46 @@ repeating-linear-gradient(100deg,#58bd48 0 26px,#4eaf42 26px 52px)}
 .viewer-guide a{display:block;text-align:center;text-decoration:none;border-radius:10px;padding:12px;background:linear-gradient(#20a86a,#087947);color:#fff;font-weight:900}
 #shareReadonly,#shareReadonlyMain{background:linear-gradient(#20a86a,#087947)}
 
+
+#openReadonlyPack,#openReadonlyPackMain{background:linear-gradient(#8a67d8,#5a39a9)}
+.readonly-mode-banner{
+  position:sticky;top:0;z-index:80;
+  display:grid;grid-template-columns:1fr auto;gap:4px 10px;align-items:center;
+  padding:calc(env(safe-area-inset-top) + 8px) 10px 9px;
+  background:linear-gradient(#7f61d4,#49349a);color:#fff;
+  border-bottom:3px solid #d9c9ff;box-shadow:0 4px 12px #0007;
+}
+.readonly-mode-banner[hidden]{display:none}
+.readonly-mode-banner strong{font-size:15px}.readonly-mode-banner span{grid-column:1;font-size:10px;font-weight:800}
+.readonly-mode-banner button{grid-column:2;grid-row:1/3;border:1px solid #fff;border-radius:9px;padding:9px;background:#fff;color:#46308e;font-weight:900}
+body.readonly-mode .top-actions button,
+body.readonly-mode .savebar,
+body.readonly-mode #smartImportCard,
+body.readonly-mode #shareCard,
+body.readonly-mode #viewerGuideCard,
+body.readonly-mode #bestNineCard,
+body.readonly-mode #teamAnalysisCard button,
+body.readonly-mode #aiAssess,
+body.readonly-mode .grade-editor,
+body.readonly-mode input,
+body.readonly-mode select,
+body.readonly-mode textarea{pointer-events:none;opacity:.55}
+body.readonly-mode #openReadonlyPack,
+body.readonly-mode #openReadonlyPackMain,
+body.readonly-mode #exitReadonlyMode{pointer-events:auto;opacity:1}
+
 </style>
 </head>
 <body>
-<div class="app">
-<header class="header"><h1>草野球AI査定</h1><div class="version">Ver.34 起動修正版</div></header>
+<div class="app"><div id="readonlyModeBanner" class="readonly-mode-banner" hidden>
+  <strong>閲覧専用モード</strong>
+  <span>このデータは変更・保存できません。</span>
+  <button id="exitReadonlyMode" type="button">本体へ戻る</button>
+</div>
+
+<header class="header"><h1>草野球AI査定</h1><div class="version">Ver.35 閲覧パック共有</div></header>
 <section class="top-actions">
-<button id="addPlayer">＋選手</button><button id="deletePlayer">選手削除</button><button id="applySeason">29選手反映</button><button id="smartImportTop">SmartScorer</button><button id="saveJson">JSON保存</button><button id="shareData">編集用データ共有</button><button id="shareReadonly">閲覧専用HTML共有</button><button id="teamPageBtn">チーム分析</button><button id="bestNineBtn">AIベストナイン</button><button id="loadJson">JSON読込</button>
+<button id="addPlayer">＋選手</button><button id="deletePlayer">選手削除</button><button id="applySeason">29選手反映</button><button id="smartImportTop">SmartScorer</button><button id="saveJson">JSON保存</button><button id="shareData">編集用データ共有</button><button id="shareReadonly">閲覧パック共有</button><button id="openReadonlyPack">閲覧パックを開く</button><button id="teamPageBtn">チーム分析</button><button id="bestNineBtn">AIベストナイン</button><button id="loadJson">JSON読込</button>
 </section>
 <section class="card"><div class="player-strip" id="playerStrip"></div></section>
 <section class="card" id="detailCard">
@@ -216,7 +249,7 @@ repeating-linear-gradient(100deg,#58bd48 0 26px,#4eaf42 26px 52px)}
     </div>
     <div class="grade-editor" id="gradeEditor"></div></section>
 <section class="card" id="viewerGuideCard">
-<div class="card-title">閲覧専用HTML共有</div>
+<div class="card-title">閲覧パック共有</div>
 <div class="viewer-guide">
   <p>閲覧専用データを送ると、相手は選手・能力・成績・守備適性・ランキングを確認できます。</p>
   <ul>
@@ -232,7 +265,7 @@ repeating-linear-gradient(100deg,#58bd48 0 26px,#4eaf42 26px 52px)}
 <div class="card-title">データ共有</div>
 <div class="share-panel">
   <p>全選手の能力・成績・守備適性・メモをJSONファイルにして共有します。</p>
-  <button id="shareDataMain">編集用データを共有</button><button id="shareReadonlyMain">閲覧専用HTMLを共有</button><button id="sharePlayerCard">選手査定表を共有・PDF保存</button>
+  <button id="shareDataMain">編集用データを共有</button><button id="shareReadonlyMain">閲覧パックを共有</button><button id="openReadonlyPackMain">閲覧パックを開く</button><button id="sharePlayerCard">選手査定表を共有・PDF保存</button>
   <button id="downloadBackup">共有できない場合：JSONを保存</button>
   <div class="share-note">iPhoneではLINE、メール、AirDrop、ファイル保存などを選べます。</div>
 </div>
@@ -288,7 +321,7 @@ repeating-linear-gradient(100deg,#58bd48 0 26px,#4eaf42 26px 52px)}
 <section class="card"><div class="card-title">監督メモ</div><div style="padding:10px"><textarea id="note"></textarea></div></section>
 </div>
 <div class="bottom"><div class="bottom-inner"><button data-go="#detailCard">選手</button><button data-go=".abilities">能力</button><button data-go=".field">守備</button><button data-go="#rankingCard">順位</button><button data-go=".top-actions">メニュー</button></div></div>
-<input id="jsonFile" type="file" accept=".json,application/json" hidden><input id="smartPdfFile" type="file" accept=".pdf,application/pdf" hidden>
+<input id="jsonFile" type="file" accept=".json,application/json" hidden><input id="readonlyPackFile" type="file" accept=".ksp,application/octet-stream,application/json" hidden><input id="smartPdfFile" type="file" accept=".pdf,application/pdf" hidden>
 <script>
 const STORAGE="kusayakyu_ai_v20";
 const POSITIONS=["投手","捕手","一塁手","二塁手","三塁手","遊撃手","左翼手","中堅手","右翼手"];
@@ -323,7 +356,7 @@ function normalizePlayer(p){
   p.stats=Object.assign({games:0,pa:0,ab:0,hits:0,doubles:0,triples:0,hr:0,runs:0,rbi:0,walks:0,so:0,sb:0,cs:0,sac:0},p.stats||{});
   return p;
 }
-function save(){localStorage.setItem(STORAGE,JSON.stringify(data))}
+function save(){if(readonlyMode)return;localStorage.setItem(STORAGE,JSON.stringify(data))}
 function current(){return data.players.find(p=>p.id===data.selected)||data.players[0]}
 function clamp(v){return Math.max(1,Math.min(100,Math.round(v)))}
 function grade(v){return v>=85?"A":v>=70?"B":v>=60?"C":v>=50?"D":v>=40?"E":v>=30?"F":"G"}
@@ -493,18 +526,18 @@ abilities.addEventListener("input",e=>{const k=e.target.dataset.ability;if(!k)re
     const gv=row.querySelector(".grade"),vv=row.querySelector(".value");
     gv.textContent=g;vv.textContent=e.target.value;
     gv.className=`grade grade-${g}`;vv.className=`value grade-${g}`;const ov=overall(current());overallGrade.textContent=grade(ov);overallNum.textContent=ov});
-saveAbilities.onclick=()=>{save();dirty=false;saveState.textContent="保存済み・ランキング更新完了";saveAbilities.disabled=true;renderRanking();renderTeamAnalysis();scoutComment.textContent=scoutText(current());playerStrip.querySelectorAll(".player-chip").forEach(()=>{})};
+saveAbilities.onclick=()=>{if(denyReadonlyAction())return;save();dirty=false;saveState.textContent="保存済み・ランキング更新完了";saveAbilities.disabled=true;renderRanking();renderTeamAnalysis();scoutComment.textContent=scoutText(current());playerStrip.querySelectorAll(".player-chip").forEach(()=>{})};
 number.oninput=()=>{current().number=+number.value||0};name.oninput=()=>{current().name=name.value};
 throwHand.onchange=()=>{current().throwHand=throwHand.value;save();render()};batHand.onchange=()=>{current().batHand=batHand.value;save();render()};
 mainPosition.onchange=()=>{current().mainPosition=mainPosition.value;save();render()};
 poseThrow.onclick=()=>{current().pose="throw";save();render()};poseBat.onclick=()=>{current().pose="bat";save();render()};
 gradeEditor.addEventListener("change",e=>{const pos=e.target.dataset.grade;if(!pos)return;current().grades[pos]=e.target.value;save();render()});
 note.oninput=()=>{current().note=note.value;save()};
-aiAssess.onclick=()=>{aiAssessPlayer(current());save();render()};
-addPlayer.onclick=()=>{const p=normalizePlayer({id:crypto.randomUUID(),number:data.players.length+1,name:"新規選手"});data.players.push(p);data.selected=p.id;save();render()};
-applySeason.onclick=()=>{const existing=new Map(data.players.map(p=>[p.name.replace(/\s/g,""),p]));for(const raw of clone(BASE_PLAYERS)){const key=raw.name.replace(/\s/g,"");const old=existing.get(key);if(old){old.stats=raw.stats;aiAssessPlayer(old)}else{const p=normalizePlayer(raw);aiAssessPlayer(p);data.players.push(p)}}data.teamResults={games:7,wins:2,losses:5,runsFor:33,runsAgainst:56};save();render()};
+aiAssess.onclick=()=>{if(denyReadonlyAction())return;aiAssessPlayer(current());save();render()};
+addPlayer.onclick=()=>{if(denyReadonlyAction())return;const p=normalizePlayer({id:crypto.randomUUID(),number:data.players.length+1,name:"新規選手"});data.players.push(p);data.selected=p.id;save();render()};
+applySeason.onclick=()=>{if(denyReadonlyAction())return;const existing=new Map(data.players.map(p=>[p.name.replace(/\s/g,""),p]));for(const raw of clone(BASE_PLAYERS)){const key=raw.name.replace(/\s/g,"");const old=existing.get(key);if(old){old.stats=raw.stats;aiAssessPlayer(old)}else{const p=normalizePlayer(raw);aiAssessPlayer(p);data.players.push(p)}}data.teamResults={games:7,wins:2,losses:5,runsFor:33,runsAgainst:56};save();render()};
 
-deletePlayer.onclick=()=>{
+deletePlayer.onclick=()=>{if(denyReadonlyAction())return;
   if(data.players.length<=1){alert("最後の1人は削除できません");return}
   const p=current();
   if(!confirm(`${p.name}を削除しますか？`))return;
@@ -594,16 +627,21 @@ smartPdfFile.onchange=async()=>{
 
 
 
-const READONLY_VIEWER_TEMPLATE_B64="PCFkb2N0eXBlIGh0bWw+CjxodG1sIGxhbmc9ImphIj4KPGhlYWQ+CjxtZXRhIGNoYXJzZXQ9InV0Zi04Ij4KPG1ldGEgbmFtZT0idmlld3BvcnQiIGNvbnRlbnQ9IndpZHRoPWRldmljZS13aWR0aCxpbml0aWFsLXNjYWxlPTEsdmlld3BvcnQtZml0PWNvdmVyIj4KPG1ldGEgbmFtZT0idGhlbWUtY29sb3IiIGNvbnRlbnQ9IiMwNjFhNGQiPgo8dGl0bGU+6I2J6YeO55CDQUnmn7vlrpog6Zay6Kan5bCC55So44OT44Ol44O844KiPC90aXRsZT4KPHN0eWxlPgo6cm9vdHstLW5hdnk6IzA2MWE0ZDstLWJsdWU6IzA4NmJkMzstLWN5YW46IzU1ZTdmZjstLWdvbGQ6I2ZmYzkyOH0KKntib3gtc2l6aW5nOmJvcmRlci1ib3h9CmJvZHl7bWFyZ2luOjA7YmFja2dyb3VuZDojMDYxYTRkO2ZvbnQtZmFtaWx5Oi1hcHBsZS1zeXN0ZW0sQmxpbmtNYWNTeXN0ZW1Gb250LCJIaXJhZ2lubyBLYWt1IEdvdGhpYyBQcm9OIiwiWXUgR290aGljIixzYW5zLXNlcmlmO2NvbG9yOiMxMDI4NTh9CmJ1dHRvbixpbnB1dHtmb250OmluaGVyaXR9Ci5hcHB7bWF4LXdpZHRoOjY0MHB4O21hcmdpbjphdXRvO3BhZGRpbmctYm90dG9tOjQwcHh9Ci5oZWFkZXJ7cG9zaXRpb246c3RpY2t5O3RvcDowO3otaW5kZXg6MzA7cGFkZGluZzpjYWxjKGVudihzYWZlLWFyZWEtaW5zZXQtdG9wKSArIDEycHgpIDEycHggMTJweDtiYWNrZ3JvdW5kOmxpbmVhci1ncmFkaWVudCgjMGE4MGVkLCMwMzI0NTcpO2JvcmRlci1ib3R0b206M3B4IHNvbGlkIHZhcigtLWN5YW4pO3RleHQtYWxpZ246Y2VudGVyO2NvbG9yOiNmZmZ9Ci5oZWFkZXIgaDF7bWFyZ2luOjA7Y29sb3I6I2ZmZGYzODtmb250LXNpemU6MjRweDt0ZXh0LXNoYWRvdzoycHggMnB4ICMwNjQ1OWJ9Ci5iYWRnZXtkaXNwbGF5OmlubGluZS1ibG9jazttYXJnaW4tdG9wOjZweDtwYWRkaW5nOjRweCAxMHB4O2JvcmRlci1yYWRpdXM6OTk5cHg7YmFja2dyb3VuZDojMjFhODZiO2NvbG9yOiNmZmY7Zm9udC1zaXplOjExcHg7Zm9udC13ZWlnaHQ6OTAwfQoubG9hZC1wYW5lbHttYXJnaW46MTBweDtib3JkZXI6MnB4IHNvbGlkIHZhcigtLWN5YW4pO2JvcmRlci1yYWRpdXM6MTRweDtwYWRkaW5nOjEycHg7YmFja2dyb3VuZDojZjNmOGZmfQoubG9hZC1wYW5lbCBwe21hcmdpbjowIDAgMTBweDtmb250LXNpemU6MTJweDtsaW5lLWhlaWdodDoxLjY7Zm9udC13ZWlnaHQ6ODAwfQoubG9hZC1wYW5lbCBidXR0b257d2lkdGg6MTAwJTtib3JkZXI6MDtib3JkZXItcmFkaXVzOjEwcHg7cGFkZGluZzoxMnB4O2JhY2tncm91bmQ6bGluZWFyLWdyYWRpZW50KCMwZDc5ZGQsIzA3MzQ3Nyk7Y29sb3I6I2ZmZjtmb250LXdlaWdodDo5MDB9Ci5zdGF0dXN7bWFyZ2luLXRvcDo4cHg7cGFkZGluZzo4cHg7Ym9yZGVyLXJhZGl1czo4cHg7YmFja2dyb3VuZDojZTVlZWY4O2ZvbnQtc2l6ZToxMXB4O2ZvbnQtd2VpZ2h0OjgwMH0KLnBsYXllci1zdHJpcHtkaXNwbGF5OmZsZXg7Z2FwOjdweDtvdmVyZmxvdzphdXRvO3BhZGRpbmc6OHB4O2JhY2tncm91bmQ6IzA2MzE2ZX0KLnBsYXllci1jaGlwe2ZsZXg6MCAwIGF1dG87Ym9yZGVyOjJweCBzb2xpZCAjNzVlOGZmO2JvcmRlci1yYWRpdXM6MTBweDtwYWRkaW5nOjhweCAxMnB4O2JhY2tncm91bmQ6IzBiNjFiODtjb2xvcjojZmZmO2ZvbnQtd2VpZ2h0OjkwMH0KLnBsYXllci1jaGlwLmFjdGl2ZXtib3JkZXItY29sb3I6I2ZmZDMyOTtiYWNrZ3JvdW5kOiMwOTQwODd9Ci5jYXJke21hcmdpbjo4cHg7Ym9yZGVyOjJweCBzb2xpZCB2YXIoLS1jeWFuKTtib3JkZXItcmFkaXVzOjE2cHg7b3ZlcmZsb3c6aGlkZGVuO2JhY2tncm91bmQ6I2ZmZjtib3gtc2hhZG93OjAgNHB4IDEwcHggIzAwMDZ9Ci5jYXJkLXRpdGxle3BhZGRpbmc6MTBweDtiYWNrZ3JvdW5kOmxpbmVhci1ncmFkaWVudCgjMGI3M2RiLCMwNTI2NjEpO2NvbG9yOiNmZmY7dGV4dC1hbGlnbjpjZW50ZXI7Zm9udC1zaXplOjE4cHg7Zm9udC13ZWlnaHQ6OTAwfQoucGxheWVyLWhlYWR7ZGlzcGxheTpncmlkO2dyaWQtdGVtcGxhdGUtY29sdW1uczo2MHB4IDFmciA5MHB4O2dhcDo4cHg7cGFkZGluZzoxMHB4O2JhY2tncm91bmQ6bGluZWFyLWdyYWRpZW50KCMwZDdlZWEsIzA1Mzk4Nyk7Y29sb3I6I2ZmZjthbGlnbi1pdGVtczpjZW50ZXJ9Ci5wbGF5ZXItaGVhZCAubnVtYmVye2ZvbnQtc2l6ZToyOHB4O2ZvbnQtd2VpZ2h0OjEwMDA7dGV4dC1hbGlnbjpjZW50ZXJ9Ci5wbGF5ZXItaGVhZCAubmFtZXtmb250LXNpemU6MjJweDtmb250LXdlaWdodDoxMDAwfQoucGxheWVyLWhlYWQgLm92ZXJhbGx7dGV4dC1hbGlnbjpjZW50ZXJ9Ci5wbGF5ZXItaGVhZCAub3ZlcmFsbCBzdHJvbmd7ZGlzcGxheTpibG9jaztmb250LXNpemU6MzZweDtjb2xvcjojZmZjZjI4fQouaW5mby1ncmlke2Rpc3BsYXk6Z3JpZDtncmlkLXRlbXBsYXRlLWNvbHVtbnM6cmVwZWF0KDMsMWZyKTtnYXA6MXB4O2JhY2tncm91bmQ6I2JmZDFlNn0KLmluZm8tZ3JpZCBkaXZ7YmFja2dyb3VuZDojZmZmO3BhZGRpbmc6MTBweCA0cHg7dGV4dC1hbGlnbjpjZW50ZXJ9Ci5pbmZvLWdyaWQgc3BhbntkaXNwbGF5OmJsb2NrO2ZvbnQtc2l6ZToxMHB4O2ZvbnQtd2VpZ2h0OjkwMDtjb2xvcjojNTU3MDhkfQouaW5mby1ncmlkIHN0cm9uZ3tkaXNwbGF5OmJsb2NrO21hcmdpbi10b3A6NHB4fQouYWJpbGl0aWVzIC5yb3d7ZGlzcGxheTpncmlkO2dyaWQtdGVtcGxhdGUtY29sdW1uczoxMDBweCAzNnB4IDQ2cHggMWZyO2FsaWduLWl0ZW1zOmNlbnRlcjtib3JkZXItdG9wOjFweCBzb2xpZCAjY2NkOWU4fQouYWJpbGl0aWVzIGxhYmVse3BhZGRpbmc6MTJweDtiYWNrZ3JvdW5kOiNlOWYzZmY7Zm9udC13ZWlnaHQ6OTAwfQouYWJpbGl0aWVzIC5ncmFkZSwuYWJpbGl0aWVzIC52YWx1ZXtmb250LXdlaWdodDoxMDAwO3RleHQtYWxpZ246Y2VudGVyfQouYmFye2hlaWdodDoxNnB4O2JvcmRlci1yYWRpdXM6OTk5cHg7YmFja2dyb3VuZDojZGNlNGVkO292ZXJmbG93OmhpZGRlbjttYXJnaW4tcmlnaHQ6MTBweH0KLmJhciBpe2Rpc3BsYXk6YmxvY2s7aGVpZ2h0OjEwMCU7YmFja2dyb3VuZDpsaW5lYXItZ3JhZGllbnQoOTBkZWcsIzQyYjgzNCwjOWJkYzQyKX0KLmdyYWRlLUF7Y29sb3I6I2VjM2Q4OX0uZ3JhZGUtQntjb2xvcjojZmY3YTUyfS5ncmFkZS1De2NvbG9yOiNmMWJkMDB9LmdyYWRlLUR7Y29sb3I6IzUyYmU0NX0uZ3JhZGUtRXtjb2xvcjojMmM5ZGUwfS5ncmFkZS1Ge2NvbG9yOiM3NzYyZDd9LmdyYWRlLUd7Y29sb3I6IzZmNzg4NH0KLnN0YXRzLWdyaWR7ZGlzcGxheTpncmlkO2dyaWQtdGVtcGxhdGUtY29sdW1uczpyZXBlYXQoNSwxZnIpfQouc3RhdHtwYWRkaW5nOjlweCAzcHg7Ym9yZGVyOjFweCBzb2xpZCAjMWE0ZDg2O2JhY2tncm91bmQ6IzA4MzY3NTtjb2xvcjojZmZmO3RleHQtYWxpZ246Y2VudGVyfQouc3RhdCBie2Rpc3BsYXk6YmxvY2s7Zm9udC1zaXplOjEwcHh9LnN0YXQgc3Bhbntmb250LXNpemU6MTlweDtmb250LXdlaWdodDo5MDB9Ci5maWVsZHtwb3NpdGlvbjpyZWxhdGl2ZTtoZWlnaHQ6MzQwcHg7bWFyZ2luOjEwcHg7Ym9yZGVyLXJhZGl1czoxNnB4O292ZXJmbG93OmhpZGRlbjtiYWNrZ3JvdW5kOnJlcGVhdGluZy1saW5lYXItZ3JhZGllbnQoMTAwZGVnLCM1OGJkNDggMCAyNnB4LCM0ZWFmNDIgMjZweCA1MnB4KX0KLmluZmllbGQtZGlydHtwb3NpdGlvbjphYnNvbHV0ZTtsZWZ0OjUwJTt0b3A6NTglO3dpZHRoOjIyMHB4O2hlaWdodDoyMjBweDt0cmFuc2Zvcm06dHJhbnNsYXRlKC01MCUsLTUwJSkgcm90YXRlKDQ1ZGVnKTtiYWNrZ3JvdW5kOiNjOTg3NDM7Ym9yZGVyOjNweCBzb2xpZCAjZTliNzc3fQouaW5maWVsZC1ncmFzc3twb3NpdGlvbjphYnNvbHV0ZTtsZWZ0OjUwJTt0b3A6NTglO3dpZHRoOjE0NXB4O2hlaWdodDoxNDVweDt0cmFuc2Zvcm06dHJhbnNsYXRlKC01MCUsLTUwJSkgcm90YXRlKDQ1ZGVnKTtiYWNrZ3JvdW5kOiM0M2FhM2V9Ci5iYXNle3Bvc2l0aW9uOmFic29sdXRlO3dpZHRoOjE4cHg7aGVpZ2h0OjE4cHg7YmFja2dyb3VuZDojZmZmO2JvcmRlcjoxcHggc29saWQgI2RkZDt0cmFuc2Zvcm06cm90YXRlKDQ1ZGVnKTt6LWluZGV4OjN9Ci5ob21le2xlZnQ6Y2FsYyg1MCUgLSA5cHgpO3RvcDo4NiV9LmZpcnN0e2xlZnQ6NzIlO3RvcDo2MyV9LnNlY29uZHtsZWZ0OmNhbGMoNTAlIC0gOXB4KTt0b3A6NDAlfS50aGlyZHtsZWZ0OjI3JTt0b3A6NjMlfQoucG9ze3Bvc2l0aW9uOmFic29sdXRlO3otaW5kZXg6NTt0cmFuc2Zvcm06dHJhbnNsYXRlKC01MCUsLTUwJSk7cGFkZGluZzo1cHggOHB4O2JvcmRlci1yYWRpdXM6OHB4O2JhY2tncm91bmQ6I2ZmZjtib3JkZXI6MnB4IHNvbGlkICMyNDVlOWY7dGV4dC1hbGlnbjpjZW50ZXI7Zm9udC13ZWlnaHQ6OTAwfQoucC1we2xlZnQ6NTAlO3RvcDo1OCV9LnAtY3tsZWZ0OjUwJTt0b3A6OTAlfS5wLTF7bGVmdDo3NyU7dG9wOjY0JX0ucC0ye2xlZnQ6NjQlO3RvcDo0MyV9LnAtM3tsZWZ0OjIzJTt0b3A6NjQlfS5wLXNze2xlZnQ6MzYlO3RvcDo0MyV9LnAtbGZ7bGVmdDoxOCU7dG9wOjIwJX0ucC1jZntsZWZ0OjUwJTt0b3A6MTIlfS5wLXJme2xlZnQ6ODIlO3RvcDoyMCV9Ci5yYW5rLXRhYnN7ZGlzcGxheTpmbGV4O2dhcDo3cHg7b3ZlcmZsb3c6YXV0bztwYWRkaW5nOjlweDtiYWNrZ3JvdW5kOiNlOGYzZmZ9Ci5yYW5rLXRhYnMgYnV0dG9ue2ZsZXg6MCAwIGF1dG87Ym9yZGVyOjA7Ym9yZGVyLXJhZGl1czo5OTlweDtwYWRkaW5nOjlweCAxM3B4O2JhY2tncm91bmQ6I2Q0ZTZmYjtjb2xvcjojMTIzYTcwO2ZvbnQtd2VpZ2h0OjkwMH0KLnJhbmstdGFicyBidXR0b24uYWN0aXZle2JhY2tncm91bmQ6dmFyKC0tZ29sZCk7Y29sb3I6IzEzMjM0Yn0KLnJhbmstZ3VpZGV7cGFkZGluZzo4cHggMTJweDtiYWNrZ3JvdW5kOiNmNWY5ZmY7Zm9udC1zaXplOjExcHg7Zm9udC13ZWlnaHQ6ODAwO2NvbG9yOiM0NjYyN2Z9Ci5yYW5rLXJvd3t3aWR0aDoxMDAlO2Rpc3BsYXk6Z3JpZDtncmlkLXRlbXBsYXRlLWNvbHVtbnM6NDRweCAxZnIgOTBweDthbGlnbi1pdGVtczpjZW50ZXI7Ym9yZGVyOjA7Ym9yZGVyLXRvcDoxcHggc29saWQgI2Q3ZTFlZDtwYWRkaW5nOjExcHg7YmFja2dyb3VuZDojZmZmO2NvbG9yOiMxMDI4NTg7dGV4dC1hbGlnbjpsZWZ0fQoucmFuay1yb3cuZ29sZHtiYWNrZ3JvdW5kOmxpbmVhci1ncmFkaWVudCg5MGRlZywjZmZmN2JmLCNmZmQ5NGYgNDUlLCNmZmY4ZDUpfQoucmFuay1yb3cuc2lsdmVye2JhY2tncm91bmQ6bGluZWFyLWdyYWRpZW50KDkwZGVnLCNmOGZiZmYsI2NmZDhlMyA0NSUsI2Y3ZjlmYyl9Ci5yYW5rLXJvdy5icm9uemV7YmFja2dyb3VuZDpsaW5lYXItZ3JhZGllbnQoOTBkZWcsI2ZmZTJjYiwjYzk4MzQ5IDQ1JSwjZmZlOGQ2KX0KLnJhbmstbm97Zm9udC1zaXplOjIwcHg7Zm9udC13ZWlnaHQ6MTAwMDt0ZXh0LWFsaWduOmNlbnRlcn0ucmFuay1uYW1le2ZvbnQtd2VpZ2h0OjEwMDB9LnJhbmstbmFtZSBzbWFsbHtkaXNwbGF5OmJsb2NrO2NvbG9yOiM3MTgwOWF9LnJhbmstdmFsdWV7dGV4dC1hbGlnbjpyaWdodDtmb250LXNpemU6MjBweDtmb250LXdlaWdodDoxMDAwfQoubm90ZXtwYWRkaW5nOjEycHg7d2hpdGUtc3BhY2U6cHJlLXdyYXA7bGluZS1oZWlnaHQ6MS43fQoucmVhZG9ubHktd2FybmluZ3ttYXJnaW46OHB4O3BhZGRpbmc6MTBweDtib3JkZXItcmFkaXVzOjEwcHg7YmFja2dyb3VuZDojZmZmMGJkO2NvbG9yOiM2ZTRmMDA7Zm9udC1zaXplOjExcHg7Zm9udC13ZWlnaHQ6OTAwfQo8L3N0eWxlPgo8L2hlYWQ+Cjxib2R5Pgo8ZGl2IGNsYXNzPSJhcHAiPgo8aGVhZGVyIGNsYXNzPSJoZWFkZXIiPjxoMT7ojYnph47nkINBSeafu+WumjwvaDE+PGRpdiBjbGFzcz0iYmFkZ2UiPumWsuimp+WwgueUqOODu+e3qOmbhuS4jeWPrzwvZGl2PjwvaGVhZGVyPgo8ZGl2IGNsYXNzPSJyZWFkb25seS13YXJuaW5nIj7jgZPjga7jg5XjgqHjgqTjg6vjga/plrLopqflsILnlKjjgafjgZnjgILlhaXlipvjg7vkv53lrZjjg7vliYrpmaTjg7tBSeafu+WumuOBr+OBp+OBjeOBvuOBm+OCk+OAgjwvZGl2Pgo8ZGl2IGNsYXNzPSJyZWFkb25seS13YXJuaW5nIj7jgZPjga7jg5rjg7zjgrjjga/plrLopqflsILnlKjjgafjgZnjgILlhaXlipvjg7vkv53lrZjjg7vliYrpmaTjg7tBSeafu+WumuOBr+OBp+OBjeOBvuOBm+OCk+OAgjwvZGl2Pgo8c2VjdGlvbiBjbGFzcz0iY2FyZCI+PGRpdiBjbGFzcz0icGxheWVyLXN0cmlwIiBpZD0icGxheWVyU3RyaXAiPjwvZGl2Pjwvc2VjdGlvbj4KPHNlY3Rpb24gY2xhc3M9ImNhcmQiIGlkPSJwbGF5ZXJDYXJkIj4KPGRpdiBjbGFzcz0icGxheWVyLWhlYWQiPjxkaXYgY2xhc3M9Im51bWJlciIgaWQ9Im51bWJlciI+LTwvZGl2PjxkaXY+PGRpdiBjbGFzcz0ibmFtZSIgaWQ9Im5hbWUiPuODh+ODvOOCv+acquiqrei+vDwvZGl2PjxzbWFsbCBpZD0iaGFuZCI+LTwvc21hbGw+PC9kaXY+PGRpdiBjbGFzcz0ib3ZlcmFsbCI+PHNtYWxsPue3j+WQiDwvc21hbGw+PHN0cm9uZyBpZD0ib3ZlcmFsbCI+LTwvc3Ryb25nPjwvZGl2PjwvZGl2Pgo8ZGl2IGNsYXNzPSJpbmZvLWdyaWQiPjxkaXY+PHNwYW4+44Oh44Kk44OzPC9zcGFuPjxzdHJvbmcgaWQ9Im1haW5Qb3NpdGlvbiI+LTwvc3Ryb25nPjwvZGl2PjxkaXY+PHNwYW4+5bm05bqmPC9zcGFuPjxzdHJvbmcgaWQ9InNlYXNvbiI+LTwvc3Ryb25nPjwvZGl2PjxkaXY+PHNwYW4+55m76Yyy5Lq65pWwPC9zcGFuPjxzdHJvbmcgaWQ9InBsYXllckNvdW50Ij4wPC9zdHJvbmc+PC9kaXY+PC9kaXY+Cjwvc2VjdGlvbj4KPHNlY3Rpb24gY2xhc3M9ImNhcmQiPjxkaXYgY2xhc3M9ImNhcmQtdGl0bGUiPuiDveWKmzwvZGl2PjxkaXYgY2xhc3M9ImFiaWxpdGllcyIgaWQ9ImFiaWxpdGllcyI+PC9kaXY+PC9zZWN0aW9uPgo8c2VjdGlvbiBjbGFzcz0iY2FyZCI+PGRpdiBjbGFzcz0iY2FyZC10aXRsZSI+5oiQ57i+PC9kaXY+PGRpdiBjbGFzcz0ic3RhdHMtZ3JpZCIgaWQ9InN0YXRzIj48L2Rpdj48L3NlY3Rpb24+CjxzZWN0aW9uIGNsYXNzPSJjYXJkIj48ZGl2IGNsYXNzPSJjYXJkLXRpdGxlIj7lrojlgpnpganmgKc8L2Rpdj48ZGl2IGNsYXNzPSJmaWVsZCIgaWQ9ImZpZWxkIj48L2Rpdj48L3NlY3Rpb24+CjxzZWN0aW9uIGNsYXNzPSJjYXJkIj48ZGl2IGNsYXNzPSJjYXJkLXRpdGxlIj7jg4Hjg7zjg6DlhoXjg6njg7Pjgq3jg7PjgrA8L2Rpdj48ZGl2IGNsYXNzPSJyYW5rLWd1aWRlIiBpZD0icmFua0d1aWRlIj48L2Rpdj48ZGl2IGNsYXNzPSJyYW5rLXRhYnMiIGlkPSJyYW5rVGFicyI+PC9kaXY+PGRpdiBpZD0icmFua0xpc3QiPjwvZGl2Pjwvc2VjdGlvbj4KPHNlY3Rpb24gY2xhc3M9ImNhcmQiPjxkaXYgY2xhc3M9ImNhcmQtdGl0bGUiPuebo+edo+ODoeODojwvZGl2PjxkaXYgY2xhc3M9Im5vdGUiIGlkPSJub3RlIj4tPC9kaXY+PC9zZWN0aW9uPgo8L2Rpdj4KPHNjcmlwdCBpZD0iZW1iZWRkZWRSZWFkb25seURhdGEiIHR5cGU9ImFwcGxpY2F0aW9uL2pzb24iPl9fRU1CRURERURfREFUQV9fPC9zY3JpcHQ+CjxzY3JpcHQ+CmNvbnN0IFBPU0lUSU9OUz1bIuaKleaJiyIsIuaNleaJiyIsIuS4gOWhgeaJiyIsIuS6jOWhgeaJiyIsIuS4ieWhgeaJiyIsIumBiuaSg+aJiyIsIuW3pue/vOaJiyIsIuS4reWgheaJiyIsIuWPs+e/vOaJiyJdOwpjb25zdCBBQklMSVRJRVM9W1siY29udGFjdCIsIuODn+ODvOODiCJdLFsicG93ZXIiLCLjg5Hjg6/jg7wiXSxbImRpc2NpcGxpbmUiLCLpgbjnkIPnnLwiXSxbInNwZWVkIiwi6LWw5YqbIl0sWyJhcm0iLCLogqnlipsiXSxbImZpZWxkaW5nIiwi5a6I5YKZ5YqbIl0sWyJjYXRjaGluZyIsIuaNleeQgyJdXTsKbGV0IGRhdGE9SlNPTi5wYXJzZShkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgiZW1iZWRkZWRSZWFkb25seURhdGEiKS50ZXh0Q29udGVudCksc2VsZWN0ZWQ9ZGF0YS5wbGF5ZXJzWzBdPy5pZHx8bnVsbCxyYW5raW5nS2V5PSJvdmVyYWxsIjsKZnVuY3Rpb24gZ3JhZGUodil7cmV0dXJuIHY+PTg1PyJBIjp2Pj03MD8iQiI6dj49NjA/IkMiOnY+PTUwPyJEIjp2Pj00MD8iRSI6dj49MzA/IkYiOiJHIn0KZnVuY3Rpb24gb3ZlcmFsbChwKXtyZXR1cm4gTWF0aC5yb3VuZChPYmplY3QudmFsdWVzKHAuYWJpbGl0aWVzfHx7fSkucmVkdWNlKChzLHYpPT5zKygrdnx8MCksMCkvNyl9CmZ1bmN0aW9uIGNhbGMocCl7Y29uc3Qgcz1wLnN0YXRzfHx7fSxhYj0rcy5hYnx8MCxoPStzLmhpdHN8fDAscGE9K3MucGF8fDAsZDI9K3MuZG91Ymxlc3x8MCxkMz0rcy50cmlwbGVzfHwwLGhyPStzLmhyfHwwLGJiPStzLndhbGtzfHwwO2NvbnN0IHNpbmdsZXM9TWF0aC5tYXgoMCxoLWQyLWQzLWhyKSx0Yj1zaW5nbGVzK2QyKjIrZDMqMytocio0O2NvbnN0IGF2Zz1hYj9oL2FiOjAsb2JwPXBhPyhoK2JiKS9wYTowLHNsZz1hYj90Yi9hYjowO3JldHVybnthdmcsb2JwLHNsZyxvcHM6b2JwK3NsZ319CmZ1bmN0aW9uIHF1YWxpZmljYXRpb24oKXtyZXR1cm4gTWF0aC5jZWlsKCgrZGF0YT8udGVhbVJlc3VsdHM/LmdhbWVzfHxNYXRoLm1heCgwLC4uLmRhdGEucGxheWVycy5tYXAocD0+K3Auc3RhdHM/LmdhbWVzfHwwKSkpKjEuNSl9CmZ1bmN0aW9uIHJhbmtWYWx1ZShwLGspe2NvbnN0IHM9cC5zdGF0c3x8e30sYz1jYWxjKHApO2lmKGs9PT0ib3ZlcmFsbCIpcmV0dXJuIG92ZXJhbGwocCk7aWYoayBpbiAocC5hYmlsaXRpZXN8fHt9KSlyZXR1cm4gK3AuYWJpbGl0aWVzW2tdfHwwO3JldHVybnthdmc6Yy5hdmcsaGl0czorcy5oaXRzfHwwLGhyOitzLmhyfHwwLHJiaTorcy5yYml8fDAsc2I6K3Muc2J8fDAsb2JwOmMub2JwLHNsZzpjLnNsZyxvcHM6Yy5vcHN9W2tdfHwwfQpmdW5jdGlvbiByZW5kZXIoKXsKIGlmKCFkYXRhPy5wbGF5ZXJzPy5sZW5ndGgpcmV0dXJuOwogY29uc3QgcD1kYXRhLnBsYXllcnMuZmluZCh4PT54LmlkPT09c2VsZWN0ZWQpfHxkYXRhLnBsYXllcnNbMF07c2VsZWN0ZWQ9cC5pZDsKIHBsYXllclN0cmlwLmlubmVySFRNTD1kYXRhLnBsYXllcnMubWFwKHg9PmA8YnV0dG9uIGNsYXNzPSJwbGF5ZXItY2hpcCAke3guaWQ9PT1zZWxlY3RlZD8iYWN0aXZlIjoiIn0iIGRhdGEtaWQ9IiR7eC5pZH0iPiR7eC5udW1iZXJ9ICR7eC5uYW1lfTwvYnV0dG9uPmApLmpvaW4oIiIpOwogbnVtYmVyLnRleHRDb250ZW50PXAubnVtYmVyO25hbWUudGV4dENvbnRlbnQ9cC5uYW1lO2hhbmQudGV4dENvbnRlbnQ9YCR7cC50aHJvd0hhbmR8fCLlj7MifeaKlSR7cC5iYXRIYW5kfHwi5Y+zIn3miZNgO292ZXJhbGwudGV4dENvbnRlbnQ9YCR7Z3JhZGUob3ZlcmFsbChwKSl9JHtvdmVyYWxsKHApfWA7bWFpblBvc2l0aW9uLnRleHRDb250ZW50PXAubWFpblBvc2l0aW9ufHwiLSI7c2Vhc29uLnRleHRDb250ZW50PXAuc2Vhc29ufHwiLSI7cGxheWVyQ291bnQudGV4dENvbnRlbnQ9ZGF0YS5wbGF5ZXJzLmxlbmd0aDsKIGFiaWxpdGllcy5pbm5lckhUTUw9QUJJTElUSUVTLm1hcCgoW2ssbF0pPT57Y29uc3Qgdj0rcC5hYmlsaXRpZXM/LltrXXx8MCxnPWdyYWRlKHYpO3JldHVybmA8ZGl2IGNsYXNzPSJyb3ciPjxsYWJlbD4ke2x9PC9sYWJlbD48c3BhbiBjbGFzcz0iZ3JhZGUtJHtnfSI+JHtnfTwvc3Bhbj48c3BhbiBjbGFzcz0iZ3JhZGUtJHtnfSB2YWx1ZSI+JHt2fTwvc3Bhbj48ZGl2IGNsYXNzPSJiYXIiPjxpIHN0eWxlPSJ3aWR0aDoke3Z9JSI+PC9pPjwvZGl2PjwvZGl2PmB9KS5qb2luKCIiKTsKIGNvbnN0IHM9cC5zdGF0c3x8e30sYz1jYWxjKHApO2NvbnN0IGl0ZW1zPVtbIuippuWQiCIscy5nYW1lc3x8MF0sWyLmiZPluK0iLHMucGF8fDBdLFsi5omT5pWwIixzLmFifHwwXSxbIuWuieaJkyIscy5oaXRzfHwwXSxbIuaJk+eOhyIsYy5hdmcudG9GaXhlZCgzKS5yZXBsYWNlKC9eMC8sIiIpXSxbIuacrOWhgeaJkyIscy5ocnx8MF0sWyLmiZPngrkiLHMucmJpfHwwXSxbIuebl+WhgSIscy5zYnx8MF0sWyLlh7rloYHnjociLGMub2JwLnRvRml4ZWQoMykucmVwbGFjZSgvXjAvLCIiKV0sWyJPUFMiLGMub3BzLnRvRml4ZWQoMykucmVwbGFjZSgvXjAvLCIiKV1dOwogc3RhdHMuaW5uZXJIVE1MPWl0ZW1zLm1hcCgoW2wsdl0pPT5gPGRpdiBjbGFzcz0ic3RhdCI+PGI+JHtsfTwvYj48c3Bhbj4ke3Z9PC9zcGFuPjwvZGl2PmApLmpvaW4oIiIpOwogY29uc3QgY2xzPXsi5oqV5omLIjoicC1wIiwi5o2V5omLIjoicC1jIiwi5LiA5aGB5omLIjoicC0xIiwi5LqM5aGB5omLIjoicC0yIiwi5LiJ5aGB5omLIjoicC0zIiwi6YGK5pKD5omLIjoicC1zcyIsIuW3pue/vOaJiyI6InAtbGYiLCLkuK3loIXmiYsiOiJwLWNmIiwi5Y+z57+85omLIjoicC1yZiJ9OwogZmllbGQuaW5uZXJIVE1MPWA8ZGl2IGNsYXNzPSJpbmZpZWxkLWRpcnQiPjwvZGl2PjxkaXYgY2xhc3M9ImluZmllbGQtZ3Jhc3MiPjwvZGl2PjxkaXYgY2xhc3M9ImJhc2UgaG9tZSI+PC9kaXY+PGRpdiBjbGFzcz0iYmFzZSBmaXJzdCI+PC9kaXY+PGRpdiBjbGFzcz0iYmFzZSBzZWNvbmQiPjwvZGl2PjxkaXYgY2xhc3M9ImJhc2UgdGhpcmQiPjwvZGl2PmArUE9TSVRJT05TLm1hcChwb3M9PmA8ZGl2IGNsYXNzPSJwb3MgJHtjbHNbcG9zXX0iPiR7cG9zfTxicj48c3BhbiBjbGFzcz0iZ3JhZGUtJHtwLmdyYWRlcz8uW3Bvc118fCJHIn0iPiR7cC5ncmFkZXM/Lltwb3NdfHwiRyJ9PC9zcGFuPjwvZGl2PmApLmpvaW4oIiIpOwogbm90ZS50ZXh0Q29udGVudD1wLm5vdGV8fCIiOwogcmVuZGVyUmFua2luZygpOwp9CmZ1bmN0aW9uIHJlbmRlclJhbmtpbmcoKXsKIGNvbnN0IHRhYnM9W1sib3ZlcmFsbCIsIue3j+WQiCJdLFsiY29udGFjdCIsIuODn+ODvOODiCJdLFsicG93ZXIiLCLjg5Hjg6/jg7wiXSxbInNwZWVkIiwi6LWw5YqbIl0sWyJhdmciLCLmiZPnjociXSxbImhpdHMiLCLlronmiZMiXSxbImhyIiwi5pys5aGB5omTIl0sWyJyYmkiLCLmiZPngrkiXSxbInNiIiwi55uX5aGBIl0sWyJvYnAiLCLlh7rloYHnjociXSxbInNsZyIsIumVt+aJk+eOhyJdLFsib3BzIiwiT1BTIl1dOwogcmFua1RhYnMuaW5uZXJIVE1MPXRhYnMubWFwKChbayxsXSk9PmA8YnV0dG9uIGRhdGEtcmFuaz0iJHtrfSIgY2xhc3M9IiR7cmFua2luZ0tleT09PWs/ImFjdGl2ZSI6IiJ9Ij4ke2x9PC9idXR0b24+YCkuam9pbigiIik7CiBjb25zdCBxdWFsaWZpZWQ9WyJhdmciLCJvYnAiLCJzbGciLCJvcHMiXSxxPXF1YWxpZmljYXRpb24oKTsKIGxldCBsaXN0PVsuLi5kYXRhLnBsYXllcnNdO2lmKHF1YWxpZmllZC5pbmNsdWRlcyhyYW5raW5nS2V5KSlsaXN0PWxpc3QuZmlsdGVyKHA9PigrcC5zdGF0cz8ucGF8fDApPj1xKTsKIGxpc3Quc29ydCgoYSxiKT0+cmFua1ZhbHVlKGIscmFua2luZ0tleSktcmFua1ZhbHVlKGEscmFua2luZ0tleSl8fCgrYi5zdGF0cz8ucGF8fDApLSgrYS5zdGF0cz8ucGF8fDApKTsKIHJhbmtHdWlkZS50ZXh0Q29udGVudD1xdWFsaWZpZWQuaW5jbHVkZXMocmFua2luZ0tleSk/YOimj+WumuaJk+W4rSAke3F95omT5bit5Lul5LiK44Gu44G/6KGo56S6YDoi6KaP5a6a5omT5bit5pyq5Yiw6YGU6ICF44KC6KGo56S6IjsKIGxldCBwcmV2PW51bGwscHJldlJhbms9MDsKIHJhbmtMaXN0LmlubmVySFRNTD1saXN0LnNsaWNlKDAsMTApLm1hcCgocCxpKT0+e2NvbnN0IHJhdz1yYW5rVmFsdWUocCxyYW5raW5nS2V5KSx2YWx1ZT1xdWFsaWZpZWQuaW5jbHVkZXMocmFua2luZ0tleSk/TnVtYmVyKHJhdy50b0ZpeGVkKDMpKTpNYXRoLnJvdW5kKHJhdykscmFuaz1wcmV2IT09bnVsbCYmdmFsdWU9PT1wcmV2P3ByZXZSYW5rOmkrMTtwcmV2PXZhbHVlO3ByZXZSYW5rPXJhbms7Y29uc3QgY2xzPXJhbms9PT0xPyJnb2xkIjpyYW5rPT09Mj8ic2lsdmVyIjpyYW5rPT09Mz8iYnJvbnplIjoiIjtyZXR1cm5gPGJ1dHRvbiBjbGFzcz0icmFuay1yb3cgJHtjbHN9IiBkYXRhLWlkPSIke3AuaWR9Ij48c3BhbiBjbGFzcz0icmFuay1ubyI+JHtyYW5rfeS9jTwvc3Bhbj48c3BhbiBjbGFzcz0icmFuay1uYW1lIj4ke3AubmFtZX08c21hbGw+JHtwLnN0YXRzPy5wYXx8MH3miZPluK08L3NtYWxsPjwvc3Bhbj48c3BhbiBjbGFzcz0icmFuay12YWx1ZSI+JHtxdWFsaWZpZWQuaW5jbHVkZXMocmFua2luZ0tleSk/dmFsdWUudG9GaXhlZCgzKS5yZXBsYWNlKC9eMC8sIiIpOnZhbHVlfTwvc3Bhbj48L2J1dHRvbj5gfSkuam9pbigiIil8fGA8ZGl2IHN0eWxlPSJwYWRkaW5nOjIwcHg7dGV4dC1hbGlnbjpjZW50ZXIiPuWvvuixoemBuOaJi+OBjOOBhOOBvuOBm+OCkzwvZGl2PmA7Cn0KCnBsYXllclN0cmlwLmFkZEV2ZW50TGlzdGVuZXIoImNsaWNrIixlPT57Y29uc3QgYj1lLnRhcmdldC5jbG9zZXN0KCJbZGF0YS1pZF0iKTtpZighYilyZXR1cm47c2VsZWN0ZWQ9Yi5kYXRhc2V0LmlkO3JlbmRlcigpfSk7CnJhbmtUYWJzLmFkZEV2ZW50TGlzdGVuZXIoImNsaWNrIixlPT57Y29uc3QgYj1lLnRhcmdldC5jbG9zZXN0KCJbZGF0YS1yYW5rXSIpO2lmKCFiKXJldHVybjtyYW5raW5nS2V5PWIuZGF0YXNldC5yYW5rO3JlbmRlclJhbmtpbmcoKX0pOwpyYW5rTGlzdC5hZGRFdmVudExpc3RlbmVyKCJjbGljayIsZT0+e2NvbnN0IGI9ZS50YXJnZXQuY2xvc2VzdCgiW2RhdGEtaWRdIik7aWYoIWIpcmV0dXJuO3NlbGVjdGVkPWIuZGF0YXNldC5pZDtyZW5kZXIoKTtwbGF5ZXJDYXJkLnNjcm9sbEludG9WaWV3KHtiZWhhdmlvcjoic21vb3RoIn0pfSk7cmVuZGVyKCk7Cjwvc2NyaXB0Pgo8L2JvZHk+CjwvaHRtbD4=";
+
+let readonlyMode=false;
+let editableSnapshot=null;
 
 function createReadonlyPayload(){
   save();
   return {
-    type:"kusayakyu-ai-readonly",
-    version:34,
+    type:"kusayakyu-ai-readonly-pack",
+    format:"KSP",
+    version:35,
+    readonly:true,
     exportedAt:new Date().toISOString(),
     teamName:data.teamName||"チーム",
     teamResults:data.teamResults||{},
+    selected:data.selected,
     players:data.players.map(player=>({
       id:player.id,
       number:player.number,
@@ -621,51 +659,106 @@ function createReadonlyPayload(){
   };
 }
 
-function decodeReadonlyViewerTemplate(){
-  const bytes=Uint8Array.from(atob(READONLY_VIEWER_TEMPLATE_B64),ch=>ch.charCodeAt(0));
-  return new TextDecoder().decode(bytes);
-}
-
-function createReadonlyHtmlFile(){
+function createReadonlyPackFile(){
   const payload=createReadonlyPayload();
-  const safeJson=JSON.stringify(payload)
-    .replace(/</g,"\\u003c")
-    .replace(/>/g,"\\u003e")
-    .replace(/&/g,"\\u0026");
-  const fileHtml=decodeReadonlyViewerTemplate().replace("__EMBEDDED_DATA__",safeJson);
   const stamp=new Date().toISOString().slice(0,10).replaceAll("-","");
   const safeTeam=(payload.teamName||"team").replace(/[\\/:*?"<>|]/g,"_");
-  return new File([fileHtml],`${safeTeam}_閲覧専用_${stamp}.html`,{type:"text/html"});
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/octet-stream"});
+  return new File([blob],`${safeTeam}_閲覧専用_${stamp}.ksp`,{type:"application/octet-stream"});
 }
 
 async function shareReadonlyData(){
   try{
-    const file=createReadonlyHtmlFile();
+    const file=createReadonlyPackFile();
     if(navigator.share && navigator.canShare?.({files:[file]})){
       await navigator.share({
-        title:`${data.teamName||"チーム"} 閲覧専用アプリ`,
-        text:"ファイルを開くだけで閲覧できます。編集はできません。",
+        title:`${data.teamName||"チーム"} 閲覧専用パック`,
+        text:"草野球AI査定の「閲覧パックを開く」から開いてください。編集はできません。",
         files:[file]
       });
       return;
     }
-    const url=URL.createObjectURL(file);
-    const link=document.createElement("a");
-    link.href=url;
-    link.download=file.name;
-    link.click();
-    setTimeout(()=>URL.revokeObjectURL(url),1000);
-    alert("閲覧専用HTMLを保存しました。このHTMLファイルだけを相手へ送ってください。");
+    downloadReadonlyPack();
+    alert("閲覧専用パックを保存しました。この.kspファイルを相手へ送ってください。");
   }catch(error){
     if(error?.name==="AbortError")return;
     console.error(error);
-    alert("閲覧専用HTMLを共有できませんでした。");
+    downloadReadonlyPack();
+    alert("共有シートで送れなかったため、閲覧専用パックを保存しました。");
+  }
+}
+
+function downloadReadonlyPack(){
+  const file=createReadonlyPackFile();
+  const url=URL.createObjectURL(file);
+  const link=document.createElement("a");
+  link.href=url;
+  link.download=file.name;
+  link.click();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+
+function enterReadonlyMode(pack){
+  if(!readonlyMode){
+    editableSnapshot=JSON.stringify(data);
+  }
+  data={
+    teamName:pack.teamName||"チーム",
+    teamResults:pack.teamResults||{},
+    selected:pack.selected||pack.players?.[0]?.id||null,
+    players:(pack.players||[]).map(normalizePlayer)
+  };
+  readonlyMode=true;
+  document.body.classList.add("readonly-mode");
+  readonlyModeBanner.hidden=false;
+  render();
+  alert("閲覧専用モードで開きました。変更や保存はできません。");
+}
+
+function exitReadonly(){
+  if(editableSnapshot){
+    try{data=JSON.parse(editableSnapshot)}catch{}
+  }else{
+    data=loadData();
+  }
+  readonlyMode=false;
+  editableSnapshot=null;
+  document.body.classList.remove("readonly-mode");
+  readonlyModeBanner.hidden=true;
+  render();
+}
+
+async function openReadonlyFile(file){
+  try{
+    const pack=JSON.parse(await file.text());
+    if(pack.type!=="kusayakyu-ai-readonly-pack" || pack.format!=="KSP" || pack.readonly!==true || !Array.isArray(pack.players)){
+      throw new Error("invalid pack");
+    }
+    enterReadonlyMode(pack);
+  }catch(error){
+    console.error(error);
+    alert("閲覧専用パックを開けませんでした。Ver.35以降で作成した.kspファイルを選んでください。");
   }
 }
 
 shareReadonly.onclick=shareReadonlyData;
 shareReadonlyMain.onclick=shareReadonlyData;
+openReadonlyPack.onclick=()=>readonlyPackFile.click();
+openReadonlyPackMain.onclick=()=>readonlyPackFile.click();
+readonlyPackFile.onchange=()=>{
+  const file=readonlyPackFile.files?.[0];
+  if(file)openReadonlyFile(file);
+  readonlyPackFile.value="";
+};
+exitReadonlyMode.onclick=exitReadonly;
 
+
+
+function denyReadonlyAction(){
+  if(!readonlyMode)return false;
+  alert("閲覧専用モードでは変更できません。");
+  return true;
+}
 function createBackupFile(){
   save();
   const stamp=new Date().toISOString().slice(0,10).replaceAll("-","");
@@ -707,7 +800,9 @@ shareData.onclick=shareAppData;
 shareDataMain.onclick=shareAppData;
 downloadBackup.onclick=downloadBackupFile;
 
-saveJson.onclick=downloadBackupFile;
+saveJson.onclick=()=>{if(denyReadonlyAction())return;downloadBackupFile};
+/* original disabled */
+const _unusedSaveJson=downloadBackupFile;
 loadJson.onclick=()=>jsonFile.click();jsonFile.onchange=async()=>{try{const obj=JSON.parse(await jsonFile.files[0].text());if(!obj.players)throw 0;data=obj;data.players=data.players.map(normalizePlayer);save();render()}catch{alert("JSONを読み込めませんでした")}jsonFile.value=""};
 
 teamPageBtn.onclick=()=>teamAnalysisCard.scrollIntoView({behavior:"smooth"});
@@ -721,7 +816,7 @@ sharePlayerCard.onclick=()=>{
 document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>document.querySelector(b.dataset.go)?.scrollIntoView({behavior:"smooth"}));
 window.addEventListener("beforeunload",e=>{if(dirty){e.preventDefault();e.returnValue=""}});
 save();render();
-if("serviceWorker"in navigator)navigator.serviceWorker.register("./sw.js?v=34").catch(()=>{});
+if("serviceWorker"in navigator)navigator.serviceWorker.register("./sw.js?v=35").catch(()=>{});
 </script>
 </body>
 </html>
