@@ -151,6 +151,117 @@
     .special-item input{width:20px;height:20px}
     .memo-wrap{padding:10px}.memo-wrap textarea{width:100%;resize:vertical;border:1px solid #9cafc8;border-radius:10px;padding:12px;color:#111;background:#fff;line-height:1.6}
 
+
+    /* ===== Ver.8 game UI ===== */
+    .app{max-width:620px;padding-left:8px;padding-right:8px}
+    .game-header{position:sticky;top:0;z-index:30;display:grid;grid-template-columns:48px 1fr 48px;align-items:center;min-height:64px;padding:calc(env(safe-area-inset-top) + 6px) 8px 8px;background:linear-gradient(#087be8,#031d58);border-bottom:2px solid #57e8ff;box-shadow:0 5px 12px #0008}
+    .header-back,.header-star{border:0;border-radius:10px;height:42px;color:#fff;font-size:30px;font-weight:1000;background:linear-gradient(#168bf4,#06377e);box-shadow:inset 0 1px #8ceeff,0 3px 5px #001438}
+    .header-star{font-size:25px;color:#ffd62b}
+    .game-logo{text-align:center;line-height:1}
+    .game-logo .logo-main{font-size:22px;text-shadow:2px 2px 0 #063d8d}
+    .game-logo .logo-sub{margin-top:5px;background:none;padding:0;color:#bcecff;font-size:8px;letter-spacing:.13em}
+    .top-game-tabs{position:sticky;top:64px;z-index:29;display:grid;grid-template-columns:repeat(5,1fr);gap:2px;background:#02143f;padding:4px;border-bottom:1px solid #2cdfff}
+    .top-game-tabs button{border:0;border-radius:6px;padding:8px 1px;background:linear-gradient(#0d72d6,#052b6d);color:#fff;font-size:11px;font-weight:900}
+    .top-game-tabs button.active{background:linear-gradient(#ffe969,#ffb100);color:#17244b}
+    .quick-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:8px 0}
+    .quick-actions button{border:1px solid #49dfff;border-radius:10px;padding:10px 2px;background:linear-gradient(#0b79df,#04317b);color:#fff;font-size:12px;font-weight:1000;box-shadow:inset 0 1px #9af2ff,0 3px 5px #0006}
+    .quick-actions button:first-child{background:linear-gradient(#ffe961,#ffb500);color:#18264e}
+    .player-topbar{grid-template-columns:58px 1fr 98px;align-items:stretch}
+    .player-heading{padding:5px 8px;color:#fff}
+    .player-heading small{display:block;color:#cce8ff;font-size:10px;font-weight:800}
+    .player-title{display:block;background:none;box-shadow:none;justify-content:flex-start;font-size:25px;letter-spacing:.02em}
+    .player-meta-line{display:flex;gap:10px;align-items:center;font-size:13px;font-weight:900}
+    .position-pill{display:inline-block;background:linear-gradient(#24a6ff,#0759b9);border-radius:999px;padding:4px 18px;color:#fff}
+    .overall-mini{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto 1fr;align-items:center;text-align:center;border-radius:9px;background:linear-gradient(#06337d,#021844);padding:5px;border:1px solid #5bdfff}
+    .overall-mini span{grid-column:1/-1;font-size:10px;font-weight:900}
+    .overall-mini strong{font-size:40px;line-height:1}
+    .overall-mini b{font-size:27px;color:#ffda28}
+    .hero-stadium{position:relative;min-height:365px;overflow:hidden;background:
+      radial-gradient(ellipse at center 14%,#dff5ff 0,#87c5f1 18%,transparent 43%),
+      linear-gradient(#2c76a6 0 42%,#409c39 43% 100%)}
+    .hero-stadium:before{content:"";position:absolute;left:0;right:0;top:31%;height:70px;background:repeating-linear-gradient(90deg,#174a6d 0 9px,#225d83 9px 18px);opacity:.6;clip-path:polygon(0 25%,100% 0,100% 100%,0 100%)}
+    .stadium-grass{position:absolute;left:-5%;right:-5%;bottom:-35px;height:180px;border-radius:50% 50% 0 0;background:repeating-linear-gradient(100deg,#42a83c 0 28px,#3c9737 28px 56px)}
+    .stadium-light{position:absolute;top:14px;width:90px;height:9px;background:#fff;box-shadow:0 0 18px 7px #fff9}
+    .stadium-light.one{left:20px;transform:rotate(-8deg)}.stadium-light.two{right:20px;transform:rotate(8deg)}
+    .chibi-player{position:absolute;left:10px;bottom:10px;width:245px;height:315px;transform-origin:center bottom}
+    .chibi-shadow{position:absolute;left:40px;bottom:2px;width:170px;height:28px;border-radius:50%;background:#0005;filter:blur(6px)}
+    .chibi-head{position:absolute;left:53px;top:65px;width:140px;height:126px;border-radius:49% 49% 45% 45%;background:linear-gradient(#ffd8ae,#f2ad70);border:3px solid #57311e;z-index:4;box-shadow:inset 0 -8px #dc8b55}
+    .ear{position:absolute;top:54px;width:25px;height:37px;border-radius:50%;background:#f4b579;border:3px solid #57311e;z-index:-1}.ear.left{left:-17px}.ear.right{right:-17px}
+    .chibi-cap{position:absolute;left:37px;top:22px;width:174px;height:92px;border-radius:60% 60% 33% 33%;background:linear-gradient(#262626,#080808);border:4px solid #332218;z-index:7;transform:rotate(-2deg)}
+    .cap-brim{position:absolute;right:-17px;bottom:-12px;width:108px;height:28px;border-radius:50%;background:#111;border:3px solid #332218;transform:rotate(7deg)}
+    .cap-letter{position:absolute;left:69px;top:15px;color:#ef3349;font-size:43px;font-weight:1000;text-shadow:2px 0 #fff,-2px 0 #fff,0 2px #fff,0 -2px #fff;z-index:2}
+    .brow{position:absolute;top:35px;width:39px;height:8px;border-radius:50%;background:#3a2418}.brow.left{left:19px;transform:rotate(8deg)}.brow.right{right:19px;transform:rotate(-8deg)}
+    .chibi-eye{position:absolute;top:51px;width:39px;height:42px;border-radius:50%;background:#fff;border:3px solid #422619;overflow:hidden}.chibi-eye.left{left:16px}.chibi-eye.right{right:16px}
+    .chibi-eye i{position:absolute;top:4px;left:11px;width:16px;height:28px;border-radius:50%;background:linear-gradient(90deg,#3e210d,#111);border:2px solid #170d08}
+    .chibi-eye i:after{content:"";position:absolute;left:3px;top:3px;width:5px;height:8px;border-radius:50%;background:#fff}
+    .chibi-nose{position:absolute;left:65px;top:89px;width:9px;height:5px;border-radius:50%;background:#e69260}
+    .chibi-mouth{position:absolute;left:58px;top:103px;width:25px;height:8px;border-bottom:3px solid #8f4d35;border-radius:50%}
+    .chibi-body{position:absolute;left:47px;top:179px;width:153px;height:116px;border-radius:45% 45% 17% 17%;background:linear-gradient(90deg,#f9f9f9 0 32%,#fff 32% 67%,#f3f3f3 67%);border:4px solid #2b261f;z-index:3;overflow:hidden}
+    .jersey-line{position:absolute;left:73px;top:0;bottom:25px;width:3px;background:#b5bdc7}
+    .team-word{position:absolute;left:28px;top:39px;color:#cf263b;font-family:Georgia,serif;font-size:18px;font-weight:1000;transform:rotate(-4deg)}
+    .belt{position:absolute;left:0;right:0;bottom:17px;height:12px;background:#172d4e;border-top:3px solid #111;border-bottom:3px solid #111}
+    .arm{position:absolute;top:202px;width:58px;height:82px;border-radius:45%;background:#f2b074;border:4px solid #44291b;z-index:2}.arm.left{left:20px;transform:rotate(19deg)}.arm.right{right:17px;transform:rotate(-18deg)}
+    .mitt{position:absolute;right:0;top:191px;width:83px;height:105px;border-radius:47% 42% 45% 40%;background:linear-gradient(135deg,#9e541f,#4d230e);border:5px solid #3a1a0b;z-index:6;transform:rotate(-13deg)}
+    .mitt:before,.mitt:after,.mitt i{content:"";position:absolute;border:2px solid #3b1a0a;border-radius:50%}
+    .mitt:before{left:13px;top:11px;width:53px;height:70px}.mitt:after{left:26px;top:5px;width:4px;height:75px;border-width:0 2px}.mitt i{left:7px;top:45px;width:64px;height:4px;border-width:2px 0 0}
+    .hero-side-cards{position:absolute;right:8px;top:12px;width:47%;display:grid;gap:6px}
+    .info-tile{border-radius:9px;overflow:hidden;background:linear-gradient(#0c4c9e,#062151);color:#fff;border:1px solid #55ddff;box-shadow:0 2px 4px #0005}
+    .info-tile>span{display:block;text-align:center;padding:4px;background:#05235a;font-size:10px;font-weight:900}
+    .info-tile>strong{display:block;text-align:center;padding:8px;font-size:17px;color:#fff}
+    .info-tile #trustStars{color:#ffcf24;letter-spacing:1px}
+    .sub-position-list{grid-template-columns:repeat(2,1fr);padding:5px}
+    .sub-chip{background:none;color:#fff;border:1px solid #79d9ff;padding:4px 2px}
+    .section{border-radius:11px;border-color:#1c86e8;box-shadow:0 4px 10px #0006}
+    .section-title{background:linear-gradient(#0c73db,#052661);border-bottom:1px solid #53dfff;font-size:17px}
+    .ability-row label{background:linear-gradient(#f8fbff,#dae8f6);color:#0d264a;border-right:1px solid #bdd0e4}
+    .ability-row{grid-template-columns:86px 28px 36px 1fr;background:#fff}
+    .ability-row .grade{font-size:18px}
+    .ability-row input[type=range]{margin-right:9px;background:linear-gradient(90deg,#62d936,#2eae28 62%,#d9dde3 63%)}
+    .field-wrap{padding:6px}
+    .field{height:340px;border-radius:10px;background:#eef6ff}
+    .special-grid{grid-template-columns:repeat(3,1fr);gap:5px}
+    .special-item{padding:7px 4px;justify-content:center;text-align:center;font-size:11px;background:linear-gradient(#fafdff,#dcecff);border:1px solid #7aafe5}
+    .special-item input{display:none}
+    .special-item:has(input:checked){background:linear-gradient(#fff179,#ffc022);color:#0b2650}
+    .stats{grid-template-columns:repeat(5,1fr)}
+    .stat{min-height:55px;background:linear-gradient(#124f98,#062c67)}
+    .stat b{color:#ccecff}.stat span{color:#fff}
+    .pdf-wizard{background:#061b49}
+    .wizard-steps{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;padding:8px;background:#061b49}
+    .wizard-step{position:relative;display:flex;align-items:center;justify-content:center;gap:4px;padding:8px 2px;background:linear-gradient(#0a5db4,#062b69);color:#d9efff;clip-path:polygon(0 0,90% 0,100% 50%,90% 100%,0 100%,10% 50%)}
+    .wizard-step:first-child{clip-path:polygon(0 0,90% 0,100% 50%,90% 100%,0 100%)}
+    .wizard-step.active{background:linear-gradient(#ffe966,#ffb400);color:#14224a}
+    .wizard-step b{display:grid;place-items:center;width:24px;height:24px;border-radius:50%;background:#fff;color:#164073}.wizard-step span{font-size:9px;font-weight:1000}
+    .wizard-card{margin:0 8px 8px;padding:10px;background:#f7f9fc;border-radius:10px;color:#102858}
+    .pdf-file-card{display:flex;gap:12px;align-items:center;padding:10px;border:1px solid #bacce0;border-radius:9px;background:#fff}
+    .pdf-file-card strong,.pdf-file-card span{display:block}.pdf-file-card span{font-size:11px;margin-top:3px;color:#53677f}
+    .pdf-icon{display:grid;place-items:center;width:48px;height:58px;border:3px solid #df2339;border-radius:5px;color:#df2339;font-weight:1000}
+    .pdf-tab-row{display:grid;grid-template-columns:repeat(3,1fr);margin-top:9px}
+    .pdf-tab-row button{padding:9px 2px;border:1px solid #0955a9;background:linear-gradient(#0d6bd0,#063075);color:#fff;font-weight:900}
+    .pdf-tab-row button.active{background:linear-gradient(#ffe765,#ffb300);color:#14224a}
+    .import-options label{align-items:flex-start;background:#fff;border:1px solid #cad8e8}
+    .import-options span b,.import-options span small{display:block}.import-options span small{margin-top:4px;color:#53677f}
+    .pdf-text-fallback{margin:9px 0;border:1px solid #b8cbe0;border-radius:8px;background:#fff}
+    .pdf-text-fallback summary{padding:9px;font-size:11px;font-weight:900}
+    .pdf-text-fallback textarea{width:calc(100% - 16px);margin:0 8px 8px;padding:8px;border:1px solid #aebfd2;border-radius:7px;color:#111}
+    .pdf-text-fallback button{width:calc(100% - 16px);margin:0 8px 8px;padding:9px;border:0;border-radius:7px;background:#0b63c0;color:#fff;font-weight:900}
+    .warning-box{padding:10px;border:1px solid #e6bc43;border-radius:8px;background:#fff2c5;font-size:11px;font-weight:800}
+    .wizard-buttons{display:grid;grid-template-columns:1fr 1.6fr;gap:10px;margin-top:10px}
+    .wizard-buttons button{border:0;border-radius:9px;padding:13px;font-weight:1000}
+    .wizard-buttons .cancel{background:linear-gradient(#fff,#cdd2da);color:#17223a}
+    .wizard-buttons .next{background:linear-gradient(#ffe65e,#ffb000);color:#17234b}
+    .bottom-nav-inner{grid-template-columns:repeat(5,1fr);gap:4px}
+    .bottom-nav button{display:grid;place-items:center;padding:6px 1px;font-size:10px}
+    .bottom-nav button span{font-size:22px;line-height:1}
+    .bottom-nav button.active{background:linear-gradient(#168bf2,#073b8c);outline:2px solid #62e4ff}
+    @media(max-width:430px){
+      .hero-stadium{min-height:340px}
+      .chibi-player{transform:scale(.88);left:-3px;bottom:0}
+      .hero-side-cards{width:49%}
+      .player-title{font-size:22px}
+      .stats{grid-template-columns:repeat(5,1fr)}
+    }
+
     @media print{
       body{background:#fff}.app{max-width:none;padding:0}.toolbar,.players,.bottom-nav,.actions,.inputs,.grade-editor,.primary{display:none!important}
       .panel,.hero,.section{box-shadow:none;break-inside:avoid}.header{background:#061a4d!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
@@ -159,25 +270,31 @@
 </head>
 <body>
 <div class="app">
-  <section class="panel header">
-    <div><div class="logo-main">草野球AI査定</div><div class="logo-sub">POWER STYLE</div></div>
-    <div class="ball">⚾️</div>
+
+  <section class="game-header">
+    <button class="header-back" type="button" onclick="scrollTo({top:0,behavior:'smooth'})">‹</button>
+    <div class="game-logo">
+      <div class="logo-main">草野球AI査定</div>
+      <div class="logo-sub">BASEBALL SCOUTING SYSTEM</div>
+    </div>
+    <button class="header-star" type="button">★</button>
   </section>
 
-  <section class="section team-name-section">
+  <nav class="top-game-tabs">
+    <button class="active" data-scroll-target=".game-hero">選手詳細</button>
+    <button data-scroll-target="#abilities">能力</button>
+    <button data-scroll-target=".field">守備</button>
+    <button data-scroll-target="#lineupList">打順</button>
+    <button data-scroll-target=".pdf-wizard">メニュー</button>
+  </nav>
+<section class="section team-name-section">
     <div class="team-name-row">
       <label>チーム名</label>
       <input id="teamName" placeholder="チーム名を入力">
     </div>
   </section>
 
-  <div class="install-notice" id="installNotice">
-    <strong>公開版 Ver.5</strong>
-    <span>Safariの共有ボタンから「ホーム画面に追加」できます。</span>
-    <button type="button" id="dismissNotice">×</button>
-  </div>
-
-  <div class="toolbar toolbar-five">
+<div class="toolbar toolbar-five">
     <button class="tool gold" id="addPlayer">＋ 選手</button>
     <button class="tool pdf-import-btn" id="importPdfTop">PDF読込</button>
     <button class="tool" id="saveJsonTop">JSON保存</button>
@@ -207,6 +324,14 @@
   </section>
 
   <section class="panel"><div class="players" id="players"></div></section>
+
+  <section class="quick-actions">
+    <button id="addPlayer">＋ 選手追加</button>
+    <button id="importPdfTop">PDF読込</button>
+    <button id="saveJsonTop">保存</button>
+    <button id="printTop">共有</button>
+  </section>
+
 
   <section class="hero">
     <div class="namebar">
@@ -316,20 +441,57 @@
     </div>
   </section>
 
-  <section class="section">
+
+  <section class="section pdf-wizard">
     <div class="section-title">SmartScorer PDF読込</div>
-    <div class="pdf-import-box">
-      <div class="pdf-import-description">
-        SmartScorerから出力した「試合結果・集計・スタッツ」PDFを読み込みます。
-        選手名と背番号を照合し、新規選手の追加または成績の更新を行います。
+
+    <div class="wizard-steps">
+      <div class="wizard-step active" data-step="1"><b>1</b><span>ファイル選択</span></div>
+      <div class="wizard-step" data-step="2"><b>2</b><span>プレビュー</span></div>
+      <div class="wizard-step" data-step="3"><b>3</b><span>読込設定</span></div>
+      <div class="wizard-step" data-step="4"><b>4</b><span>読込完了</span></div>
+    </div>
+
+    <div class="wizard-card">
+      <div class="pdf-file-card">
+        <div class="pdf-icon">PDF</div>
+        <div>
+          <strong id="pdfFileName">SmartScorer PDFを選択</strong>
+          <span id="pdfFileMeta">試合結果・集計・スタッツを含むPDF</span>
+        </div>
       </div>
-      <button class="primary" id="importPdf">📄 SmartScorer PDFを選択</button>
-      <div class="import-options">
-        <label><input type="radio" name="pdfMode" value="merge" checked> 既存選手へ上書き・新規選手を追加</label>
-        <label><input type="radio" name="pdfMode" value="replace"> 選手データを入れ替える</label>
+
+      <div class="pdf-tab-row">
+        <button type="button">試合結果一覧</button>
+        <button type="button">集計</button>
+        <button type="button" class="active">選手スタッツ</button>
       </div>
+
       <div class="pdf-import-status" id="pdfImportStatus">PDFはまだ読み込まれていません。</div>
       <div class="pdf-preview" id="pdfPreview"></div>
+
+      <div class="import-options">
+        <label><input type="radio" name="pdfMode" value="merge" checked>
+          <span><b>既存選手へ上書き・新規選手を追加</b><small>背番号と選手名で照合し、成績だけ更新します。</small></span>
+        </label>
+        <label><input type="radio" name="pdfMode" value="replace">
+          <span><b>選手データを入れ替える</b><small>現在の選手を削除し、PDFの選手へ置き換えます。</small></span>
+        </label>
+      </div>
+
+      
+  <details class="pdf-text-fallback">
+    <summary>PDFが読めない場合：スタッツ文字列を貼り付ける</summary>
+    <textarea id="smartScorerText" rows="7" placeholder="SmartScorerのスタッツ表をコピーして貼り付けます。"></textarea>
+    <button type="button" id="parseSmartScorerText">貼り付けたデータを解析</button>
+  </details>
+
+      <div class="warning-box">⚠ 読込前にJSONバックアップを保存することをおすすめします。</div>
+
+      <div class="wizard-buttons">
+        <button type="button" class="cancel" id="clearPdfPreview">キャンセル</button>
+        <button type="button" class="next" id="importPdf">PDFを選択して次へ</button>
+      </div>
     </div>
   </section>
 
@@ -348,10 +510,11 @@
 <input id="pdfFileInput" type="file" accept="application/pdf,.pdf" hidden>
 <div class="bottom-nav">
   <div class="bottom-nav-inner">
-    <button onclick="scrollTo({top:0,behavior:'smooth'})">選手</button>
-    <button onclick="document.querySelector('#abilities').scrollIntoView({behavior:'smooth'})">能力</button>
-    <button onclick="document.querySelector('.field').scrollIntoView({behavior:'smooth'})">守備</button>
-    <button onclick="document.querySelector('.actions').scrollIntoView({behavior:'smooth'})">共有</button>
+    <button class="active" onclick="document.querySelector('.game-hero').scrollIntoView({behavior:'smooth'})"><span>⚾</span>選手</button>
+    <button onclick="document.querySelector('#abilities').scrollIntoView({behavior:'smooth'})"><span>🏏</span>能力</button>
+    <button onclick="document.querySelector('.field').scrollIntoView({behavior:'smooth'})"><span>🧤</span>守備</button>
+    <button onclick="document.querySelector('#lineupList').scrollIntoView({behavior:'smooth'})"><span>📊</span>打順</button>
+    <button onclick="document.querySelector('.pdf-wizard').scrollIntoView({behavior:'smooth'})"><span>☰</span>メニュー</button>
   </div>
 </div>
 <div class="toast" id="toast"></div>
@@ -915,7 +1078,19 @@ shareReport.onclick=async()=>{
   await navigator.clipboard.writeText(shareText);toast("査定内容をコピーしました")
 };
 
+
+document.querySelectorAll("[data-scroll-target]").forEach(btn=>{
+  btn.onclick=()=>{
+    document.querySelectorAll(".top-game-tabs button").forEach(x=>x.classList.remove("active"));
+    btn.classList.add("active");
+    document.querySelector(btn.dataset.scrollTarget)?.scrollIntoView({behavior:"smooth",block:"start"});
+  };
+});
+
 async function handlePdfImport(file){
+  document.querySelectorAll(".wizard-step").forEach((x,i)=>x.classList.toggle("active",i===1));
+  pdfFileName.textContent=file.name;
+  pdfFileMeta.textContent=`${(file.size/1024/1024).toFixed(2)}MB / PDF解析中`;
   pdfImportStatus.className="pdf-import-status loading";
   pdfImportStatus.textContent="PDFを解析しています。初回は解析ライブラリの読込に少し時間がかかります。";
   pdfPreview.innerHTML="";
@@ -924,6 +1099,8 @@ async function handlePdfImport(file){
     const parsed=parseSmartScorerPdf(pages);
     if(!parsed.players.length)throw new Error("選手別スタッツを検出できませんでした。SmartScorerのスタッツページを含むPDFを選択してください。");
     showPdfPreview(parsed);
+    pdfFileMeta.textContent=`${parsed.players.length}人を検出 / ${parsed.games}試合`;
+    document.querySelectorAll(".wizard-step").forEach((x,i)=>x.classList.toggle("active",i===2));
     const mode=document.querySelector('input[name="pdfMode"]:checked')?.value||"merge";
     const ok=confirm(`${parsed.players.length}人の成績を検出しました。\nチーム: ${parsed.teamName||"不明"}\nこのデータをアプリへ反映しますか？`);
     if(!ok){
@@ -932,6 +1109,7 @@ async function handlePdfImport(file){
       return;
     }
     const result=applySmartScorerImport(parsed,mode);
+    document.querySelectorAll(".wizard-step").forEach((x,i)=>x.classList.toggle("active",i===3));
     pdfImportStatus.className="pdf-import-status success";
     pdfImportStatus.textContent=`読込完了：${result.added}人を追加、${result.updated}人を更新しました。チーム成績は${parsed.games}試合 ${parsed.wins}勝${parsed.losses}敗です。`;
     toast("SmartScorer PDFを読み込みました");
@@ -944,10 +1122,50 @@ async function handlePdfImport(file){
   }
 }
 importPdf.onclick=()=>pdfFileInput.click();
-importPdfTop.onclick=()=>pdfFileInput.click();
+importPdfTop.onclick=()=>{document.querySelector(".pdf-wizard")?.scrollIntoView({behavior:"smooth"});setTimeout(()=>pdfFileInput.click(),350)};
+clearPdfPreview.onclick=()=>{
+  pdfPreview.innerHTML="";
+  pdfImportStatus.className="pdf-import-status";
+  pdfImportStatus.textContent="PDFはまだ読み込まれていません。";
+  pdfFileName.textContent="SmartScorer PDFを選択";
+  pdfFileMeta.textContent="試合結果・集計・スタッツを含むPDF";
+  document.querySelectorAll(".wizard-step").forEach((x,i)=>x.classList.toggle("active",i===0));
+};
 pdfFileInput.onchange=e=>{
   const file=e.target.files?.[0];
   if(file)handlePdfImport(file);
+};
+
+
+function parseSmartScorerPastedText(text){
+  const rows=[];
+  for(const raw of String(text).split(/\n+/)){
+    const parts=raw.trim().split(/\s+/);
+    if(!/^\d+$/.test(parts[0]||""))continue;
+    let rateIdx=parts.findIndex((v,i)=>i>0 && (/^\.\d{3}$/.test(v)||v==="-"));
+    if(rateIdx<2)continue;
+    const values=parts.slice(rateIdx);
+    if(values.length<18)continue;
+    const n=v=>v==="-"?0:(Number(v)||0);
+    rows.push({
+      number:+parts[0],name:parts.slice(1,rateIdx).join(" "),
+      avg:values[0],obp:values[1],slg:values[2],risp:values[3],
+      games:n(values[4]),pa:n(values[5]),ab:n(values[6]),hits:n(values[7]),
+      singles:n(values[8]),doubles:n(values[9]),triples:n(values[10]),hr:n(values[11]),
+      runs:n(values[12]),rbi:n(values[13]),sacrifice:n(values[14]),walks:n(values[15]),
+      so:n(values[16]),errorReach:n(values[17]),sb:n(values[18]),cs:n(values[19]),pickoff:n(values[20])
+    });
+  }
+  return {teamName:data.teamName||"",games:0,wins:0,losses:0,draws:0,runsFor:0,runsAgainst:0,players:rows,warnings:[]};
+}
+parseSmartScorerText.onclick=()=>{
+  const parsed=parseSmartScorerPastedText(smartScorerText.value);
+  if(!parsed.players.length){alert("選手データを検出できませんでした。");return}
+  showPdfPreview(parsed);
+  const result=applySmartScorerImport(parsed,document.querySelector('input[name="pdfMode"]:checked')?.value||"merge");
+  pdfImportStatus.className="pdf-import-status success";
+  pdfImportStatus.textContent=`文字列読込完了：${result.added}人を追加、${result.updated}人を更新しました。`;
+  document.querySelectorAll(".wizard-step").forEach((x,i)=>x.classList.toggle("active",i===3));
 };
 
 dismissNotice.onclick=()=>{installNotice.style.display="none";localStorage.setItem("hide_install_notice_v5","1")};
