@@ -152,6 +152,28 @@
     .memo-wrap{padding:10px}.memo-wrap textarea{width:100%;resize:vertical;border:1px solid #9cafc8;border-radius:10px;padding:12px;color:#111;background:#fff;line-height:1.6}
 
 
+
+    .quick-actions-five{grid-template-columns:repeat(5,1fr)}
+    .quick-actions-five button{font-size:10px}
+    .preloaded-data-panel{background:linear-gradient(#f8fbff,#dceeff)}
+    .preloaded-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:#bfcfe3}
+    .preloaded-summary div{background:#fff;text-align:center;padding:9px 3px;color:#102858}
+    .preloaded-summary span{display:block;font-size:10px;font-weight:900}
+    .preloaded-summary strong{display:block;font-size:20px;margin-top:3px}
+    .preloaded-data-panel p{margin:10px;color:#314d75;font-size:12px;line-height:1.6;font-weight:700}
+    .embedded-status{margin:0 10px 10px;padding:9px;border-radius:8px;background:#e7f2ff;color:#23436c;font-size:11px;font-weight:800}
+    .embedded-status.success{background:#d8f4d3;color:#1f5a26}
+    @media(max-width:420px){.quick-actions-five{grid-template-columns:repeat(3,1fr)}}
+
+
+    .chibi-head{width:148px;height:132px;left:49px;border-radius:48% 48% 44% 44%;box-shadow:inset 0 -10px #d98751,0 3px 6px #0005}
+    .chibi-eye{width:42px;height:45px;top:50px}
+    .chibi-eye.left{left:15px}.chibi-eye.right{right:15px}
+    .chibi-eye i{width:18px;height:31px;left:10px}
+    .chibi-cap{width:180px;left:33px}
+    .chibi-body{width:158px;left:44px}
+    .team-word{left:24px;font-size:20px}
+
     /* ===== Ver.8 game UI ===== */
     .app{max-width:620px;padding-left:8px;padding-right:8px}
     .game-header{position:sticky;top:0;z-index:30;display:grid;grid-template-columns:48px 1fr 48px;align-items:center;min-height:64px;padding:calc(env(safe-area-inset-top) + 6px) 8px 8px;background:linear-gradient(#087be8,#031d58);border-bottom:2px solid #57e8ff;box-shadow:0 5px 12px #0008}
@@ -325,8 +347,9 @@
 
   <section class="panel"><div class="players" id="players"></div></section>
 
-  <section class="quick-actions">
+  <section class="quick-actions quick-actions-five">
     <button id="addPlayer">＋ 選手追加</button>
+    <button id="loadSeasonData">2026データ</button>
     <button id="importPdfTop">PDF読込</button>
     <button id="saveJsonTop">保存</button>
     <button id="printTop">共有</button>
@@ -441,6 +464,19 @@
     </div>
   </section>
 
+
+  <section class="section preloaded-data-panel">
+    <div class="section-title">2026シーズン公式データ</div>
+    <div class="preloaded-summary">
+      <div><span>試合</span><strong>7</strong></div>
+      <div><span>勝敗</span><strong>2勝5敗</strong></div>
+      <div><span>得点</span><strong>33</strong></div>
+      <div><span>失点</span><strong>56</strong></div>
+    </div>
+    <p>アップロードされたSmartScorer PDFの内容を、アプリへ直接組み込んであります。</p>
+    <button class="primary" id="applyEmbeddedSeasonData">29選手の2026成績を反映</button>
+    <div class="embedded-status" id="embeddedStatus">既存の手動能力と守備適性は保持して更新します。</div>
+  </section>
 
   <section class="section pdf-wizard">
     <div class="section-title">SmartScorer PDF読込</div>
@@ -737,6 +773,95 @@ function showPdfPreview(parsed){
     (parsed.players.length>30?`<div style="padding:8px;text-align:center">ほか${parsed.players.length-30}人</div>`:"");
 }
 
+
+const EMBEDDED_2026_DATA = {
+  teamName:"ロマンス",
+  teamResults:{games:7,wins:2,losses:5,draws:0,runsFor:33,runsAgainst:56,season:"2026"},
+  players:[
+    {number:39,name:"金田 幸介",g:4,pa:14,ab:11,h:5,d2:0,d3:0,hr:0,r:5,rbi:2,bb:3,so:2,sb:3,cs:0,sac:0},
+    {number:31,name:"松井 将弘",g:4,pa:15,ab:15,h:6,d2:2,d3:0,hr:0,r:0,rbi:4,bb:0,so:4,sb:0,cs:0,sac:0},
+    {number:13,name:"植田 拓也",g:5,pa:19,ab:18,h:7,d2:1,d3:0,hr:0,r:5,rbi:2,bb:1,so:3,sb:3,cs:0,sac:0},
+    {number:8,name:"山本 永遠",g:7,pa:25,ab:21,h:6,d2:2,d3:0,hr:0,r:1,rbi:4,bb:4,so:3,sb:0,cs:0,sac:0},
+    {number:41,name:"長谷川 正貴",g:7,pa:21,ab:19,h:4,d2:0,d3:0,hr:0,r:2,rbi:5,bb:2,so:3,sb:0,cs:0,sac:0},
+    {number:14,name:"加藤 淳",g:7,pa:24,ab:21,h:4,d2:2,d3:2,hr:0,r:4,rbi:3,bb:3,so:3,sb:0,cs:0,sac:0},
+    {number:28,name:"木村 歩",g:6,pa:16,ab:14,h:2,d2:0,d3:0,hr:0,r:4,rbi:3,bb:2,so:2,sb:0,cs:0,sac:0},
+    {number:24,name:"滝 晴樹",g:6,pa:14,ab:9,h:1,d2:0,d3:0,hr:0,r:1,rbi:0,bb:4,so:1,sb:1,cs:1,sac:1},
+    {number:28,name:"ライチ",g:1,pa:1,ab:1,h:1,d2:1,d3:0,hr:0,r:0,rbi:2,bb:0,so:0,sb:0,cs:0,sac:0},
+    {number:0,name:"鈴木（助っ人）",g:1,pa:3,ab:3,h:2,d2:0,d3:0,hr:0,r:0,rbi:1,bb:0,so:1,sb:1,cs:0,sac:0},
+    {number:4,name:"山賀 宥士",g:2,pa:8,ab:6,h:3,d2:0,d3:0,hr:0,r:2,rbi:1,bb:2,so:0,sb:3,cs:0,sac:0},
+    {number:5,name:"大庭 祐耀",g:1,pa:2,ab:2,h:1,d2:0,d3:0,hr:0,r:0,rbi:0,bb:0,so:0,sb:0,cs:0,sac:0},
+    {number:18,name:"長田 直樹",g:3,pa:8,ab:8,h:3,d2:1,d3:0,hr:0,r:1,rbi:0,bb:0,so:0,sb:0,cs:0,sac:0},
+    {number:1,name:"久保田 将史",g:4,pa:8,ab:8,h:3,d2:0,d3:0,hr:0,r:1,rbi:0,bb:0,so:0,sb:0,cs:0,sac:0},
+    {number:3,name:"望月 司",g:2,pa:3,ab:3,h:1,d2:0,d3:0,hr:0,r:1,rbi:0,bb:0,so:0,sb:0,cs:0,sac:0},
+    {number:10,name:"田崎 悠太",g:1,pa:4,ab:4,h:1,d2:0,d3:0,hr:0,r:0,rbi:0,bb:0,so:2,sb:0,cs:0,sac:0},
+    {number:23,name:"和田 将",g:2,pa:8,ab:7,h:1,d2:0,d3:0,hr:1,r:2,rbi:2,bb:1,so:1,sb:0,cs:0,sac:0},
+    {number:99,name:"坂下 大",g:4,pa:8,ab:7,h:1,d2:0,d3:0,hr:0,r:2,rbi:0,bb:1,so:4,sb:2,cs:0,sac:0},
+    {number:47,name:"鮎沢 涼太",g:3,pa:9,ab:9,h:1,d2:0,d3:0,hr:0,r:2,rbi:0,bb:0,so:4,sb:0,cs:1,sac:0},
+    {number:19,name:"兵頭 光希",g:3,pa:6,ab:4,h:0,d2:0,d3:0,hr:0,r:0,rbi:0,bb:2,so:1,sb:0,cs:0,sac:0},
+    {number:45,name:"村田 憲仁",g:2,pa:2,ab:2,h:0,d2:0,d3:0,hr:0,r:0,rbi:0,bb:0,so:1,sb:0,cs:0,sac:0},
+    {number:0,name:"助っ人（徳田）",g:1,pa:2,ab:2,h:0,d2:0,d3:0,hr:0,r:0,rbi:0,bb:0,so:0,sb:0,cs:0,sac:0},
+    {number:56,name:"西浦 乃吾",g:1,pa:1,ab:1,h:0,d2:0,d3:0,hr:0,r:0,rbi:0,bb:0,so:1,sb:0,cs:0,sac:0},
+    {number:0,name:"助っ人（松永）",g:0,pa:0,ab:0,h:0,d2:0,d3:0,hr:0,r:0,rbi:0,bb:0,so:0,sb:0,cs:0,sac:0},
+    {number:0,name:"助っ人A",g:0,pa:0,ab:0,h:0,d2:0,d3:0,hr:0,r:0,rbi:0,bb:0,so:0,sb:0,cs:0,sac:0},
+    {number:17,name:"多田良 嘉則",g:0,pa:0,ab:0,h:0,d2:0,d3:0,hr:0,r:0,rbi:0,bb:0,so:0,sb:0,cs:0,sac:0},
+    {number:27,name:"助っ人B",g:0,pa:0,ab:0,h:0,d2:0,d3:0,hr:0,r:0,rbi:0,bb:0,so:0,sb:0,cs:0,sac:0},
+    {number:29,name:"伊藤 亮",g:0,pa:0,ab:0,h:0,d2:0,d3:0,hr:0,r:0,rbi:0,bb:0,so:0,sb:0,cs:0,sac:0},
+    {number:31,name:"上田 進太",g:0,pa:0,ab:0,h:0,d2:0,d3:0,hr:0,r:0,rbi:0,bb:0,so:0,sb:0,cs:0,sac:0}
+  ]
+};
+
+function normalizeEmbeddedName(name){
+  return String(name).replace(/[　\s]+/g,"").replace(/[（）]/g,m=>m==="（"?"(":")");
+}
+
+function findEmbeddedExisting(row){
+  const n=normalizeEmbeddedName(row.name);
+  return data.players.find(p=>{
+    const pn=normalizeEmbeddedName(p.name);
+    if(row.number===0)return pn===n;
+    return (Number(p.number)===Number(row.number) && pn===n) || pn===n;
+  });
+}
+
+function applyEmbedded2026Data(){
+  let added=0,updated=0;
+  for(const row of EMBEDDED_2026_DATA.players){
+    let p=findEmbeddedExisting(row);
+    if(!p){
+      p=samplePlayer();
+      p.id=crypto.randomUUID();
+      p.name=row.name;
+      p.number=row.number;
+      p.season="2026";
+      p.mainPosition="捕手";
+      p.abilities={contact:50,power:50,discipline:50,speed:50,arm:50,fielding:50,catching:50};
+      p.grades=Object.fromEntries(POSITIONS.map(x=>[x,"G"]));
+      p.specials=[];
+      p.note="";
+      data.players.push(p);
+      added++;
+    }else{
+      updated++;
+    }
+    p.season="2026";
+    p.stats={
+      games:row.g,pa:row.pa,ab:row.ab,hits:row.h,
+      doubles:row.d2,triples:row.d3,hr:row.hr,
+      rbi:row.rbi,runs:row.r,walks:row.bb,so:row.so,
+      sb:row.sb,cs:row.cs,sacrifice:row.sac
+    };
+  }
+  data.teamName=EMBEDDED_2026_DATA.teamName;
+  data.teamResults={...EMBEDDED_2026_DATA.teamResults,importedAt:new Date().toISOString()};
+  if(!data.selected && data.players[0])data.selected=data.players[0].id;
+  data.embeddedDatasetVersion="2026-07-13-v1";
+  saveLocal();
+  render();
+  embeddedStatus.className="embedded-status success";
+  embeddedStatus.textContent=`反映完了：${added}人追加、${updated}人更新。手動能力と守備適性は保持されています。`;
+  toast("2026シーズンデータを反映しました");
+}
+
 let data=loadLocal()||{selected:null,teamName:"Romance",lineup:[],players:[samplePlayer()]};
 let rankingKey="overall";
 let playerFilter="";
@@ -744,6 +869,9 @@ let playerSort="number";
 data.teamName ??= "Romance";
 data.lineup ??= [];
 if(!data.selected && data.players.length)data.selected=data.players[0].id;
+if(!data.embeddedDatasetVersion && data.players.length===1 && normalizeEmbeddedName(data.players[0].name)==="山本永遠"){
+  setTimeout(()=>applyEmbedded2026Data(),0);
+}
 
 function samplePlayer(){
   return {
@@ -1086,6 +1214,17 @@ document.querySelectorAll("[data-scroll-target]").forEach(btn=>{
     document.querySelector(btn.dataset.scrollTarget)?.scrollIntoView({behavior:"smooth",block:"start"});
   };
 });
+
+
+applyEmbeddedSeasonData.onclick=()=>{
+  if(confirm("2026シーズンの29選手データを反映しますか？\n既存選手の手動能力・守備適性は保持されます。")){
+    applyEmbedded2026Data();
+  }
+};
+loadSeasonData.onclick=()=>{
+  document.querySelector(".preloaded-data-panel")?.scrollIntoView({behavior:"smooth"});
+  setTimeout(()=>applyEmbeddedSeasonData.click(),350);
+};
 
 async function handlePdfImport(file){
   document.querySelectorAll(".wizard-step").forEach((x,i)=>x.classList.toggle("active",i===1));
