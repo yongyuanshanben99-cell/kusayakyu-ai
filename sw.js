@@ -1,5 +1,5 @@
-const CACHE="kusayakyu-ai-github-v11";
-const ASSETS=["./icon-192.png","./icon-512.png","./manifest.webmanifest","./assets/player-character.png"];
+const CACHE="kusayakyu-ai-github-v12";
+const ASSETS=["./icon-192.png","./icon-512.png","./manifest.webmanifest"];
 
 self.addEventListener("install",event=>{
   event.waitUntil(
