@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#061a4d">
-<link rel="manifest" href="./manifest.webmanifest?v=23">
-<title>草野球AI査定 Ver.23</title>
+<link rel="manifest" href="./manifest.webmanifest?v=30">
+<title>草野球AI査定 Ver.30</title>
 <style>
 :root{--navy:#061a4d;--blue:#086bd3;--cyan:#55e7ff;--gold:#ffc928;--panel:#eef6ff}
 *{box-sizing:border-box}
@@ -135,13 +135,34 @@ repeating-linear-gradient(100deg,#58bd48 0 26px,#4eaf42 26px 52px)}
   color:#102858;
 }
 
+
+.team-analysis-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:#bfd1e6}
+.team-analysis-grid>div{background:#fff;padding:10px 4px;text-align:center}
+.team-analysis-grid span{display:block;font-size:10px;font-weight:900;color:#45627f}
+.team-analysis-grid strong{display:block;margin-top:4px;font-size:20px;color:#102858}
+.team-analysis-comment,.scout-comment{padding:14px;background:linear-gradient(#fff,#edf5ff);line-height:1.75;font-weight:800;color:#17385f;white-space:pre-line}
+.bestnine-controls{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:10px}
+.bestnine-controls label{font-size:11px;font-weight:900}
+.bestnine-controls select{width:100%;margin-top:4px;padding:9px;border-radius:8px;border:1px solid #9ab2cf;background:#fff}
+.bestnine-row{display:grid;grid-template-columns:42px 1fr 72px 60px;gap:6px;align-items:center;padding:9px;border-top:1px solid #d9e2ec;background:#fff}
+.bestnine-order{font-size:20px;font-weight:1000;text-align:center}
+.bestnine-name{font-weight:1000}.bestnine-name small{display:block;color:#72829a}
+.bestnine-pos{font-weight:1000;text-align:center;color:#0b5fb9}
+.bestnine-score{text-align:right;font-weight:1000}
+.bestnine-summary{padding:10px;background:#e8f3ff;color:#23476f;font-size:11px;font-weight:800;line-height:1.6}
+@media print{
+  .top-actions,.bottom,.savebar,#smartImportCard,#bestNineCard,#teamAnalysisCard{display:none!important}
+  body{background:#fff}
+  .card{box-shadow:none;break-inside:avoid}
+}
+
 </style>
 </head>
 <body>
 <div class="app">
-<header class="header"><h1>草野球AI査定</h1><div class="version">Ver.23 規定打席・順位色</div></header>
+<header class="header"><h1>草野球AI査定</h1><div class="version">Ver.30 統合完成版</div></header>
 <section class="top-actions">
-<button id="addPlayer">＋選手</button><button id="deletePlayer">選手削除</button><button id="applySeason">29選手反映</button><button id="smartImportTop">SmartScorer</button><button id="saveJson">JSON保存</button><button id="shareData">データ共有</button><button id="loadJson">JSON読込</button>
+<button id="addPlayer">＋選手</button><button id="deletePlayer">選手削除</button><button id="applySeason">29選手反映</button><button id="smartImportTop">SmartScorer</button><button id="saveJson">JSON保存</button><button id="shareData">データ共有</button><button id="teamPageBtn">チーム分析</button><button id="bestNineBtn">AIベストナイン</button><button id="loadJson">JSON読込</button>
 </section>
 <section class="card"><div class="player-strip" id="playerStrip"></div></section>
 <section class="card" id="detailCard">
@@ -180,11 +201,45 @@ repeating-linear-gradient(100deg,#58bd48 0 26px,#4eaf42 26px 52px)}
 <div class="card-title">データ共有</div>
 <div class="share-panel">
   <p>全選手の能力・成績・守備適性・メモをJSONファイルにして共有します。</p>
-  <button id="shareDataMain">アプリデータを共有</button>
+  <button id="shareDataMain">アプリデータを共有</button><button id="sharePlayerCard">選手査定表を共有・PDF保存</button>
   <button id="downloadBackup">共有できない場合：JSONを保存</button>
   <div class="share-note">iPhoneではLINE、メール、AirDrop、ファイル保存などを選べます。</div>
 </div>
 </section>
+
+<section class="card" id="teamAnalysisCard">
+  <div class="card-title">チーム分析</div>
+  <div class="team-analysis-grid" id="teamAnalysisGrid"></div>
+  <div class="team-analysis-comment" id="teamAnalysisComment"></div>
+</section>
+
+<section class="card" id="bestNineCard">
+  <div class="card-title">AIベストナイン・おすすめ打順</div>
+  <div class="bestnine-controls">
+    <label>方針
+      <select id="bestNineStyle">
+        <option value="balance">バランス型</option>
+        <option value="attack">攻撃重視</option>
+        <option value="defense">守備重視</option>
+        <option value="speed">機動力重視</option>
+      </select>
+    </label>
+    <label>DH
+      <select id="bestNineDH">
+        <option value="off">なし</option>
+        <option value="on">あり</option>
+      </select>
+    </label>
+  </div>
+  <button class="primary" id="generateBestNine">AIベストナインを作成</button>
+  <div id="bestNineList"></div>
+</section>
+
+<section class="card" id="scoutCommentCard">
+  <div class="card-title">AIスカウトコメント</div>
+  <div class="scout-comment" id="scoutComment"></div>
+</section>
+
 <section class="card" id="smartImportCard">
 <div class="card-title">SmartScorer読込</div>
 <div class="smart-import">
@@ -257,6 +312,81 @@ function aiAssessPlayer(p){
  p.abilities.power=clamp(blend(18+c.slg*115+(hr/Math.max(1,ab))*160));
  p.abilities.discipline=clamp(blend(38+walk*300-k*95));
 }
+
+function teamMetrics(){
+  const ps=data.players;
+  const totalAB=ps.reduce((s,p)=>s+(+p.stats?.ab||0),0);
+  const totalH=ps.reduce((s,p)=>s+(+p.stats?.hits||0),0);
+  const totalBB=ps.reduce((s,p)=>s+(+p.stats?.walks||0),0);
+  const totalPA=ps.reduce((s,p)=>s+(+p.stats?.pa||0),0);
+  const totalTB=ps.reduce((sum,p)=>{
+    const s=p.stats||{},h=+s.hits||0,d2=+s.doubles||0,d3=+s.triples||0,hr=+s.hr||0;
+    return sum+Math.max(0,h-d2-d3-hr)+d2*2+d3*3+hr*4;
+  },0);
+  const avg=totalAB?totalH/totalAB:0;
+  const obp=totalPA?(totalH+totalBB)/totalPA:0;
+  const slg=totalAB?totalTB/totalAB:0;
+  const wins=+data.teamResults?.wins||0,losses=+data.teamResults?.losses||0,draws=+data.teamResults?.draws||0;
+  const games=+data.teamResults?.games||wins+losses+draws;
+  return {avg,obp,slg,ops:obp+slg,wins,losses,draws,games,
+    runsFor:+data.teamResults?.runsFor||0,runsAgainst:+data.teamResults?.runsAgainst||0,
+    winPct:(wins+losses)?wins/(wins+losses):0,
+    hr:ps.reduce((s,p)=>s+(+p.stats?.hr||0),0),
+    sb:ps.reduce((s,p)=>s+(+p.stats?.sb||0),0)
+  };
+}
+function renderTeamAnalysis(){
+  const m=teamMetrics();
+  const items=[
+    ["試合",m.games],["勝敗",`${m.wins}勝${m.losses}敗`],["勝率",m.winPct.toFixed(3).replace(/^0/,"")],
+    ["得失点",`${m.runsFor}-${m.runsAgainst}`],["打率",m.avg.toFixed(3).replace(/^0/,"")],
+    ["出塁率",m.obp.toFixed(3).replace(/^0/,"")],["長打率",m.slg.toFixed(3).replace(/^0/,"")],
+    ["OPS",m.ops.toFixed(3).replace(/^0/,"")],["本塁打",m.hr],["盗塁",m.sb],["登録人数",data.players.length],["規定打席",qualification()]
+  ];
+  teamAnalysisGrid.innerHTML=items.map(([l,v])=>`<div><span>${l}</span><strong>${v}</strong></div>`).join("");
+  const comments=[];
+  if(m.avg>=.300)comments.push("チーム打率が高く、安打をつなぐ攻撃が強みです。");
+  else comments.push("得点力向上には、出塁と進塁打の増加がポイントです。");
+  if(m.ops>=.750)comments.push("長打と出塁のバランスが良く、攻撃力は高水準です。");
+  if(m.runsAgainst>m.runsFor)comments.push("失点が得点を上回っているため、守備配置と投手運用の改善余地があります。");
+  if(m.sb>=10)comments.push("機動力を生かした攻撃が可能です。");
+  teamAnalysisComment.textContent=comments.join("\n");
+}
+function scoutText(p){
+  const c=calc(p),a=p.abilities,lines=[];
+  if(a.contact>=75)lines.push("高いミート力を持つ安打製造タイプ。");
+  else if(a.contact>=60)lines.push("安定したコンタクト能力があります。");
+  else lines.push("打撃では確実性向上が課題です。");
+  if(a.power>=75||c.slg>=.500)lines.push("長打力があり、中軸での起用に向きます。");
+  if(a.discipline>=70||c.obp>=.400)lines.push("選球眼が良く、上位打線でも出塁が期待できます。");
+  if(a.speed>=75)lines.push("走力を生かしたリードオフマン・代走起用が有効です。");
+  if(a.fielding>=75&&a.catching>=70)lines.push("守備の安定感が高く、重要な守備位置を任せられます。");
+  lines.push(`2026成績：打率 ${c.avg.toFixed(3).replace(/^0/,"")}／OPS ${c.ops.toFixed(3).replace(/^0/,"")}。`);
+  return lines.join("\n");
+}
+function bestNineScore(p,style){
+  const a=p.abilities,c=calc(p);
+  if(style==="attack")return a.contact*.30+a.power*.30+a.discipline*.15+c.ops*25;
+  if(style==="defense")return a.fielding*.35+a.catching*.25+a.arm*.20+overall(p)*.20;
+  if(style==="speed")return a.speed*.45+a.contact*.25+a.discipline*.15+c.obp*15;
+  return overall(p)*.55+(a.contact+a.power+a.speed)/3*.25+(a.fielding+a.catching)/2*.20;
+}
+function bestPosition(p,used,allowDH){
+  const list=POSITIONS.filter(pos=>!used.has(pos)).sort((x,y)=>GRADES.indexOf(p.grades[x]||"G")-GRADES.indexOf(p.grades[y]||"G"));
+  if(list.length)return list[0];
+  return allowDH?"DH":p.mainPosition;
+}
+function generateBestNineResult(){
+  const count=bestNineDH.value==="on"?10:9;
+  if(data.players.length<count){alert(`${count}人以上の登録が必要です`);return}
+  const chosen=[...data.players].sort((a,b)=>bestNineScore(b,bestNineStyle.value)-bestNineScore(a,bestNineStyle.value)).slice(0,count);
+  const used=new Set();
+  const rows=chosen.map(p=>{let pos=bestPosition(p,used,bestNineDH.value==="on");if(pos!=="DH")used.add(pos);return {p,pos}});
+  rows.sort((a,b)=>(b.p.abilities.contact+b.p.abilities.discipline+b.p.abilities.speed)-(a.p.abilities.contact+a.p.abilities.discipline+a.p.abilities.speed));
+  bestNineList.innerHTML=rows.map((r,i)=>`<div class="bestnine-row"><div class="bestnine-order">${i+1}</div><div class="bestnine-name">${r.p.name}<small>総合 ${grade(overall(r.p))}${overall(r.p)}</small></div><div class="bestnine-pos">${r.pos}</div><div class="bestnine-score">${Math.round(bestNineScore(r.p,bestNineStyle.value))}</div></div>`).join("")+
+  `<div class="bestnine-summary">方針：${bestNineStyle.options[bestNineStyle.selectedIndex].text}／DH：${bestNineDH.options[bestNineDH.selectedIndex].text}</div>`;
+}
+
 function render(){
  const p=current(); if(!p)return;
  playerStrip.innerHTML=data.players.map(x=>`<button class="player-chip ${x.id===p.id?"active":""}" data-id="${x.id}">${x.number} ${x.name}　${grade(overall(x))}${overall(x)}</button>`).join("");
@@ -273,7 +403,7 @@ function render(){
  gradeEditor.innerHTML=POSITIONS.map(pos=>`<label>${pos}<select data-grade="${pos}">${GRADES.map(g=>`<option ${p.grades[pos]===g?"selected":""}>${g}</option>`).join("")}</select></label>`).join("");
  note.value=p.note;
  dirty=false;saveState.textContent="保存済み";saveAbilities.disabled=true;
- renderRanking();
+ renderRanking();renderTeamAnalysis();scoutComment.textContent=scoutText(current());
 }
 function statsItems(p){const s=p.stats,c=calc(p);return [["試合",s.games],["打席",s.pa],["打数",s.ab],["安打",s.hits],["打率",c.avg.toFixed(3).replace(/^0/,"")],["本塁打",s.hr],["打点",s.rbi],["得点",s.runs],["四死球",s.walks],["三振",s.so],["盗塁",s.sb],["出塁率",c.obp.toFixed(3).replace(/^0/,"")],["長打率",c.slg.toFixed(3).replace(/^0/,"")],["OPS",c.ops.toFixed(3).replace(/^0/,"")]]}
 function fieldMarkup(p){
@@ -281,10 +411,10 @@ function fieldMarkup(p){
  const bg=`<div class="outfield-arc"></div><div class="infield-dirt"></div><div class="infield-grass"></div><div class="base home"></div><div class="base first"></div><div class="base second"></div><div class="base third"></div><div class="mound"></div>`;
  return bg+POSITIONS.map(pos=>`<div class="pos ${cls[pos]}">${pos}<br><span class="grade-${p.grades[pos]}">${p.grades[pos]}</span></div>`).join("");
 }
-function qualification(){return Math.ceil((+data.teamResults?.games||Math.max(0,...data.players.map(p=>+p.stats.games||0)))*1.1)}
-function rankValue(p,k){const s=p.stats,c=calc(p);if(k==="overall")return overall(p);if(k in p.abilities)return p.abilities[k];return {avg:c.avg,hits:+s.hits||0,doubles:+s.doubles||0,triples:+s.triples||0,hr:+s.hr||0,rbi:+s.rbi||0,runs:+s.runs||0,sb:+s.sb||0,walks:+s.walks||0,so:+s.so||0,obp:c.obp,slg:c.slg,ops:c.ops}[k]||0}
+function qualification(){return Math.ceil((+data.teamResults?.games||Math.max(0,...data.players.map(p=>+p.stats.games||0)))*1.5)}
+function rankValue(p,k){const s=p.stats,c=calc(p);if(k==="overall")return overall(p);if(k in p.abilities)return p.abilities[k];return {avg:c.avg,hits:+s.hits||0,doubles:+s.doubles||0,triples:+s.triples||0,hr:+s.hr||0,rbi:+s.rbi||0,runs:+s.runs||0,sb:+s.sb||0,walks:+s.walks||0,so:+s.so||0,sac:+s.sac||0,obp:c.obp,slg:c.slg,ops:c.ops}[k]||0}
 function renderRanking(){
- const tabs=[["overall","総合"],["contact","ミート"],["power","パワー"],["speed","走力"],["arm","肩力"],["fielding","守備"],["catching","捕球"],["avg","打率"],["hits","安打"],["doubles","二塁打"],["triples","三塁打"],["hr","本塁打"],["rbi","打点"],["runs","得点"],["sb","盗塁"],["walks","四死球"],["so","三振"],["obp","出塁率"],["slg","長打率"],["ops","OPS"]];
+ const tabs=[["overall","総合"],["contact","ミート"],["power","パワー"],["speed","走力"],["arm","肩力"],["fielding","守備"],["catching","捕球"],["avg","打率"],["hits","安打"],["doubles","二塁打"],["triples","三塁打"],["hr","本塁打"],["rbi","打点"],["runs","得点"],["sb","盗塁"],["walks","四死球"],["so","三振"],["sac","犠打"],["obp","出塁率"],["slg","長打率"],["ops","OPS"]];
  rankTabs.innerHTML=tabs.map(([k,l])=>`<button data-rank="${k}" class="${rankingKey===k?"active":""}">${l}</button>`).join("");
  let list=[...data.players];
  const q=qualification();
@@ -315,7 +445,7 @@ abilities.addEventListener("input",e=>{const k=e.target.dataset.ability;if(!k)re
     const gv=row.querySelector(".grade"),vv=row.querySelector(".value");
     gv.textContent=g;vv.textContent=e.target.value;
     gv.className=`grade grade-${g}`;vv.className=`value grade-${g}`;const ov=overall(current());overallGrade.textContent=grade(ov);overallNum.textContent=ov});
-saveAbilities.onclick=()=>{save();dirty=false;saveState.textContent="保存済み・ランキング更新完了";saveAbilities.disabled=true;renderRanking();playerStrip.querySelectorAll(".player-chip").forEach(()=>{})};
+saveAbilities.onclick=()=>{save();dirty=false;saveState.textContent="保存済み・ランキング更新完了";saveAbilities.disabled=true;renderRanking();renderTeamAnalysis();scoutComment.textContent=scoutText(current());playerStrip.querySelectorAll(".player-chip").forEach(()=>{})};
 number.oninput=()=>{current().number=+number.value||0};name.oninput=()=>{current().name=name.value};
 throwHand.onchange=()=>{current().throwHand=throwHand.value;save();render()};batHand.onchange=()=>{current().batHand=batHand.value;save();render()};
 mainPosition.onchange=()=>{current().mainPosition=mainPosition.value;save();render()};
@@ -457,10 +587,19 @@ downloadBackup.onclick=downloadBackupFile;
 
 saveJson.onclick=downloadBackupFile;
 loadJson.onclick=()=>jsonFile.click();jsonFile.onchange=async()=>{try{const obj=JSON.parse(await jsonFile.files[0].text());if(!obj.players)throw 0;data=obj;data.players=data.players.map(normalizePlayer);save();render()}catch{alert("JSONを読み込めませんでした")}jsonFile.value=""};
+
+teamPageBtn.onclick=()=>teamAnalysisCard.scrollIntoView({behavior:"smooth"});
+bestNineBtn.onclick=()=>bestNineCard.scrollIntoView({behavior:"smooth"});
+generateBestNine.onclick=generateBestNineResult;
+sharePlayerCard.onclick=()=>{
+  document.querySelector("#detailCard")?.scrollIntoView({behavior:"smooth"});
+  setTimeout(()=>window.print(),350);
+};
+
 document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>document.querySelector(b.dataset.go)?.scrollIntoView({behavior:"smooth"}));
 window.addEventListener("beforeunload",e=>{if(dirty){e.preventDefault();e.returnValue=""}});
 save();render();
-if("serviceWorker"in navigator)navigator.serviceWorker.register("./sw.js?v=23").catch(()=>{});
+if("serviceWorker"in navigator)navigator.serviceWorker.register("./sw.js?v=30").catch(()=>{});
 </script>
 </body>
 </html>
