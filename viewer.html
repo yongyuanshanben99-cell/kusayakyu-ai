@@ -167,25 +167,18 @@ button,input{font:inherit}
 
 
 html,body{width:100%;max-width:100%;overflow-x:hidden}
-img{max-width:100%}
 .android-guide{position:sticky;top:0;z-index:90;display:grid;grid-template-columns:1fr auto;gap:3px 10px;align-items:center;padding:10px;background:linear-gradient(#2f8b57,#176a3d);color:#fff;border-bottom:3px solid #b9f1ce}
-.android-guide[hidden]{display:none}.android-guide strong{font-size:14px}.android-guide span{grid-column:1;font-size:10px;font-weight:800}.android-guide button{grid-column:2;grid-row:1/3;border:1px solid #fff;border-radius:9px;padding:9px;background:#fff;color:#176a3d;font-weight:900}
+.android-guide[hidden]{display:none}
+.android-guide span{grid-column:1;font-size:10px;font-weight:800;line-height:1.5}
+.android-guide button{grid-column:2;grid-row:1/3;border:1px solid #fff;border-radius:9px;padding:9px;background:#fff;color:#176a3d;font-weight:900}
 @media(max-width:480px){
-  .app{width:100%;max-width:100%}.card{margin-left:6px;margin-right:6px}
+  .app{width:100%;max-width:100%}
+  .card{margin-left:6px;margin-right:6px}
   .player-head{grid-template-columns:52px minmax(0,1fr) 82px}
   .player-head .name{font-size:19px;overflow-wrap:anywhere}
   .abilities .row{grid-template-columns:88px 32px 42px minmax(0,1fr)}
   .stats-grid{grid-template-columns:repeat(3,1fr)}
   .rank-row{grid-template-columns:42px minmax(0,1fr) 78px}
-  .rank-name{min-width:0;overflow-wrap:anywhere}
-  .viewer-character-stage{height:285px!important}
-  .viewer-character-stage .viewer-pose.throw{max-width:82%!important;max-height:87%!important}
-  .viewer-character-stage .viewer-pose.bat{max-width:78%!important;max-height:83%!important}
-}
-@media(max-width:360px){
-  .player-head{grid-template-columns:46px minmax(0,1fr) 72px}
-  .abilities .row{grid-template-columns:78px 28px 38px minmax(0,1fr)}
-  .stats-grid{grid-template-columns:repeat(2,1fr)}
 }
 </style>
 </head>
@@ -193,7 +186,7 @@ img{max-width:100%}
 <div class="app">
 <div id="androidGuide" class="android-guide" hidden>
   <strong>Androidで閲覧中</strong>
-  <span id="androidGuideText">Chromeで開くと、より安定して表示できます。</span>
+  <span id="androidGuideText">Chromeで開くと安定して表示できます。</span>
   <button id="copyViewerUrl" type="button">URLをコピー</button>
 </div>
 <header class="header"><h1>草野球AI査定</h1><div class="badge">閲覧専用ビューア Ver.46</div></header>
@@ -346,17 +339,21 @@ function detectAndroidEnvironment(){
   if(!isAndroid && !isInApp)return;
   androidGuide.hidden=false;
   androidGuideText.textContent=isInApp
-    ?"アプリ内ブラウザでは表示が不安定な場合があります。URLをコピーしてChromeで開いてください。"
-    :"Chromeで開くと、より安定して表示できます。";
+    ?"アプリ内ブラウザでは崩れる場合があります。URLをコピーしてChromeで開いてください。"
+    :"Chromeで開くと安定して表示できます。";
 }
 document.getElementById("copyViewerUrl").onclick=async()=>{
   try{
     await navigator.clipboard.writeText(location.href);
-    alert("閲覧リンクをコピーしました。Chromeへ貼り付けて開いてください。");
+    alert("URLをコピーしました。Chromeへ貼り付けてください。");
   }catch{
-    const t=document.createElement("textarea");
-    t.value=location.href;document.body.appendChild(t);t.select();document.execCommand("copy");t.remove();
-    alert("閲覧リンクをコピーしました。");
+    const temp=document.createElement("textarea");
+    temp.value=location.href;
+    document.body.appendChild(temp);
+    temp.select();
+    document.execCommand("copy");
+    temp.remove();
+    alert("URLをコピーしました。");
   }
 };
 
