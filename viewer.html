@@ -63,11 +63,11 @@ button,input{font:inherit}
 </head>
 <body>
 <div class="app">
-<header class="header"><h1>草野球AI査定</h1><div class="badge">閲覧専用ビューア Ver.34</div></header>
+<header class="header"><h1>草野球AI査定</h1><div class="badge">閲覧専用ビューア Ver.40</div></header>
 <section class="load-panel">
 <p>共有された閲覧専用JSONを選択してください。この画面ではデータを変更できません。</p>
 <button id="loadButton">閲覧専用データを開く</button>
-<div class="status" id="status">データはまだ読み込まれていません。</div>
+<div class="status" id="status">共有リンクのデータを確認しています…</div>
 </section>
 <div class="readonly-warning">このページは閲覧専用です。入力・保存・削除・AI査定はできません。</div>
 <section class="card"><div class="player-strip" id="playerStrip"></div></section>
@@ -114,6 +114,54 @@ function renderRanking(){
  let prev=null,prevRank=0;
  rankList.innerHTML=list.slice(0,10).map((p,i)=>{const raw=rankValue(p,rankingKey),value=qualified.includes(rankingKey)?Number(raw.toFixed(3)):Math.round(raw),rank=prev!==null&&value===prev?prevRank:i+1;prev=value;prevRank=rank;const cls=rank===1?"gold":rank===2?"silver":rank===3?"bronze":"";return`<button class="rank-row ${cls}" data-id="${p.id}"><span class="rank-no">${rank}位</span><span class="rank-name">${p.name}<small>${p.stats?.pa||0}打席</small></span><span class="rank-value">${qualified.includes(rankingKey)?value.toFixed(3).replace(/^0/,""):value}</span></button>`}).join("")||`<div style="padding:20px;text-align:center">対象選手がいません</div>`;
 }
+
+function base64UrlToBytes(text){
+  const normalized=text.replace(/-/g,"+").replace(/_/g,"/");
+  const padded=normalized+"=".repeat((4-normalized.length%4)%4);
+  const binary=atob(padded);
+  return Uint8Array.from(binary,ch=>ch.charCodeAt(0));
+}
+
+async function gunzipBytes(bytes){
+  if(!("DecompressionStream" in window))throw new Error("gzip unsupported");
+  const stream=new Blob([bytes]).stream().pipeThrough(new DecompressionStream("gzip"));
+  return await new Response(stream).text();
+}
+
+async function loadFromShareLink(){
+  const hash=location.hash.slice(1);
+  if(!hash.startsWith("v40:"))return false;
+
+  try{
+    const separator=hash.indexOf(":",4);
+    const mode=hash.slice(4,separator);
+    const encoded=hash.slice(separator+1);
+    const bytes=base64UrlToBytes(encoded);
+    const json=mode==="gz"
+      ? await gunzipBytes(bytes)
+      : new TextDecoder().decode(bytes);
+
+    const obj=JSON.parse(json);
+    if(!Array.isArray(obj.players))throw new Error("invalid data");
+
+    data=obj;
+    selected=data.selected||data.players[0]?.id||null;
+    status.textContent=`${obj.teamName||"チーム"}：${obj.players.length}人を閲覧専用で表示しています`;
+
+    const loadPanel=document.querySelector(".load-panel");
+    if(loadPanel)loadPanel.style.display="none";
+
+    render();
+    return true;
+  }catch(error){
+    console.error(error);
+    status.textContent="共有リンクのデータを開けませんでした。ファイル読込をお試しください。";
+    return false;
+  }
+}
+
+window.addEventListener("DOMContentLoaded",()=>loadFromShareLink());
+
 loadButton.onclick=()=>fileInput.click();
 fileInput.onchange=async()=>{try{const obj=JSON.parse(await fileInput.files[0].text());if(obj.type!=="kusayakyu-ai-readonly"||!Array.isArray(obj.players))throw 0;data=obj;selected=data.players[0]?.id;status.textContent=`${obj.teamName}：${obj.players.length}人を読み込みました`;render()}catch{status.textContent="閲覧専用データを読み込めませんでした"}fileInput.value=""};
 playerStrip.addEventListener("click",e=>{const b=e.target.closest("[data-id]");if(!b)return;selected=b.dataset.id;render()});

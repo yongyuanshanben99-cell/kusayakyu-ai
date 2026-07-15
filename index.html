@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#061a4d">
-<link rel="manifest" href="./manifest.webmanifest?v=35">
-<title>草野球AI査定 Ver.35</title>
+<link rel="manifest" href="./manifest.webmanifest?v=40">
+<title>草野球AI査定 Ver.40</title>
 <style>
 :root{--navy:#061a4d;--blue:#086bd3;--cyan:#55e7ff;--gold:#ffc928;--panel:#eef6ff}
 *{box-sizing:border-box}
@@ -202,6 +202,13 @@ body.readonly-mode #openReadonlyPack,
 body.readonly-mode #openReadonlyPackMain,
 body.readonly-mode #exitReadonlyMode{pointer-events:auto;opacity:1}
 
+
+#shareReadonlyLink,#shareReadonlyLinkMain{background:linear-gradient(#20a86a,#087947)}
+.readonly-link-box{margin-top:10px;padding:10px;border-radius:10px;background:#eaf4ff;border:1px solid #b9cfe6}
+.readonly-link-box label{display:block;margin-bottom:6px;font-size:11px;font-weight:900;color:#284d78}
+.readonly-link-box textarea{width:100%;min-height:88px;padding:8px;border:1px solid #9db6d1;border-radius:8px;background:#fff;font-size:10px;word-break:break-all}
+.readonly-link-box button{width:100%;margin-top:7px;border:0;border-radius:9px;padding:10px;background:linear-gradient(#0d79dd,#073477);color:#fff;font-weight:900}
+
 </style>
 </head>
 <body>
@@ -211,9 +218,9 @@ body.readonly-mode #exitReadonlyMode{pointer-events:auto;opacity:1}
   <button id="exitReadonlyMode" type="button">本体へ戻る</button>
 </div>
 
-<header class="header"><h1>草野球AI査定</h1><div class="version">Ver.35 閲覧パック共有</div></header>
+<header class="header"><h1>草野球AI査定</h1><div class="version">Ver.40 リンク共有完成版</div></header>
 <section class="top-actions">
-<button id="addPlayer">＋選手</button><button id="deletePlayer">選手削除</button><button id="applySeason">29選手反映</button><button id="smartImportTop">SmartScorer</button><button id="saveJson">JSON保存</button><button id="shareData">編集用データ共有</button><button id="shareReadonly">閲覧パック共有</button><button id="openReadonlyPack">閲覧パックを開く</button><button id="teamPageBtn">チーム分析</button><button id="bestNineBtn">AIベストナイン</button><button id="loadJson">JSON読込</button>
+<button id="addPlayer">＋選手</button><button id="deletePlayer">選手削除</button><button id="applySeason">29選手反映</button><button id="smartImportTop">SmartScorer</button><button id="saveJson">JSON保存</button><button id="shareData">編集用データ共有</button><button id="shareReadonlyLink">閲覧リンク共有</button><button id="shareReadonly">閲覧パック共有</button><button id="openReadonlyPack">閲覧パックを開く</button><button id="teamPageBtn">チーム分析</button><button id="bestNineBtn">AIベストナイン</button><button id="loadJson">JSON読込</button>
 </section>
 <section class="card"><div class="player-strip" id="playerStrip"></div></section>
 <section class="card" id="detailCard">
@@ -265,9 +272,14 @@ body.readonly-mode #exitReadonlyMode{pointer-events:auto;opacity:1}
 <div class="card-title">データ共有</div>
 <div class="share-panel">
   <p>全選手の能力・成績・守備適性・メモをJSONファイルにして共有します。</p>
-  <button id="shareDataMain">編集用データを共有</button><button id="shareReadonlyMain">閲覧パックを共有</button><button id="openReadonlyPackMain">閲覧パックを開く</button><button id="sharePlayerCard">選手査定表を共有・PDF保存</button>
+  <button id="shareDataMain">編集用データを共有</button><button id="shareReadonlyLinkMain">閲覧リンクを共有</button><button id="shareReadonlyMain">閲覧パックを共有</button><button id="openReadonlyPackMain">閲覧パックを開く</button><button id="sharePlayerCard">選手査定表を共有・PDF保存</button>
   <button id="downloadBackup">共有できない場合：JSONを保存</button>
   <div class="share-note">iPhoneではLINE、メール、AirDrop、ファイル保存などを選べます。</div>
+<div class="readonly-link-box" id="readonlyLinkBox" hidden>
+  <label>作成した閲覧専用リンク</label>
+  <textarea id="readonlyLinkText" readonly></textarea>
+  <button id="copyReadonlyLink" type="button">リンクをコピー</button>
+</div>
 </div>
 </section>
 
@@ -667,6 +679,81 @@ function createReadonlyPackFile(){
   return new File([blob],`${safeTeam}_閲覧専用_${stamp}.ksp`,{type:"application/octet-stream"});
 }
 
+
+function bytesToBase64Url(bytes){
+  let binary="";
+  const chunk=0x8000;
+  for(let i=0;i<bytes.length;i+=chunk){
+    binary+=String.fromCharCode(...bytes.subarray(i,i+chunk));
+  }
+  return btoa(binary).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
+}
+
+async function gzipText(text){
+  if(!("CompressionStream" in window))return null;
+  const stream=new Blob([text]).stream().pipeThrough(new CompressionStream("gzip"));
+  return new Uint8Array(await new Response(stream).arrayBuffer());
+}
+
+async function createReadonlyShareUrl(){
+  const payload=createReadonlyPayload();
+  const json=JSON.stringify(payload);
+  const compressed=await gzipText(json);
+
+  const encoded=compressed
+    ? bytesToBase64Url(compressed)
+    : bytesToBase64Url(new TextEncoder().encode(json));
+
+  const mode=compressed ? "gz" : "raw";
+  const url=new URL("./viewer.html",location.href);
+  url.hash=`v40:${mode}:${encoded}`;
+  return url.toString();
+}
+
+async function shareReadonlyLink(){
+  try{
+    const url=await createReadonlyShareUrl();
+
+    if(url.length>28000){
+      const usePack=confirm("データ量が多く、共有リンクが長すぎます。閲覧パックで共有しますか？");
+      if(usePack)await shareReadonlyData();
+      return;
+    }
+
+    readonlyLinkText.value=url;
+    readonlyLinkBox.hidden=false;
+
+    if(navigator.share){
+      await navigator.share({
+        title:`${data.teamName||"チーム"} 閲覧専用リンク`,
+        text:"リンクを開くだけで草野球AI査定を閲覧できます。編集はできません。",
+        url
+      });
+      return;
+    }
+
+    await navigator.clipboard.writeText(url);
+    alert("閲覧専用リンクをコピーしました。");
+  }catch(error){
+    if(error?.name==="AbortError")return;
+    console.error(error);
+    alert("閲覧リンクを作成できませんでした。閲覧パック共有をお使いください。");
+  }
+}
+
+shareReadonlyLink.onclick=shareReadonlyLink;
+shareReadonlyLinkMain.onclick=shareReadonlyLink;
+copyReadonlyLink.onclick=async()=>{
+  try{
+    await navigator.clipboard.writeText(readonlyLinkText.value);
+    alert("リンクをコピーしました。");
+  }catch{
+    readonlyLinkText.select();
+    document.execCommand("copy");
+    alert("リンクをコピーしました。");
+  }
+};
+
 async function shareReadonlyData(){
   try{
     const file=createReadonlyPackFile();
@@ -816,7 +903,7 @@ sharePlayerCard.onclick=()=>{
 document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>document.querySelector(b.dataset.go)?.scrollIntoView({behavior:"smooth"}));
 window.addEventListener("beforeunload",e=>{if(dirty){e.preventDefault();e.returnValue=""}});
 save();render();
-if("serviceWorker"in navigator)navigator.serviceWorker.register("./sw.js?v=35").catch(()=>{});
+if("serviceWorker"in navigator)navigator.serviceWorker.register("./sw.js?v=40").catch(()=>{});
 </script>
 </body>
 </html>
