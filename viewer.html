@@ -63,7 +63,7 @@ button,input{font:inherit}
 </head>
 <body>
 <div class="app">
-<header class="header"><h1>草野球AI査定</h1><div class="badge">閲覧専用ビューア Ver.41</div></header>
+<header class="header"><h1>草野球AI査定</h1><div class="badge">閲覧専用ビューア Ver.42</div></header>
 <section class="load-panel">
 <p>共有された閲覧専用JSONを選択してください。この画面ではデータを変更できません。</p>
 <button id="loadButton">閲覧専用データを開く</button>
@@ -72,8 +72,8 @@ button,input{font:inherit}
 <div class="readonly-warning">このページは閲覧専用です。入力・保存・削除・AI査定はできません。</div>
 <section class="card"><div class="player-strip" id="playerStrip"></div></section>
 <section class="card" id="playerCard">
-<div class="player-head"><div class="number" id="number">-</div><div><div class="name" id="name">データ未読込</div><small id="hand">-</small></div><div class="overall"><small>総合</small><strong id="overall">-</strong></div></div>
-<div class="info-grid"><div><span>メイン</span><strong id="mainPosition">-</strong></div><div><span>年度</span><strong id="season">-</strong></div><div><span>登録人数</span><strong id="playerCount">0</strong></div></div>
+<div class="player-head"><div class="number" id="playerNumber">-</div><div><div class="name" id="playerName">データ未読込</div><small id="handDisplay">-</small></div><div class="overall"><small>総合</small><strong id="overallDisplay">-</strong></div></div>
+<div class="info-grid"><div><span>メイン</span><strong id="mainPositionDisplay">-</strong></div><div><span>年度</span><strong id="seasonDisplay">-</strong></div><div><span>登録人数</span><strong id="playerCountDisplay">0</strong></div></div>
 </section>
 <section class="card"><div class="card-title">能力</div><div class="abilities" id="abilities"></div></section>
 <section class="card"><div class="card-title">成績</div><div class="stats-grid" id="stats"></div></section>
@@ -86,6 +86,23 @@ button,input{font:inherit}
 const POSITIONS=["投手","捕手","一塁手","二塁手","三塁手","遊撃手","左翼手","中堅手","右翼手"];
 const ABILITIES=[["contact","ミート"],["power","パワー"],["discipline","選球眼"],["speed","走力"],["arm","肩力"],["fielding","守備力"],["catching","捕球"]];
 let data=null,selected=null,rankingKey="overall";
+const playerNumberEl=document.getElementById("playerNumber");
+const playerNameEl=document.getElementById("playerName");
+const handDisplayEl=document.getElementById("handDisplay");
+const overallDisplayEl=document.getElementById("overallDisplay");
+const mainPositionDisplayEl=document.getElementById("mainPositionDisplay");
+const seasonDisplayEl=document.getElementById("seasonDisplay");
+const playerCountDisplayEl=document.getElementById("playerCountDisplay");
+const abilitiesEl=document.getElementById("abilities");
+const statsEl=document.getElementById("stats");
+const fieldEl=document.getElementById("field");
+const noteEl=document.getElementById("note");
+const playerStripEl=document.getElementById("playerStrip");
+const rankingTabsEl=document.getElementById("rankTabs");
+const rankingListEl=document.getElementById("rankList");
+const rankingGuideEl=document.getElementById("rankGuide");
+const statusEl=document.getElementById("status");
+const playerCardEl=document.getElementById("playerCard");
 function grade(v){return v>=85?"A":v>=70?"B":v>=60?"C":v>=50?"D":v>=40?"E":v>=30?"F":"G"}
 function overall(p){return Math.round(Object.values(p.abilities||{}).reduce((s,v)=>s+(+v||0),0)/7)}
 function calc(p){const s=p.stats||{},ab=+s.ab||0,h=+s.hits||0,pa=+s.pa||0,d2=+s.doubles||0,d3=+s.triples||0,hr=+s.hr||0,bb=+s.walks||0;const singles=Math.max(0,h-d2-d3-hr),tb=singles+d2*2+d3*3+hr*4;const avg=ab?h/ab:0,obp=pa?(h+bb)/pa:0,slg=ab?tb/ab:0;return{avg,obp,slg,ops:obp+slg}}
@@ -94,14 +111,14 @@ function rankValue(p,k){const s=p.stats||{},c=calc(p);if(k==="overall")return ov
 function render(){
  if(!data?.players?.length)return;
  const p=data.players.find(x=>x.id===selected)||data.players[0];selected=p.id;
- playerStrip.innerHTML=data.players.map(x=>`<button class="player-chip ${x.id===selected?"active":""}" data-id="${x.id}">${x.number} ${x.name}</button>`).join("");
- number.textContent=p.number;name.textContent=p.name;hand.textContent=`${p.throwHand||"右"}投${p.batHand||"右"}打`;overall.textContent=`${grade(overall(p))}${overall(p)}`;mainPosition.textContent=p.mainPosition||"-";season.textContent=p.season||"-";playerCount.textContent=data.players.length;
- abilities.innerHTML=ABILITIES.map(([k,l])=>{const v=+p.abilities?.[k]||0,g=grade(v);return`<div class="row"><label>${l}</label><span class="grade-${g}">${g}</span><span class="grade-${g} value">${v}</span><div class="bar"><i style="width:${v}%"></i></div></div>`}).join("");
+ playerStripEl.innerHTML=data.players.map(x=>`<button class="player-chip ${x.id===selected?"active":""}" data-id="${x.id}">${x.number} ${x.name}</button>`).join("");
+ playerNumberEl.textContent=p.number;playerNameEl.textContent=p.name||"選手名未設定";handDisplayEl.textContent=`${p.throwHand||"右"}投${p.batHand||"右"}打`;const total=overall(p);overallDisplayEl.textContent=`${grade(total)}${total}`;mainPositionDisplayEl.textContent=p.mainPosition||"-";seasonDisplayEl.textContent=p.season||"-";playerCountDisplayEl.textContent=data.players.length;
+ abilitiesEl.innerHTML=ABILITIES.map(([k,l])=>{const v=+p.abilities?.[k]||0,g=grade(v);return`<div class="row"><label>${l}</label><span class="grade-${g}">${g}</span><span class="grade-${g} value">${v}</span><div class="bar"><i style="width:${v}%"></i></div></div>`}).join("");
  const s=p.stats||{},c=calc(p);const items=[["試合",s.games||0],["打席",s.pa||0],["打数",s.ab||0],["安打",s.hits||0],["打率",c.avg.toFixed(3).replace(/^0/,"")],["本塁打",s.hr||0],["打点",s.rbi||0],["盗塁",s.sb||0],["出塁率",c.obp.toFixed(3).replace(/^0/,"")],["OPS",c.ops.toFixed(3).replace(/^0/,"")]];
- stats.innerHTML=items.map(([l,v])=>`<div class="stat"><b>${l}</b><span>${v}</span></div>`).join("");
+ statsEl.innerHTML=items.map(([l,v])=>`<div class="stat"><b>${l}</b><span>${v}</span></div>`).join("");
  const cls={"投手":"p-p","捕手":"p-c","一塁手":"p-1","二塁手":"p-2","三塁手":"p-3","遊撃手":"p-ss","左翼手":"p-lf","中堅手":"p-cf","右翼手":"p-rf"};
- field.innerHTML=`<div class="infield-dirt"></div><div class="infield-grass"></div><div class="base home"></div><div class="base first"></div><div class="base second"></div><div class="base third"></div>`+POSITIONS.map(pos=>`<div class="pos ${cls[pos]}">${pos}<br><span class="grade-${p.grades?.[pos]||"G"}">${p.grades?.[pos]||"G"}</span></div>`).join("");
- note.textContent=p.note||"";
+ fieldEl.innerHTML=`<div class="infield-dirt"></div><div class="infield-grass"></div><div class="base home"></div><div class="base first"></div><div class="base second"></div><div class="base third"></div>`+POSITIONS.map(pos=>`<div class="pos ${cls[pos]}">${pos}<br><span class="grade-${p.grades?.[pos]||"G"}">${p.grades?.[pos]||"G"}</span></div>`).join("");
+ noteEl.textContent=p.note||"";
  renderRanking();
 }
 function renderRanking(){
@@ -110,9 +127,9 @@ function renderRanking(){
  const qualified=["avg","obp","slg","ops"],q=qualification();
  let list=[...data.players];if(qualified.includes(rankingKey))list=list.filter(p=>(+p.stats?.pa||0)>=q);
  list.sort((a,b)=>rankValue(b,rankingKey)-rankValue(a,rankingKey)||(+b.stats?.pa||0)-(+a.stats?.pa||0));
- rankGuide.textContent=qualified.includes(rankingKey)?`規定打席 ${q}打席以上のみ表示`:"規定打席未到達者も表示";
+ rankingGuideEl.textContent=qualified.includes(rankingKey)?`規定打席 ${q}打席以上のみ表示`:"規定打席未到達者も表示";
  let prev=null,prevRank=0;
- rankList.innerHTML=list.slice(0,10).map((p,i)=>{const raw=rankValue(p,rankingKey),value=qualified.includes(rankingKey)?Number(raw.toFixed(3)):Math.round(raw),rank=prev!==null&&value===prev?prevRank:i+1;prev=value;prevRank=rank;const cls=rank===1?"gold":rank===2?"silver":rank===3?"bronze":"";return`<button class="rank-row ${cls}" data-id="${p.id}"><span class="rank-no">${rank}位</span><span class="rank-name">${p.name}<small>${p.stats?.pa||0}打席</small></span><span class="rank-value">${qualified.includes(rankingKey)?value.toFixed(3).replace(/^0/,""):value}</span></button>`}).join("")||`<div style="padding:20px;text-align:center">対象選手がいません</div>`;
+ rankingListEl.innerHTML=list.slice(0,10).map((p,i)=>{const raw=rankValue(p,rankingKey),value=qualified.includes(rankingKey)?Number(raw.toFixed(3)):Math.round(raw),rank=prev!==null&&value===prev?prevRank:i+1;prev=value;prevRank=rank;const cls=rank===1?"gold":rank===2?"silver":rank===3?"bronze":"";return`<button class="rank-row ${cls}" data-id="${p.id}"><span class="rank-no">${rank}位</span><span class="rank-name">${p.name}<small>${p.stats?.pa||0}打席</small></span><span class="rank-value">${qualified.includes(rankingKey)?value.toFixed(3).replace(/^0/,""):value}</span></button>`}).join("")||`<div style="padding:20px;text-align:center">対象選手がいません</div>`;
 }
 
 function base64UrlToBytes(text){
@@ -146,7 +163,7 @@ async function loadFromShareLink(){
 
     data=obj;
     selected=data.selected||data.players[0]?.id||null;
-    status.textContent=`${obj.teamName||"チーム"}：${obj.players.length}人を閲覧専用で表示しています`;
+    statusEl.textContent=`${obj.teamName||"チーム"}：${obj.players.length}人を閲覧専用で表示しています`;
 
     const loadPanel=document.querySelector(".load-panel");
     if(loadPanel)loadPanel.style.display="none";
@@ -155,7 +172,7 @@ async function loadFromShareLink(){
     return true;
   }catch(error){
     console.error(error);
-    status.textContent="共有リンクのデータを開けませんでした。ファイル読込をお試しください。";
+    statusEl.textContent="共有リンクのデータを開けませんでした。ファイル読込をお試しください。";
     return false;
   }
 }
@@ -163,7 +180,7 @@ async function loadFromShareLink(){
 async function startViewer(){
   const loaded=await loadFromShareLink();
   if(!loaded && !location.hash.startsWith("#v41:") && !location.hash.startsWith("#v40:")){
-    status.textContent="このURLには閲覧データが含まれていません。送信者から届いた長い共有URLをそのまま開いてください。";
+    statusEl.textContent="このURLには閲覧データが含まれていません。送信者から届いた長い共有URLをそのまま開いてください。";
   }
 }
 if(document.readyState==="loading"){
@@ -173,11 +190,11 @@ if(document.readyState==="loading"){
 }
 window.addEventListener("hashchange",startViewer);
 
-loadButton.onclick=()=>fileInput.click();
-fileInput.onchange=async()=>{try{const obj=JSON.parse(await fileInput.files[0].text());if(obj.type!=="kusayakyu-ai-readonly"||!Array.isArray(obj.players))throw 0;data=obj;selected=data.players[0]?.id;status.textContent=`${obj.teamName}：${obj.players.length}人を読み込みました`;render()}catch{status.textContent="閲覧専用データを読み込めませんでした"}fileInput.value=""};
-playerStrip.addEventListener("click",e=>{const b=e.target.closest("[data-id]");if(!b)return;selected=b.dataset.id;render()});
+document.getElementById("loadButton").onclick=()=>document.getElementById("fileInput").click();
+document.getElementById("fileInput").onchange=async()=>{try{const obj=JSON.parse(await document.getElementById("fileInput").files[0].text());if(obj.type!=="kusayakyu-ai-readonly"||!Array.isArray(obj.players))throw 0;data=obj;selected=data.players[0]?.id;statusEl.textContent=`${obj.teamName}：${obj.players.length}人を読み込みました`;render()}catch{statusEl.textContent="閲覧専用データを読み込めませんでした"}document.getElementById("fileInput").value=""};
+playerStripEl.addEventListener("click",e=>{const b=e.target.closest("[data-id]");if(!b)return;selected=b.dataset.id;render()});
 rankTabs.addEventListener("click",e=>{const b=e.target.closest("[data-rank]");if(!b)return;rankingKey=b.dataset.rank;renderRanking()});
-rankList.addEventListener("click",e=>{const b=e.target.closest("[data-id]");if(!b)return;selected=b.dataset.id;render();playerCard.scrollIntoView({behavior:"smooth"})});
+rankingListEl.addEventListener("click",e=>{const b=e.target.closest("[data-id]");if(!b)return;selected=b.dataset.id;render();playerCardEl.scrollIntoView({behavior:"smooth"})});
 </script>
 </body>
 </html>
