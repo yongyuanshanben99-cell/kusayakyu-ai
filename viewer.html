@@ -63,7 +63,7 @@ button,input{font:inherit}
 </head>
 <body>
 <div class="app">
-<header class="header"><h1>草野球AI査定</h1><div class="badge">閲覧専用ビューア Ver.40</div></header>
+<header class="header"><h1>草野球AI査定</h1><div class="badge">閲覧専用ビューア Ver.41</div></header>
 <section class="load-panel">
 <p>共有された閲覧専用JSONを選択してください。この画面ではデータを変更できません。</p>
 <button id="loadButton">閲覧専用データを開く</button>
@@ -130,7 +130,7 @@ async function gunzipBytes(bytes){
 
 async function loadFromShareLink(){
   const hash=location.hash.slice(1);
-  if(!hash.startsWith("v40:"))return false;
+  if(!hash.startsWith("v40:") && !hash.startsWith("v41:"))return false;
 
   try{
     const separator=hash.indexOf(":",4);
@@ -160,7 +160,18 @@ async function loadFromShareLink(){
   }
 }
 
-window.addEventListener("DOMContentLoaded",()=>loadFromShareLink());
+async function startViewer(){
+  const loaded=await loadFromShareLink();
+  if(!loaded && !location.hash.startsWith("#v41:") && !location.hash.startsWith("#v40:")){
+    status.textContent="このURLには閲覧データが含まれていません。送信者から届いた長い共有URLをそのまま開いてください。";
+  }
+}
+if(document.readyState==="loading"){
+  window.addEventListener("DOMContentLoaded",startViewer,{once:true});
+}else{
+  startViewer();
+}
+window.addEventListener("hashchange",startViewer);
 
 loadButton.onclick=()=>fileInput.click();
 fileInput.onchange=async()=>{try{const obj=JSON.parse(await fileInput.files[0].text());if(obj.type!=="kusayakyu-ai-readonly"||!Array.isArray(obj.players))throw 0;data=obj;selected=data.players[0]?.id;status.textContent=`${obj.teamName}：${obj.players.length}人を読み込みました`;render()}catch{status.textContent="閲覧専用データを読み込めませんでした"}fileInput.value=""};

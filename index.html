@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#061a4d">
-<link rel="manifest" href="./manifest.webmanifest?v=40">
-<title>草野球AI査定 Ver.40</title>
+<link rel="manifest" href="./manifest.webmanifest?v=41">
+<title>草野球AI査定 Ver.41</title>
 <style>
 :root{--navy:#061a4d;--blue:#086bd3;--cyan:#55e7ff;--gold:#ffc928;--panel:#eef6ff}
 *{box-sizing:border-box}
@@ -209,6 +209,10 @@ body.readonly-mode #exitReadonlyMode{pointer-events:auto;opacity:1}
 .readonly-link-box textarea{width:100%;min-height:88px;padding:8px;border:1px solid #9db6d1;border-radius:8px;background:#fff;font-size:10px;word-break:break-all}
 .readonly-link-box button{width:100%;margin-top:7px;border:0;border-radius:9px;padding:10px;background:linear-gradient(#0d79dd,#073477);color:#fff;font-weight:900}
 
+
+.link-warning{margin-bottom:7px;padding:7px;border-radius:7px;background:#fff1bf;color:#795600;font-size:10px;font-weight:900;line-height:1.5}
+#testReadonlyLink{background:linear-gradient(#20a86a,#087947)}
+
 </style>
 </head>
 <body>
@@ -218,7 +222,7 @@ body.readonly-mode #exitReadonlyMode{pointer-events:auto;opacity:1}
   <button id="exitReadonlyMode" type="button">本体へ戻る</button>
 </div>
 
-<header class="header"><h1>草野球AI査定</h1><div class="version">Ver.40 リンク共有完成版</div></header>
+<header class="header"><h1>草野球AI査定</h1><div class="version">Ver.41 ワンタップ閲覧修正版</div></header>
 <section class="top-actions">
 <button id="addPlayer">＋選手</button><button id="deletePlayer">選手削除</button><button id="applySeason">29選手反映</button><button id="smartImportTop">SmartScorer</button><button id="saveJson">JSON保存</button><button id="shareData">編集用データ共有</button><button id="shareReadonlyLink">閲覧リンク共有</button><button id="shareReadonly">閲覧パック共有</button><button id="openReadonlyPack">閲覧パックを開く</button><button id="teamPageBtn">チーム分析</button><button id="bestNineBtn">AIベストナイン</button><button id="loadJson">JSON読込</button>
 </section>
@@ -276,9 +280,9 @@ body.readonly-mode #exitReadonlyMode{pointer-events:auto;opacity:1}
   <button id="downloadBackup">共有できない場合：JSONを保存</button>
   <div class="share-note">iPhoneではLINE、メール、AirDrop、ファイル保存などを選べます。</div>
 <div class="readonly-link-box" id="readonlyLinkBox" hidden>
-  <label>作成した閲覧専用リンク</label>
+  <label>作成した閲覧専用リンク</label><div class="link-warning">LINEでは、この長いURLがすべて送信されていることを確認してください。</div>
   <textarea id="readonlyLinkText" readonly></textarea>
-  <button id="copyReadonlyLink" type="button">リンクをコピー</button>
+  <button id="copyReadonlyLink" type="button">リンクをコピー</button><button id="testReadonlyLink" type="button">この端末でリンクを確認</button>
 </div>
 </div>
 </section>
@@ -706,7 +710,7 @@ async function createReadonlyShareUrl(){
 
   const mode=compressed ? "gz" : "raw";
   const url=new URL("./viewer.html",location.href);
-  url.hash=`v40:${mode}:${encoded}`;
+  url.hash=`v41:${mode}:${encoded}`;
   return url.toString();
 }
 
@@ -723,11 +727,14 @@ async function shareReadonlyLink(){
     readonlyLinkText.value=url;
     readonlyLinkBox.hidden=false;
 
+    const message=`${data.teamName||"チーム"}の草野球AI査定です。\n下のURLをタップするだけで閲覧できます。\n編集はできません。\n\n${url}`;
+
+    // Some iPhone apps drop URL fragments when the URL field is used.
+    // Put the complete URL in the text body instead.
     if(navigator.share){
       await navigator.share({
         title:`${data.teamName||"チーム"} 閲覧専用リンク`,
-        text:"リンクを開くだけで草野球AI査定を閲覧できます。編集はできません。",
-        url
+        text:message
       });
       return;
     }
@@ -743,6 +750,13 @@ async function shareReadonlyLink(){
 
 shareReadonlyLink.onclick=shareReadonlyLink;
 shareReadonlyLinkMain.onclick=shareReadonlyLink;
+
+testReadonlyLink.onclick=()=>{
+  const url=readonlyLinkText.value;
+  if(!url){alert("先に閲覧リンクを作成してください。");return}
+  window.open(url,"_blank","noopener");
+};
+
 copyReadonlyLink.onclick=async()=>{
   try{
     await navigator.clipboard.writeText(readonlyLinkText.value);
@@ -903,7 +917,7 @@ sharePlayerCard.onclick=()=>{
 document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>document.querySelector(b.dataset.go)?.scrollIntoView({behavior:"smooth"}));
 window.addEventListener("beforeunload",e=>{if(dirty){e.preventDefault();e.returnValue=""}});
 save();render();
-if("serviceWorker"in navigator)navigator.serviceWorker.register("./sw.js?v=40").catch(()=>{});
+if("serviceWorker"in navigator)navigator.serviceWorker.register("./sw.js?v=41").catch(()=>{});
 </script>
 </body>
 </html>
